@@ -1,5 +1,28 @@
+## ============================================================================
+## SymbolTable.py 
+##
+## COPYRIGHT 2016 Richard Evans, Ed Spittles
+##
+## This file is part of f100l - an set of utilities for programming and 
+## emulation of the Ferranti F100-L CPU and peripheral components.
+##
+## f100l is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Lesser General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## f100l is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Lesser General Public License for more details.
+##
+## See  <http://www.gnu.org/licenses/> for a copy of the GNU Lesser General 
+## Public License
+##
+## ============================================================================
 '''
 SymbolTable
+===========
 
 SymbolTable is a class for holding symbols and expressions, together with the
 means of evaluating those expressions or any other expressions which are defined
@@ -12,7 +35,7 @@ functionality to provide a single method 'eval_expr' which uses the Python
 Abstract Syntax Tree class to parse and evaluate any arbitary expression 
 which uses these variables.
 
-Example
+Examples
 
     s = SymbolTable( {"A":"1", "B":"2", "C":"A+B" } )
     
