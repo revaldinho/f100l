@@ -76,9 +76,9 @@ Labels are treated like any other variable as far as expression parsing is conce
 
 ``.DATA`` and ``.WORD`` are synonyms of each other. These can be followed by a list of comma separated numeric values or expressions on the same line. e.g.
 
-``WORD 1,1,2,3,5,8 ; Fibonacci numbers``
+``.WORD 1,1,2,3,5,8 ; Fibonacci numbers``
      
-``WORD STK_PTR1, MEMTOP - STKSIZE  ; examples of expressions``
+``.WORD STK_PTR1, MEMTOP - STKSIZE  ; examples of expressions``
 
 
 **Unsupported features**
