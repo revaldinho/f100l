@@ -1,3 +1,26 @@
+'''
+SymbolTable
+
+SymbolTable is a class for holding symbols and expressions, together with the
+means of evaluating those expressions or any other expressions which are defined
+using the symbols. It is intended for use in an assembler.
+
+SymbolTable extends the built-in dictionary type, and so inherits that type's 
+ability to store keys (variable or label names) and associate them with a string
+holding either a numeric literal or an expression. It extends the base type 
+functionality to provide a single method 'eval_expr' which uses the Python 
+Abstract Syntax Tree class to parse and evaluate any arbitary expression 
+which uses these variables.
+
+Example
+
+    s = SymbolTable( {"A":"1", "B":"2", "C":"A+B" } )
+    
+    s.eval_expr('A') will return the integer 1
+    s.eval_expr('B') will return the integer 2
+    s.eval_expr('C') will return the integer 3
+    s.eval_expr('A+2*B-C') will return the integer 2
+'''
 
 import ast
 import operator as op
@@ -15,11 +38,11 @@ class SymbolTable (dict) :
         return self.eval_(ast.parse(expr, mode='eval').body)
 
     def eval_(self, node):
-        if isinstance(node, ast.Num): # <number>
+        if isinstance(node, ast.Num):
             return node.n
-        elif isinstance(node, ast.BinOp): # <left> <operator> <right>
+        elif isinstance(node, ast.BinOp): 
             return operators[type(node.op)](self.eval_(node.left), self.eval_(node.right))
-        elif isinstance(node, ast.UnaryOp): # <operator> <operand> e.g., -1
+        elif isinstance(node, ast.UnaryOp): 
             return operators[type(node.op)](self.eval_(node.operand))
         elif isinstance(node, ast.Name): # Variable name
             if node.id in self:
@@ -29,9 +52,22 @@ class SymbolTable (dict) :
         else:
             raise TypeError(node)
 
+    def tostring( self ) :
+        marker = "%-32s: %-32s : %s" % ("-"*32,"-"*32,"-"*22)
+        lines = [marker, "%-32s: %-32s : %s" % ("Symbol","Definition","Value Hex (Decimal)"), marker]        
+        for s in sorted(self):
+            lines.append("%-32s: %-32s : %04X (%d)" % (s, self[s], self.eval_expr(s), self.eval_expr(s) ))
+        lines.append(marker)
+        return('\n'.join(lines))
+
+
+
 
 
 if __name__ == "__main__":
+    #
+    # Some simple test code for the class if run as the main program
+    # 
 
     labels = {"F1":"1",
               "F2":"F1 + F1",
@@ -59,7 +95,7 @@ if __name__ == "__main__":
                 print ("SymbolTable Error: Syntax error in definition of label %s" % L)
                 del ep[L]          # remove the bad variable for second pass
             except TypeError as e:
-                print e
+                print (e)
             except RuntimeError:
                 print ("SymbolTable Error: Recursive definition of label %s" % L)
                 del ep[L]          # remove the bad variable for second pass
