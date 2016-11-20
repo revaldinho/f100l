@@ -145,12 +145,14 @@ class F100Asm():
                             print(v)                        
                     except UserWarning as e:                            
                         error_count += 1
-                        print("Error on line %d" % lineno)
-                        print(e)
+                        if pass_number > 0:
+                            print("Error on line %d" % lineno)
+                            print(e)
                         
                     if len(warnings) > 0 :
                         for w in warnings:
-                            print(w)
+                            if pass_number > 0 :
+                                print(w)
                     warning_count += len(warnings)
                     self.pc += len(line_words)
 
