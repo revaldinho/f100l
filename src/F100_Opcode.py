@@ -191,10 +191,10 @@ class F100_Opcode :
 
 class OpcodeClass0a(F100_Opcode) :
     '''
-    JBC d A|C|mMMM mMMM
-    JBS d A|C|mMMM mMMM
-    JCS d A|C|mMMM mMMM
-    JSC d A|C|mMMM mMMM
+    JBC d A|CR|mMMM mMMM
+    JBS d A|CR|mMMM mMMM
+    JCS d A|CR|mMMM mMMM
+    JSC d A|CR|mMMM mMMM
     '''
     def __init__ (self):
         super().__init__( opcode_fn = { "JBC":0, "JBS":0, "JCS":0, "JSC":0 } )
@@ -234,7 +234,7 @@ class OpcodeClass0a(F100_Opcode) :
 
         if operands[1] == "A":
             self.R = 0
-        elif operands[1] == "C":
+        elif operands[1] == "CR":
             self.R = 1
         else:
             self.R = 3
@@ -260,14 +260,14 @@ class OpcodeClass0a(F100_Opcode) :
 
 class OpcodeClass0b(F100_Opcode) :
     '''
-    SRE  d  A|C|mMMM
-    SLE  d  A|C|mMMM
-    SRA  d  A|C|mMMM
-    SLA  d  A|C|mMMM
-    SRL  d  A|C|mMMM
-    SLL  d  A|C|mMMM
-    CLR  d  A|C|mMMM
-    SET  d  A|C|mMMM
+    SRE  d  A|CR|mMMM
+    SLE  d  A|CR|mMMM
+    SRA  d  A|CR|mMMM
+    SLA  d  A|CR|mMMM
+    SRL  d  A|CR|mMMM
+    SLL  d  A|CR|mMMM
+    CLR  d  A|CR|mMMM
+    SET  d  A|CR|mMMM
     '''
     def __init__ (self):
         super().__init__(opcode_fn = { "SRE":0, "SLE":0, "SLA":0, "SRA":0, "SRL":0, "SLL":0, "CLR":0, "SET":0 } )
@@ -325,7 +325,7 @@ class OpcodeClass0b(F100_Opcode) :
         else:
             if operands[1] == "A":
                 self.R = 0
-            elif operands[1] == "C":
+            elif operands[1] == "CR":
                 self.R = 1
             else:
                 self.R = 3
