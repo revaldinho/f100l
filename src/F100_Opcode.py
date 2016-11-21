@@ -1,3 +1,4 @@
+
 ## ============================================================================
 ## F100_Opcode.py 
 ##
@@ -390,6 +391,149 @@ class OpcodeClass2(F100_Opcode) :
         else:
             return(super().assemble(opcode_token, operands, symbol_table, suppress_errors))
 
+
+class OpcodeF12(F100_Opcode) :
+    '''
+    AND
+    ===
+    
+    Logical AND of accumulator with specified operand
+    
+    Function
+    --------
+    
+    ::
+       
+       AND N      A <- A & (N)
+       AND ,D     A <- A & D
+       AND /P     A <- A & (P)
+       AND /P+    P <- P + 1 ; A <- A & (P) 
+       AND /P-    A <- A & (P) ; P <- P - 1
+       AND .W     A <- A & (W)
+    
+    Instruction Encoding
+    --------------------
+    
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |              Opcode Word                |     Operand Word    | Function | Cycle count          |
+     +-------+----+----+-----+-----------------+                     |          |                      |
+     |       |    | N                          |                     |          |                      |
+     |       |    +----+-----+-----------------+                     |          |                      |
+     |  F    |  I |    | R   | P               |                     |          |                      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b0|     11'b<non-zero addr>    |           none      | AND N    | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b0|     11'b000000000000       |        16b'<data>   | AND ,D   | Ra1 + Rc1 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b1|1'bx|2'bx0|8'b<non-zero ptr>|           none      | AND /P   | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b1|1'bx|2'b01|8'b<non-zero ptr>|           none      | AND /P+  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b1|1'bx|2'b11|8'b<non-zero ptr>|           none      | AND /P-  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b1|1'bx|2'bxx|8'b00000000      |1'bx|   15b'<addr>   | AND .W   | Ra1 + Ra2 + Rc1 + 18L|
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+    
+    where
+    
+    * Ra1 = Program memory read access time
+    * Ra2 = Data memory read access time
+    * Rc1 = Program memory read cycle time
+    * Rc2 = Data memory read cycle time
+    * M   = Read-modify-write cycle time
+    * Wc  = Data memory write cycle time
+    * L   = 1 Logic cycle time (2x period of the CPU clock input)
+    
+      
+     Condition Register
+     ------------------
+    
+     +---+---+---+---+---+---+---+
+     | F | M | C | S | V | Z | I |
+     +---+---+---+---+---+---+---+
+     |\- |\- | 1 | * | x | * |\- | 
+     +---+---+---+---+---+---+---+ 
+    
+     * C is always set to 1
+     * Z is set if the result is all-zeroes, otherwise cleared
+     * S is set if the MSB of the result is a '1', otherwise cleared
+     * V is undefined after this operation
+    '''    
+    def __init__ (self):
+        super().__init__( opcode_fn = { "AND":12} )
+
+
+class OpcodeF13(F100_Opcode) :
+    '''
+    NEQ (XOR)
+    =========
+    
+    Logical XOR of accumulator with specified operand
+    
+    Function
+    --------
+    
+    ::
+       
+       NEQ N      A <- A & (N)
+       NEQ ,D     A <- A & D
+       NEQ /P     A <- A & (P)
+       NEQ /P+    P <- P + 1 ; A <- A & (P) 
+       NEQ /P-    A <- A & (P) ; P <- P - 1
+       NEQ .W     A <- A & (W)
+    
+    Instruction Encoding
+    --------------------
+    
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |              Opcode Word                |     Operand Word    | Function | Cycle count          |
+     +-------+----+----+-----+-----------------+                     |          |                      |
+     |       |    | N                          |                     |          |                      |
+     |       |    +----+-----+-----------------+                     |          |                      |
+     |  F    |  I |    | R   | P               |                     |          |                      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b0|     11'b<non-zero addr>    |           none      | NEQ N    | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b0|     11'b000000000000       |        16b'<data>   | NEQ ,D   | Ra1 + Rc1 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b1|1'bx|2'bx0|8'b<non-zero ptr>|           none      | NEQ /P   | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b1|1'bx|2'b01|8'b<non-zero ptr>|           none      | NEQ /P+  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b1|1'bx|2'b11|8'b<non-zero ptr>|           none      | NEQ /P-  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b1|1'bx|2'bxx|8'b00000000      |1'bx|   15b'<addr>   | NEQ .W   | Ra1 + Ra2 + Rc1 + 18L|
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+    
+    where
+    
+    * Ra1 = Program memory read access time
+    * Ra2 = Data memory read access time
+    * Rc1 = Program memory read cycle time
+    * Rc2 = Data memory read cycle time
+    * M   = Read-modify-write cycle time
+    * Wc  = Data memory write cycle time
+    * L   = 1 Logic cycle time (2x period of the CPU clock input)
+    
+      
+     Condition Register
+     ------------------
+    
+     +---+---+---+---+---+---+---+
+     | F | M | C | S | V | Z | I |
+     +---+---+---+---+---+---+---+
+     |\- |\- | 1 | * | x | * |\- | 
+     +---+---+---+---+---+---+---+ 
+    
+     * C is always set to 1
+     * Z is set if the result is all-zeroes, otherwise cleared
+     * S is set if the MSB of the result is a '1', otherwise cleared
+     * V is undefined after this operation
+    '''    
+    def __init__ (self):
+        super().__init__( opcode_fn = { "NEQ":13, "XOR":13} )
+        
+
         
 class OpcodeClass4(F100_Opcode) :
     '''
@@ -399,12 +543,12 @@ class OpcodeClass4(F100_Opcode) :
     OPD ,DDDD     
 
 
-    where OPD is one of JMP, NEQ, AND, CMP, SUB, ADD, LDA, SBS, ADS, STO
+   where OPD is one of JMP, CMP, SUB, ADD, LDA, SBS, ADS, STO
 
     
     '''
     def __init__ (self):
-        super().__init__( opcode_fn = { "JMP":15, "NEQ":13, "AND":12, 
+        super().__init__( opcode_fn = { "JMP":15, 
                                         "CMP":11, "SUB":10, "ADD":9, 
                                         "LDA":8, "SBS":6, "ADS":5, 
                                         "STO":4 } )

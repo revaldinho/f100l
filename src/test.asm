@@ -22,11 +22,11 @@ mylabel:
                AND /F1*2
                AND /0xF4+
                AND /0x1F-
-               NEQ 0
-               NEQ .0
-               NEQ ,0
-               NEQ 0x0FE
-               NEQ F1
+               XOR 0
+               XOR .0
+               XOR ,0
+               XOR 0x0FE
+               XOR F1
                NEQ .0x0FE
                NEQ ,0x0FE
                NEQ /F1*2
