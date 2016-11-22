@@ -1,4 +1,3 @@
-
 ## ============================================================================
 ## F100_Opcode.py 
 ##
@@ -22,21 +21,107 @@
 ##
 ## ============================================================================
 '''
-F100_Opcode
-===========
+Instruction Definitions
+=======================
 
-Basic class for all F100 opcodes which defines all the required bit fields and
-a method for assembling these into an opcode word. Individual instruction definitions
-should overrire the opcode_regexp (to register which opcode will be handled by the
-subclass) and then provide the assemble() method to fill out the opcodes.
+The following pages present complete descriptions for all instructions implemented in the F100-L.
 
-TODO:
-- OpcodeClass01 
-  o HALT could take a 10bit operand
-  o EXTFN with an 11 bit identified is not implemented yet
-- OpcodeClass0b
-  o Syntax for double length SHIFTs is not implemented (not clear how this works
-    given than internal state needs setting to enable a double length shift...)
+Addressing Modes
+----------------
+
+The F100-L CPU supports 4 addressing modes and these are described below together
+with the assembler syntax.
+
+**Direct addressing**
+  
+The address of the operand data is encoded in an 11 bit field in the opcode word. In the 
+assembler this mode is denoted by providing just a bare operand. e.g. 
+
+  ::
+
+    AND 0x444  ;  A <- A & (0x444)
+
+If an operand is used which is larger than 11 bits, the assembler will emit a warning
+and instead assemble the instruction using the Immediate Indirect Addressing mode below.
+This will always achieve the correct behaviour, but the latter mode requires two instruction
+words where Direct Addressing, with a smaller operand, needs only one.
+
+**Immediate addressing**
+
+The 16 bit operand data is placed in the word immediately following the opcode. In the 
+assembler this mode is denoted by a comma (,) immediately before the operand e.g. 
+
+  ::
+
+    AND ,0x4444 ; A <- A & 0x4444
+
+**Pointer addressing**
+
+The address of the operand data is encoded in an 8 bit field in the opcode word. 
+Optionally the value of this pointer can be pre-incremented or post-decremented. 
+This mode is denoted in the assembler by a slash (/) immediately in front of the 
+operand and optionally a plus (+) or minus (-) symbol following. e.g.
+
+  :: 
+
+    AND /0x44  ;  A <- A & (0x44)
+    AND /0x44+ ;  (0x44) <- (0x44) + 1 ; A <- A & (0x44)
+    AND /0x44- ;  A <- A & (0x44) ; (0x44) <- (0x44) -1
+
+**Immediate indirect addressing**
+
+The 15 bit address of the operand data is placed in the word immediately following
+the opcode. This mode is denoted in the assembler by a dot (.) immediately in front
+of the operand, e.g.
+
+  ::
+
+    AND .0x4444  ;  A <- A & (0x4444)
+
+Instruction Encoding
+--------------------
+
+All instruction encodings are defined as overlapping but mutually exclusive bit fields.
+
+The bit fields are defined as follows
+
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |Field |Number of bits | Bit positions | Comment                                                        | 
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  F   |      4        |  15..12       | Instruction class or function                                  |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  I   |      1        |    11         | Address Mode                                                   |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  N   |     11        |   10..0       | Memory address for direct addressing                           |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  P   |      8        |    7..0       | Memory address used as pointer for pointer indirect addressing |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  R   |      2        |   10,9        | Register field or auto-index mode for indirect addressing      | 
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  T   |      1        |               | General field to qualify F=0 instructions                      |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  J   |      1        |               | General field to qualify F=0 instructions                      |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  S   |      1        |               | General field to qualify F=0 instructions                      |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  B   |      4        |               | Shift number or bit significance                               |
+  +------+---------------+---------------+----------------------------------------------------------------+
+
+Where a don't care (x) bit is presented in the tables, the assembler will consistently use a '0'. The 
+emulator will ignore this field during decoding.
+
+Abbrieviations
+--------------
+
+Definitions ::
+
+  N   11 bit memory address (associated with opcode field N above)
+  P    8 bit memory address (associated with opcode field P above)
+  W   15 bit memory address
+  D   16 bit immediate data 
+  \(N\)   Contents of memory location N
+  \(P\)   Contents of memory location P
+  \(W\)   Contents of memory location W
 '''
 
 import re
@@ -196,6 +281,7 @@ class OpcodeClass0a(F100_Opcode) :
     JCS d A|CR|mMMM mMMM
     JSC d A|CR|mMMM mMMM
     '''
+
     def __init__ (self):
         super().__init__( opcode_fn = { "JBC":0, "JBS":0, "JCS":0, "JSC":0 } )
 
@@ -269,6 +355,7 @@ class OpcodeClass0b(F100_Opcode) :
     CLR  d  A|CR|mMMM
     SET  d  A|CR|mMMM
     '''
+
     def __init__ (self):
         super().__init__(opcode_fn = { "SRE":0, "SLE":0, "SLA":0, "SRA":0, "SRL":0, "SLL":0, "CLR":0, "SET":0 } )
 
@@ -347,6 +434,7 @@ class OpcodeClass013(F100_Opcode) :
     RTN
     RTC
     '''
+
     def __init__ (self):
         super().__init__(opcode_fn = { "HALT":0, "SJM":1, "RTN":3, "RTC":3 } )
 
@@ -379,6 +467,7 @@ class OpcodeClass2(F100_Opcode) :
     CAL   /DD 
     CAL ,DDDD     
     '''
+
     def __init__ (self):
         super().__init__( opcode_fn = { "CAL":2 } )
 
@@ -392,146 +481,6 @@ class OpcodeClass2(F100_Opcode) :
             return(super().assemble(opcode_token, operands, symbol_table, suppress_errors))
 
 
-class OpcodeF12(F100_Opcode) :
-    '''
-    AND
-    ===
-    
-    Logical AND of accumulator with specified operand
-    
-    Function
-    --------
-    
-    ::
-       
-       AND N      A <- A & (N)
-       AND ,D     A <- A & D
-       AND /P     A <- A & (P)
-       AND /P+    P <- P + 1 ; A <- A & (P) 
-       AND /P-    A <- A & (P) ; P <- P - 1
-       AND .W     A <- A & (W)
-    
-    Instruction Encoding
-    --------------------
-    
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-     |              Opcode Word                |     Operand Word    | Function | Cycle count          |
-     +-------+----+----+-----+-----------------+                     |          |                      |
-     |       |    | N                          |                     |          |                      |
-     |       |    +----+-----+-----------------+                     |          |                      |
-     |  F    |  I |    | R   | P               |                     |          |                      |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-     |4'b1100|1'b0|     11'b<non-zero addr>    |           none      | AND N    | Ra1 + Ra2 + 18L      |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
-     |4'b1100|1'b0|     11'b000000000000       |        16b'<data>   | AND ,D   | Ra1 + Rc1 + 18L      |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-     |4'b1100|1'b1|1'bx|2'bx0|8'b<non-zero ptr>|           none      | AND /P   | Ra1 + Ra2 + 18L      |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-     |4'b1100|1'b1|1'bx|2'b01|8'b<non-zero ptr>|           none      | AND /P+  | Ra1 + M + 34L        |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
-     |4'b1100|1'b1|1'bx|2'b11|8'b<non-zero ptr>|           none      | AND /P-  | Ra1 + M + 34L        |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
-     |4'b1100|1'b1|1'bx|2'bxx|8'b00000000      |1'bx|   15b'<addr>   | AND .W   | Ra1 + Ra2 + Rc1 + 18L|
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-    
-    where
-    
-    * Ra1 = Program memory read access time
-    * Ra2 = Data memory read access time
-    * Rc1 = Program memory read cycle time
-    * Rc2 = Data memory read cycle time
-    * M   = Read-modify-write cycle time
-    * Wc  = Data memory write cycle time
-    * L   = 1 Logic cycle time (2x period of the CPU clock input)
-    
-      
-     Condition Register
-     ------------------
-    
-     +---+---+---+---+---+---+---+
-     | F | M | C | S | V | Z | I |
-     +---+---+---+---+---+---+---+
-     |\- |\- | 1 | * | x | * |\- | 
-     +---+---+---+---+---+---+---+ 
-    
-     * C is always set to 1
-     * Z is set if the result is all-zeroes, otherwise cleared
-     * S is set if the MSB of the result is a '1', otherwise cleared
-     * V is undefined after this operation
-    '''    
-    def __init__ (self):
-        super().__init__( opcode_fn = { "AND":12} )
-
-
-class OpcodeF13(F100_Opcode) :
-    '''
-    NEQ (XOR)
-    =========
-    
-    Logical XOR of accumulator with specified operand
-    
-    Function
-    --------
-    
-    ::
-       
-       NEQ N      A <- A & (N)
-       NEQ ,D     A <- A & D
-       NEQ /P     A <- A & (P)
-       NEQ /P+    P <- P + 1 ; A <- A & (P) 
-       NEQ /P-    A <- A & (P) ; P <- P - 1
-       NEQ .W     A <- A & (W)
-    
-    Instruction Encoding
-    --------------------
-    
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-     |              Opcode Word                |     Operand Word    | Function | Cycle count          |
-     +-------+----+----+-----+-----------------+                     |          |                      |
-     |       |    | N                          |                     |          |                      |
-     |       |    +----+-----+-----------------+                     |          |                      |
-     |  F    |  I |    | R   | P               |                     |          |                      |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-     |4'b1100|1'b0|     11'b<non-zero addr>    |           none      | NEQ N    | Ra1 + Ra2 + 18L      |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
-     |4'b1100|1'b0|     11'b000000000000       |        16b'<data>   | NEQ ,D   | Ra1 + Rc1 + 18L      |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-     |4'b1100|1'b1|1'bx|2'bx0|8'b<non-zero ptr>|           none      | NEQ /P   | Ra1 + Ra2 + 18L      |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-     |4'b1100|1'b1|1'bx|2'b01|8'b<non-zero ptr>|           none      | NEQ /P+  | Ra1 + M + 34L        |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
-     |4'b1100|1'b1|1'bx|2'b11|8'b<non-zero ptr>|           none      | NEQ /P-  | Ra1 + M + 34L        |
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
-     |4'b1100|1'b1|1'bx|2'bxx|8'b00000000      |1'bx|   15b'<addr>   | NEQ .W   | Ra1 + Ra2 + Rc1 + 18L|
-     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
-    
-    where
-    
-    * Ra1 = Program memory read access time
-    * Ra2 = Data memory read access time
-    * Rc1 = Program memory read cycle time
-    * Rc2 = Data memory read cycle time
-    * M   = Read-modify-write cycle time
-    * Wc  = Data memory write cycle time
-    * L   = 1 Logic cycle time (2x period of the CPU clock input)
-    
-      
-     Condition Register
-     ------------------
-    
-     +---+---+---+---+---+---+---+
-     | F | M | C | S | V | Z | I |
-     +---+---+---+---+---+---+---+
-     |\- |\- | 1 | * | x | * |\- | 
-     +---+---+---+---+---+---+---+ 
-    
-     * C is always set to 1
-     * Z is set if the result is all-zeroes, otherwise cleared
-     * S is set if the MSB of the result is a '1', otherwise cleared
-     * V is undefined after this operation
-    '''    
-    def __init__ (self):
-        super().__init__( opcode_fn = { "NEQ":13, "XOR":13} )
         
 
         
@@ -543,24 +492,82 @@ class OpcodeClass4(F100_Opcode) :
     OPD ,DDDD     
 
 
-   where OPD is one of JMP, CMP, SUB, ADD, LDA, SBS, ADS, STO
+   where OPD is one of JMP, SUB, ADD, LDA, SBS, ADS, STO
 
     
     '''
+
     def __init__ (self):
         super().__init__( opcode_fn = { "JMP":15, 
-                                        "CMP":11, "SUB":10, "ADD":9, 
+                                        "SUB":10, "ADD":9, 
                                         "LDA":8, "SBS":6, "ADS":5, 
                                         "STO":4 } )
 
 
 class OpcodeClass7(F100_Opcode) :
     '''
-    ICZ   dDD     mMMM
-    ICZ .mMMM     mMMM
-    ICZ   /DD(+-) mMMM
-    ICZ ,DDDD     mMMM
+    ICZ
+    ===
+    
+    Increment the contents of a counter or address and jump to a specified location if the result is non-zero
+    
+    Function
+    --------
+    
+    ::
+       
+       ICZ N   W1  (N) <- (N)+1 ; if (Z==0) PC <- W1
+       ICZ ,D  W1  D <- D+1 ; if (Z==0) PC <- W1
+       ICZ /P  W1  (P) <= (P)+1 ; if (Z==0) PC <- W1
+       ICZ /P+ W1  P <- P+1 ; (P) <- (P)+1 ; if (Z==0) PC <- W1
+       ICZ /P- W1  (P) <- (P)+1 ;  P <- P-1; ; if (Z==0) PC <- W1
+       ICZ .W  W1  (W) <- (W)+1 ; if (Z==0) PC <- W1
+    
+    Instruction Encoding
+    --------------------
+    
+     +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+
+     |              Opcode Word                |     Operand Word   | 2nd Operand Word    | Function  | Cycle count          |
+     +-------+----+----+-----+-----------------+                    |                     |           |                      |
+     |       |    | N                          |                    |                     |           |                      |
+     |       |    +----+-----+-----------------+                    |                     |           |                      |
+     |  F    |  I |    | R   | P               |                    |                     |           |                      |
+     +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+
+     |4'b0111|1'b0|     11'b<non-zero addr>    |1'bx|15b'<jump addr>|           none      | ICZ N   W1| TBC                  |
+     +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+ 
+     |4'b0111|1'b0|     11'b000000000000       |        16b'<data>  |1'bx|15b'<jump addr> | ICZ ,D  W1| TBC                  |
+     +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+
+     |4'b0111|1'b1|1'bx|2'bx0|8'b<non-zero ptr>|1'bx|15b'<jump addr>|           none      | ICZ /P  W1| TBC                  |
+     +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+
+     |4'b0111|1'b1|1'bx|2'b01|8'b<non-zero ptr>|1'bx|15b'<jump addr>|           none      | ICZ /P+ W1| TBC                  |
+     +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+ 
+     |4'b0111|1'b1|1'bx|2'b11|8'b<non-zero ptr>|1'bx|15b'<jump addr>|           none      | ICZ /P- W1| TBC                  |
+     +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+ 
+     |4'b0111|1'b1|1'bx|2'bxx|8'b00000000      |1'bx|   15b'<addr>  |1'bx|15b'<jump addr>x| ICZ .W  W1| TBC                  |
+     +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+
+    
+    where
+    
+    * Ra1 = Program memory read access time
+    * Ra2 = Data memory read access time
+    * Rc1 = Program memory read cycle time
+    * Rc2 = Data memory read cycle time
+    * M   = Read-modify-write cycle time
+    * Wc  = Data memory write cycle time
+    * L   = 1 Logic cycle time (2x period of the CPU clock input)
+      
+     Condition Register
+     ------------------
+    
+     +---+---+---+---+---+---+---+
+     | F | M | C | S | V | Z | I |
+     +---+---+---+---+---+---+---+
+     |\- |\- |\- |\- |\- |\- |\- | 
+     +---+---+---+---+---+---+---+ 
+    
+     * The condition code register is unchanged after this operation
     '''
+    
     def __init__ (self):
         super().__init__( opcode_fn = { "ICZ":7 } )
 
@@ -620,3 +627,224 @@ class OpcodeClass7(F100_Opcode) :
             self.W1 = operand_values[1]
 
         return (self.bitassemble(), warnings)
+
+class OpcodeF11(F100_Opcode) :
+    '''
+
+    CMP
+    ===
+    
+    Perform a multi-length comparison of two operands. A sequence of these instructions performs a
+    multi-length subtraction without overwriting any of the operands. The results are discarded
+    but the appropriate flags are set in the condition register.
+
+    Multi-length compare is performed by including the carray from a previous compare in at the 
+    LSB end of the current instruction
+    
+    Function
+    --------
+    
+    ::
+       
+       CMP N      x <- (N) - A + C - 1
+       CMP ,D     x <- D - A + C - 1
+       CMP /P     A <- (P) - A + C - 1
+       CMP /P+    P <- P + 1 ; x <- (P) - A + C - 1
+       CMP /P-    x <- (P) - A + C - 1;  P <- P - 1 ;
+       CMP .W     x <- (W) - A + C - 1
+    
+    Instruction Encoding
+    --------------------
+    
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |              Opcode Word                |     Operand Word    | Function | Cycle count          |
+     +-------+----+----+-----+-----------------+                     |          |                      |
+     |       |    | N                          |                     |          |                      |
+     |       |    +----+-----+-----------------+                     |          |                      |
+     |  F    |  I |    | R   | P               |                     |          |                      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1011|1'b0|     11'b<non-zero addr>    |           none      | CMP N    | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1011|1'b0|     11'b000000000000       |        16b'<data>   | CMP ,D   | Ra1 + Rc1 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1011|1'b1|1'bx|2'bx0|8'b<non-zero ptr>|           none      | CMP /P   | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1011|1'b1|1'bx|2'b01|8'b<non-zero ptr>|           none      | CMP /P+  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1011|1'b1|1'bx|2'b11|8'b<non-zero ptr>|           none      | CMP /P-  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1011|1'b1|1'bx|2'bxx|8'b00000000      |1'bx|   15b'<addr>   | CMP .W   | Ra1 + Ra2 + Rc1 + 18L|
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+    
+    where
+    
+    * Ra1 = Program memory read access time
+    * Ra2 = Data memory read access time
+    * Rc1 = Program memory read cycle time
+    * Rc2 = Data memory read cycle time
+    * M   = Read-modify-write cycle time
+    * Wc  = Data memory write cycle time
+    * L   = 1 Logic cycle time (2x period of the CPU clock input)
+      
+     Condition Register
+     ------------------
+    
+     +---+---+---+---+---+---+---+
+     | F | M | C | S | V | Z | I |
+     +---+---+---+---+---+---+---+
+     |\- | 1 | * | * | * | * |\- | 
+     +---+---+---+---+---+---+---+ 
+    
+     * C is set if the operation results in a borrow (carry), otherwise cleared
+     * M is always set to 1
+     * Z is set if the result is all-zeroes, otherwise cleared
+     * S is set if the MSB of the result is a '1', otherwise cleared
+     * V is set if the subtraction of two numbers of different sign results in 
+         a number with the same sign as the subtrahend, otherwise cleared
+
+    '''    
+
+    def __init__ (self):
+        super().__init__( opcode_fn = { "CMP":11} )
+
+
+class OpcodeF12(F100_Opcode) :
+    '''
+    AND
+    ===
+    
+    Logical AND of accumulator with specified operand
+    
+    Function
+    --------
+    
+    ::
+       
+       AND N      A <- A & (N)
+       AND ,D     A <- A & D
+       AND /P     A <- A & (P)
+       AND /P+    P <- P + 1 ; A <- A & (P) 
+       AND /P-    A <- A & (P) ; P <- P - 1
+       AND .W     A <- A & (W)
+    
+    Instruction Encoding
+    --------------------
+    
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |              Opcode Word                |     Operand Word    | Function | Cycle count          |
+     +-------+----+----+-----+-----------------+                     |          |                      |
+     |       |    | N                          |                     |          |                      |
+     |       |    +----+-----+-----------------+                     |          |                      |
+     |  F    |  I |    | R   | P               |                     |          |                      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b0|     11'b<non-zero addr>    |           none      | AND N    | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b0|     11'b000000000000       |        16b'<data>   | AND ,D   | Ra1 + Rc1 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b1|1'bx|2'bx0|8'b<non-zero ptr>|           none      | AND /P   | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1100|1'b1|1'bx|2'b01|8'b<non-zero ptr>|           none      | AND /P+  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b1|1'bx|2'b11|8'b<non-zero ptr>|           none      | AND /P-  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1100|1'b1|1'bx|2'bxx|8'b00000000      |1'bx|   15b'<addr>   | AND .W   | Ra1 + Ra2 + Rc1 + 18L|
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+    
+    where
+    
+    * Ra1 = Program memory read access time
+    * Ra2 = Data memory read access time
+    * Rc1 = Program memory read cycle time
+    * Rc2 = Data memory read cycle time
+    * M   = Read-modify-write cycle time
+    * Wc  = Data memory write cycle time
+    * L   = 1 Logic cycle time (2x period of the CPU clock input)
+      
+     Condition Register
+     ------------------
+    
+     +---+---+---+---+---+---+---+
+     | F | M | C | S | V | Z | I |
+     +---+---+---+---+---+---+---+
+     |\- |\- | 1 | * | x | * |\- | 
+     +---+---+---+---+---+---+---+ 
+    
+     * C is always set to 1
+     * Z is set if the result is all-zeroes, otherwise cleared
+     * S is set if the MSB of the result is a '1', otherwise cleared
+     * V is undefined after this operation
+    '''
+    
+    def __init__ (self):
+        super().__init__( opcode_fn = { "AND":12} )
+
+
+class OpcodeF13(F100_Opcode) :
+    '''
+    NEQ (XOR)
+    =========
+    
+    Logical XOR of accumulator with specified operand
+    
+    Function
+    --------
+    
+    ::
+       
+       NEQ N      A <- A & (N)
+       NEQ ,D     A <- A & D
+       NEQ /P     A <- A & (P)
+       NEQ /P+    P <- P + 1 ; A <- A & (P) 
+       NEQ /P-    A <- A & (P) ; P <- P - 1
+       NEQ .W     A <- A & (W)
+    
+    Instruction Encoding
+    --------------------
+    
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |              Opcode Word                |     Operand Word    | Function | Cycle count          |
+     +-------+----+----+-----+-----------------+                     |          |                      |
+     |       |    | N                          |                     |          |                      |
+     |       |    +----+-----+-----------------+                     |          |                      |
+     |  F    |  I |    | R   | P               |                     |          |                      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1101|1'b0|     11'b<non-zero addr>    |           none      | NEQ N    | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1101|1'b0|     11'b000000000000       |        16b'<data>   | NEQ ,D   | Ra1 + Rc1 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1101|1'b1|1'bx|2'bx0|8'b<non-zero ptr>|           none      | NEQ /P   | Ra1 + Ra2 + 18L      |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+     |4'b1101|1'b1|1'bx|2'b01|8'b<non-zero ptr>|           none      | NEQ /P+  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1101|1'b1|1'bx|2'b11|8'b<non-zero ptr>|           none      | NEQ /P-  | Ra1 + M + 34L        |
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+ 
+     |4'b1101|1'b1|1'bx|2'bxx|8'b00000000      |1'bx|   15b'<addr>   | NEQ .W   | Ra1 + Ra2 + Rc1 + 18L|
+     +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
+    
+    where
+    
+    * Ra1 = Program memory read access time
+    * Ra2 = Data memory read access time
+    * Rc1 = Program memory read cycle time
+    * Rc2 = Data memory read cycle time
+    * M   = Read-modify-write cycle time
+    * Wc  = Data memory write cycle time
+    * L   = 1 Logic cycle time (2x period of the CPU clock input)
+      
+     Condition Register
+     ------------------
+    
+     +---+---+---+---+---+---+---+
+     | F | M | C | S | V | Z | I |
+     +---+---+---+---+---+---+---+
+     |\- |\- | 1 | * | x | * |\- | 
+     +---+---+---+---+---+---+---+ 
+    
+     * C is always set to 1
+     * Z is set if the result is all-zeroes, otherwise cleared
+     * S is set if the MSB of the result is a '1', otherwise cleared
+     * V is undefined after this operation
+    '''
+    
+    def __init__ (self):
+        super().__init__( opcode_fn = { "NEQ":13, "XOR":13} )

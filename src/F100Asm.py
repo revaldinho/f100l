@@ -75,7 +75,7 @@ class F100Asm():
         self.st = SymbolTable()
         self.pc = 0
         self.opcodes = [ o() for o in (OpcodeClass0a, OpcodeClass0b, OpcodeClass013, OpcodeClass2, 
-                                       OpcodeClass4, OpcodeClass7, OpcodeF12, OpcodeF13 ) ]
+                                       OpcodeClass4, OpcodeClass7, OpcodeF11, OpcodeF12, OpcodeF13 ) ]
 
     def is_valid_opcode(self, opcode_str):
         for o in self.opcodes:
