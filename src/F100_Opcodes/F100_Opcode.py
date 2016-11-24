@@ -198,7 +198,7 @@ class F100_Opcode :
     def get_address_mode(self, operand):
         # Determine the address mode and strip the prefix/postfix from the operand string
         (prefix, stripped_operand, postfix) = prefix_postfix_re.match(operand.strip()).groups()
-        mode = address_mode_keys[prefix]
+        mode = address_mode_keys[prefix] 
         if mode == ADM_POINTER_INDIRECT and postfix:
             mode = address_mode_keys[postfix]
         elif postfix:
