@@ -1,0 +1,19 @@
+class OpcodeClass4(F100_Opcode) :
+    '''
+    OPD   dDD     
+    OPD .mMMM     
+    OPD   /DD(+-) 
+    OPD ,DDDD     
+
+
+   where OPD is one of JMP, SUB, ADD, LDA, SBS, ADS, STO
+
+    
+    '''
+
+    def __init__ (self):
+        super().__init__( opcode_fn = { "JMP":15, 
+                                        "SUB":10, "ADD":9, 
+                                        "LDA":8, "SBS":6, "ADS":5, 
+                                        "STO":4 } )
+
