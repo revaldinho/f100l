@@ -3,21 +3,27 @@ F100L
 
 F100L is a set of utilities for programming and emulation of the Ferranti F100-L CPU and associated peripheral chips.
 
-Currently this is a work in progress and the only component checked in is an initial draft of the assembler, F100Asm.
 
-Using the Assembler
-===================
+Running the Assembler
+=====================
 
 The standard command line is
 
-``F100ASM  -f|--filename <assembler_file.txt> -h|--help``
+``python3.x F100ASM.py  -f|--filename <assembler_file.txt> -h|--help``
 
 All output is sent only to a listing file currently.
 
+Running the Emulator
+====================
+
+``python3.x F100L_System.py``
+
+Emulation is barely started and this command line runs through a very short (hardcoded) test program while printing to stdout
+the state of the processor after each instruction.
+
+
 Assembler File Format
 =====================
-
-
 
 Comments
 --------
