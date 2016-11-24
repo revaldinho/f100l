@@ -188,7 +188,13 @@ See see <http://www.gnu.org/licenses/> for a copy of the GNU Lesser General Publ
 '''
 
 from SymbolTable import SymbolTable
-from F100_Opcode import *
+from F100_Opcodes.F100_Opcode import *
+from F100_Opcodes.OpcodeF15 import *
+from F100_Opcodes.OpcodeF13 import *
+from F100_Opcodes.OpcodeF12 import *
+from F100_Opcodes.OpcodeF11 import *
+from F100_Opcodes.OpcodeF7 import *
+from F100_Opcodes.OpcodeF2 import *
 import string
 import re
 import getopt
@@ -223,8 +229,8 @@ class F100Asm():
     def __init__(self):
         self.st = SymbolTable()
         self.pc = 0
-        self.opcodes = [ o() for o in (OpcodeClass0a, OpcodeClass0b, OpcodeClass013, OpcodeClass2, 
-                                       OpcodeClass4, OpcodeClass7, OpcodeF11, OpcodeF12, OpcodeF13 ) ]
+        self.opcodes = [ o() for o in (OpcodeClass0a, OpcodeClass0b, OpcodeClass013,
+                                       OpcodeClass4, OpcodeF2, OpcodeF7, OpcodeF11, OpcodeF12, OpcodeF13, OpcodeF15 ) ]
 
     def is_valid_opcode(self, opcode_str):
         for o in self.opcodes:
