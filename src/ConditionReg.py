@@ -3,6 +3,11 @@ class ConditionReg:
         self.reset()
         
     def reset (self):
+        '''
+        Reset the condition register after a general CPU reset. Note that in 
+        the actual silicon only the I, M and F bits are reset to 0. The other bits are
+        left undefined.
+        '''
         self.V = 0
         self.Z = 0
         self.S = 0

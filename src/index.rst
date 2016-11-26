@@ -11,7 +11,8 @@ Contents:
 .. toctree::
    :titlesonly:
    :maxdepth: 2
-      
+
+   doc/F100CPU	     
    doc/F100_Opcodes   
    doc/F100Asm	      
    doc/license

@@ -26,58 +26,6 @@ Instruction Definitions
 
 The following pages present complete descriptions for all instructions implemented in the F100-L.
 
-Addressing Modes
-----------------
-
-The F100-L CPU supports 4 addressing modes and these are described below together
-with the assembler syntax.
-
-**Direct addressing**
-  
-The address of the operand data is encoded in an 11 bit field in the opcode word. In the 
-assembler this mode is denoted by providing just a bare operand. e.g. 
-
-  ::
-
-    AND 0x444  ;  A <- A & (0x444)
-
-If an operand is used which is larger than 11 bits, the assembler will emit a warning
-and instead assemble the instruction using the Immediate Indirect Addressing mode below.
-This will always achieve the correct behaviour, but the latter mode requires two instruction
-words where Direct Addressing, with a smaller operand, needs only one.
-
-**Immediate addressing**
-
-The 16 bit operand data is placed in the word immediately following the opcode. In the 
-assembler this mode is denoted by a comma (,) immediately before the operand e.g. 
-
-  ::
-
-    AND ,0x4444 ; A <- A & 0x4444
-
-**Pointer addressing**
-
-The address of the operand data is encoded in an 8 bit field in the opcode word. 
-Optionally the value of this pointer can be pre-incremented or post-decremented. 
-This mode is denoted in the assembler by a slash (/) immediately in front of the 
-operand and optionally a plus (+) or minus (-) symbol following. e.g.
-
-  :: 
-
-    AND /0x44  ;  A <- A & (0x44)
-    AND /0x44+ ;  (0x44) <- (0x44) + 1 ; A <- A & (0x44)
-    AND /0x44- ;  A <- A & (0x44) ; (0x44) <- (0x44) -1
-
-**Immediate indirect addressing**
-
-The 15 bit address of the operand data is placed in the word immediately following
-the opcode. This mode is denoted in the assembler by a dot (.) immediately in front
-of the operand, e.g.
-
-  ::
-
-    AND .0x4444  ;  A <- A & (0x4444)
-
 Instruction Encoding
 --------------------
 
@@ -110,6 +58,7 @@ The bit fields are defined as follows
 Where a don't care (x) bit is presented in the tables, the assembler will consistently use a '0'. The 
 emulator will ignore this field during decoding.
 
+
 Instruction Timings
 -------------------
 
@@ -135,6 +84,8 @@ Definitions ::
   \(N\)   Contents of memory location N
   \(P\)   Contents of memory location P
   \(W\)   Contents of memory location W
+ 
+
 '''
 import re
 
