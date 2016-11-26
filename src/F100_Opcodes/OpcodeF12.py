@@ -1,14 +1,13 @@
 from .F100_Opcode import *
-
+'''
+AND - Logical AND of Accumulator and Operand
+============================================
+'''
 class OpcodeF12(F100_Opcode) :
     '''
-    AND
-    ===
-    
     Logical AND of accumulator with specified operand
-    
+        
     Function
-    --------
     
     ::
        
@@ -20,7 +19,6 @@ class OpcodeF12(F100_Opcode) :
        AND .W     A <- A & (W)
     
     Instruction Encoding
-    --------------------
     
      +-------+----+----+-----+-----------------+----+----------------+----------+----------------------+
      |              Opcode Word                |     Operand Word    | Function | Cycle count          |
@@ -44,7 +42,6 @@ class OpcodeF12(F100_Opcode) :
     
       
      Condition Register
-     ------------------
     
      +---+---+---+---+---+---+---+
      | F | M | C | S | V | Z | I |

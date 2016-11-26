@@ -2,13 +2,11 @@ from .F100_Opcode import *
 
 class OpcodeF2(F100_Opcode) :
     '''
-    CAL
-    ===
+    CAL - Store Link in Link Stack
     
     Jump to location provided by operand, store link in link stack
     
     Function
-    --------
     
     ::
        
@@ -25,7 +23,6 @@ class OpcodeF2(F100_Opcode) :
     treated as the next instruction.
 
     Instruction Encoding
-    --------------------
     
      +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
      |              Opcode Word                |     Operand Word   | Function| Cycle count          |
@@ -33,7 +30,7 @@ class OpcodeF2(F100_Opcode) :
      |       |    | N                          |                    |         |                      |
      |       |    +----+-----+-----------------+                    |         |                      |
      |  F    |  I |    | R   | P               |                    |         |                      |
-     +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
+     +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
      |4'b0010|1'b0|     11'b<non-zero addr>    |1'bx|15b'<jump addr>| CAL N   | TBC                  |
      +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+ 
      |4'b0010|1'b0|     11'b000000000000       |        none        | CAL ,D  | TBC                  |
@@ -45,7 +42,6 @@ class OpcodeF2(F100_Opcode) :
 
     
      Condition Register
-     ------------------
     
      +---+---+---+---+---+---+---+
      | F | M | C | S | V | Z | I |

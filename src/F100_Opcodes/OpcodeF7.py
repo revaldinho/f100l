@@ -1,14 +1,14 @@
 from .F100_Opcode import *
-
+'''
+ICZ - Jump to (PC) if non-zero
+------------------------------
+    
+'''
 class OpcodeF7(F100_Opcode) :
     '''
-    ICZ
-    ===
-    
     Increment the contents of a counter or address and jump to a specified location if the result is non-zero
-    
+
     Function
-    --------
     
     ::
        
@@ -20,7 +20,6 @@ class OpcodeF7(F100_Opcode) :
        ICZ .W  W1  (W) <- (W)+1 ; if (Z==0) PC <- W1
     
     Instruction Encoding
-    --------------------
     
      +-------+----+----+-----+-----------------+----+---------------+----+----------------+-----------+----------------------+
      |              Opcode Word                |     Operand Word   | 2nd Operand Word    | Function  | Cycle count          |
@@ -44,7 +43,6 @@ class OpcodeF7(F100_Opcode) :
 
     
      Condition Register
-     ------------------
     
      +---+---+---+---+---+---+---+
      | F | M | C | S | V | Z | I |
