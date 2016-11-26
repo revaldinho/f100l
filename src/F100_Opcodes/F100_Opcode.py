@@ -493,12 +493,10 @@ class OpcodeClass0b(F100_Opcode) :
 class OpcodeClass013(F100_Opcode) :
     '''
     HALT
-    RTN
-    RTC
     '''
 
-    def __init__ (self):
-        super().__init__(opcode_fn = { "HALT":0, "RTN":3, "RTC":3 } )
+    def __init__ (self, CPU=None):
+        super().__init__(opcode_fn = { "HALT":0 }, CPU=CPU )
 
     def assemble(self, opcode_token, operands, symbol_table, suppress_errors=False):
         warnings = []
@@ -512,10 +510,6 @@ class OpcodeClass013(F100_Opcode) :
 
         if opcode_token == "HALT":
             self.T = 1        
-        elif opcode_token == "RTN":
-            self.I = 0
-        elif opcode_token == "RTC":
-            self.I = 1
 
         return( self.bitassemble(), warnings)
 

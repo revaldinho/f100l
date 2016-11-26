@@ -16,7 +16,7 @@ class ConditionReg:
         Unpack an integer value into the individual flag components
         '''
         for flag in [
-                self.V,
+                self.I,
                 self.Z,
                 self.V,
                 self.S,

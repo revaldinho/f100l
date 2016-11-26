@@ -21,169 +21,26 @@
 ##
 ## ============================================================================
 '''
-  USAGE: 
+USAGE: 
 
-    F100Asm is an assembler for the Ferranti F100-L CPU. 
+  F100Asm is an assembler for the Ferranti F100-L CPU. 
 
-  REQUIRED SWITCHES 
+REQUIRED SWITCHES ::
 
-    -f  --filename  <filename>       specify the assembler source file
+  -f  --filename  <filename>       specify the assembler source file
 
-  OPTIONAL SWITCHES
+OPTIONAL SWITCHES ::
 
-    -h  --help                       print this help message
+  -h  --help                       print this help message
 
-  EXAMPLES
+EXAMPLES ::
 
-    python F100Asm -f testfile.asm 
+  python F100Asm -f testfile.asm 
 
 
-Using the Assembler
-===================
-
-The standard command line is
-
-``F100ASM  -f|--filename <assembler_file.txt> -h|--help``
+BUGS ::
 
 All output is sent only to a listing file currently.
-
-Assembler File Format
-=====================
-
-Comments
---------
-Comments can be placed anywhere in the code and start with the semi-colon (;) character, e.g. ::
-
- ADDS 0x134 ; add the magic number to the accumulator
-
-
-Labels
-------
-
-Labels can be placed anywhere in the code and will be evaluated during the first assembly pass.
-
-Labels must start with an alphabetic character or an underscore, end with a ':' and any combination of alphanumeric characters or underscores is allowed in between.
-
-All labels and variables are case insensitive; they will all be converted to upper case during symbol table processing. e.g. ::
-
- LOOP_TOP:    SRL  0x01 A
-
-
-Directives
-----------
-
-F100ASM supports the following directives, all of which start with the dot (.) character
-
-* ``.ORG <address>``
-
-* ``.EQU <variable name> <expression>``
-
-* ``.DATA <data> [, <data> [, ... ]]]``
-
-* ``.WORD <data> [, <data> [, ... ]]]``
-
-
-**``.ORG``** sets the current instruction address to the value supplied before assembling the next instruction. e.g. ::
-
-.ORG 0x0800 ; Instruction execution starts at 0x800 following a reset when AdSel is left floating or tied high
-
-**``.EQU``** is used to assign expressions or values to variable names. e.g. ::
-
-.EQU  PTR_START 0x100
-.EQU  STK_PTR1  PTR_START+1
-.EQU  MEMTOP    0x7FFF
-.EQU  STK_SIZE  0x0400
-.EQU  STK_BOT   MEMTOP - STK_SIZE
-
-F100ASM uses the Python ASR parser class to allow parsing of any valid Python expression. All expressions must evaulate to an integer number by the end of the first pass through the assembler. Expressions or symbols may be used anywhere a numerical value is allowed. 
-
-Like labels all variable names must start with an alphabetic character or an underscore but subsequent characters may be alphanumeric. All variable names are case insensitive.
-
-Note that the two symbols A and C are reserved words and may not be used as variable names.
-
-Labels are treated like any other variable as far as expression parsing is concerned. 
-
-**``.DATA``** and **``.WORD``** are synonyms of each other. These can be followed by a list of comma separated numeric values or expressions on the same line. e.g.::
-
- .WORD 1,1,2,3,5,8 ; Fibonacci numbers
- .WORD STK_PTR1, MEMTOP - STKSIZE  ; examples of expressions
-
-**Unsupported features**
-
-F100ASM doesn't directly support definition of macros or conditional assembly. These features are easily added by pre-processing the assembly source using the C-preprocessor (cpp).
-
-Example
--------
-
-::
-
-  # -------------------------------------------------------------------------------------------
-  #     _____________  ____        __       ___                             __    __         
-  #    / ____<  / __ \/ __ \      / /      /   |  _____________  ____ ___  / /_  / /__  _____
-  #   / /_   / / / / / / / /_____/ /      / /| | / ___/ ___/ _ \/ __ `__ \/ __ \/ / _ \/ ___/
-  #  / __/  / / /_/ / /_/ /_____/ /___   / ___ |(__  |__  )  __/ / / / / / /_/ / /  __/ /    
-  # /_/    /_/\____/\____/     /_____/  /_/  |_/____/____/\___/_/ /_/ /_/_.___/_/\___/_/     
-  # 
-  # 
-  # F 1 0 0 - L * A S S E M B L E R (c) 2016 Revaldinho & BigEd
-  # -------------------------------------------------------------------------------------------
-  # 
-  # LINE:       ADDR: CODE     SOURCE
-  # ----:-----------:--------------------------------------------------------------------------
-       1:                       .EQU  _TMP 0x3E8
-       2:                       .EQU  ping 0x3EA
-       3:      001A: 8001       LDA 0x0001
-       4:      001B: 4800 03EA  STO .ping
-       5:                       .EQU  pong 0x3EC
-       6:      001D: 8001       LDA 0x0001
-       7:      001E: 4800 03EC  STO .pong
-       8:                       .EQU  new_pong 0x3EE
-       9:                       L1:
-      10:      0020: 8800 03EA  LDA .ping
-      11:      0022: 9800 03EC  ADD .pong
-      12:      0024: 4800 03EE  STO .new_pong
-      13:      0026: 8800 03EC  LDA .pong
-      14:      0028: 4800 03EA  STO .ping
-      15:      002A: 8800 03EE  LDA .new_pong
-      16:      002C: 4800 03EC  STO .pong
-      17:      002E: 8800 03EA  LDA .ping
-      18:      0030: D000 0262  NEQ ,610
-      19:      0032: 0181 0020  JBC 0x01 C L1
-  # -------------------------------------------------------------------------------------------
-  # 0 Errors
-  # 0 Warnings
-  # -------------------------------------------------------------------------------------------
-  # SymbolTable
-  # --------------------------------: -------------------------------- : ----------------------
-  # Symbol                          : Definition                       : Value Hex (Decimal)
-  # --------------------------------: -------------------------------- : ----------------------
-  # L1                              : 32                               : 0020 (32)
-  # NEW_PONG                        : 0X3EE                            : 03EE (1006)
-  # PING                            : 0X3EA                            : 03EA (1002)
-  # PONG                            : 0X3EC                            : 03EC (1004)
-  # _TMP                            : 0X3E8                            : 03E8 (1000)
-  # --------------------------------: -------------------------------- : ----------------------
-  # Run time = 0.004 s
-  # -------------------------------------------------------------------------------------------
-
-
-
-
-License
--------
-
-f100l is free software: you can redistribute it and/or modify it 
-under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-f100l is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-See see <http://www.gnu.org/licenses/> for a copy of the GNU Lesser General Public License
-
 
 '''
 
@@ -193,8 +50,16 @@ from F100_Opcodes.OpcodeF15 import *
 from F100_Opcodes.OpcodeF13 import *
 from F100_Opcodes.OpcodeF12 import *
 from F100_Opcodes.OpcodeF11 import *
+from F100_Opcodes.OpcodeF10 import *
+from F100_Opcodes.OpcodeF9 import *
+from F100_Opcodes.OpcodeF8 import *
 from F100_Opcodes.OpcodeF7 import *
+from F100_Opcodes.OpcodeF6 import *
+from F100_Opcodes.OpcodeF5 import *
+from F100_Opcodes.OpcodeF4 import *
+from F100_Opcodes.OpcodeF3 import *
 from F100_Opcodes.OpcodeF2 import *
+from F100_Opcodes.OpcodeF1 import *
 import string
 import re
 import getopt
@@ -230,7 +95,9 @@ class F100Asm():
         self.st = SymbolTable()
         self.pc = 0
         self.opcodes = [ o() for o in (OpcodeClass0a, OpcodeClass0b, OpcodeClass013,
-                                       OpcodeClass4, OpcodeF2, OpcodeF7, OpcodeF11, OpcodeF12, OpcodeF13, OpcodeF15 ) ]
+                                       OpcodeF1, OpcodeF2, OpcodeF3, FOpcodeF4, OpcodeF5,
+                                       OpcodeF6, OpcodeF7,  OpcodeF8, OpcodeF9,
+                                       OpcodeF10, OpcodeF11, OpcodeF12, OpcodeF13, OpcodeF15 ) ]
 
     def is_valid_opcode(self, opcode_str):
         for o in self.opcodes:

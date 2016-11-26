@@ -9,7 +9,6 @@ mylabel:
                .equ F1 23 ; some arbitrary constant 
                .equ F2 F1 * 2 
 
-               INVALIDOC blh
                AND ,LABELWITHCODE
                AND ,labelwithcode
                AND 0
@@ -65,7 +64,6 @@ mylabel:
                LDA /F1*2
                LDA /0x55+
                LDA /0x55-
-               ICZ .0x0FE
                ICZ .F1*2 44
                ICZ ,0x0FE 33
                ICZ /F1*2 1
@@ -84,12 +82,10 @@ mylabel:
 
                SJM
                SJM 1 
-               SJM 1 2 
-               CAL ,0x0FE
+               SJM 1 2
+	       CAL ,0x1234 	; should assemble to a single word
+               CAL .0x0FE
                CAL /F1*2
-               CAL /0x55+
-               CAL /0x55-
-               CAL /0x01-
                JMP mylabel
                SBS .89
                JMP mylabel 
@@ -97,7 +93,9 @@ mylabel:
                .word 0x99,10, F1, F1*2, HERE
                SBS 0x55
 HERE: 
-               ADS 0x88 
+        ADS 0x88
+        ADS .0x88
+               ADS /0x88 		
 LABELWITHCODE: SBS 0x88 
                ADD 0x88 ; DIRECT
                STO ,0x88 ; IMMEDIATE
@@ -107,18 +105,17 @@ LABELWITHCODE: SBS 0x88
                ADD .0x88 ; IMMMEDIATE INDIRECT
 
                SET 0x02 A
-               CLR 0x01 C
+               CLR 0x01 CR
                SET 0x05 0x100
-               SRL 0x01 
-               SRE 0x01
                SRA 0x02 0x450
 
                JBC 0x02 A 0x400
-               JSC 0x01 C 0x500
+               JSC 0x01 CR 0x500
                JSC 0x05 0x100 0x100
                JCS 0x01 A 0x100
-               JCS 0x01 C 0x200
-               JSC 0x02 0x450 0x299
+               JCS 0x01 CR 0x200
+        JSC 0x02 0x450 0x299
+	       JMP ,0x1234 	; should assemble to a single word ignoring the operand
                
                HALT 
 

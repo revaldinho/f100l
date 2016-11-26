@@ -1,11 +1,18 @@
-
 from F100_Opcodes.F100_Opcode import *
 from F100_Opcodes.OpcodeF15 import *
 from F100_Opcodes.OpcodeF13 import *
 from F100_Opcodes.OpcodeF12 import *
 from F100_Opcodes.OpcodeF11 import *
+from F100_Opcodes.OpcodeF10 import *
+from F100_Opcodes.OpcodeF9 import *
+from F100_Opcodes.OpcodeF8 import *
 from F100_Opcodes.OpcodeF7 import *
+from F100_Opcodes.OpcodeF6 import *
+from F100_Opcodes.OpcodeF5 import *
+from F100_Opcodes.OpcodeF4 import *
+from F100_Opcodes.OpcodeF3 import *
 from F100_Opcodes.OpcodeF2 import *
+from F100_Opcodes.OpcodeF1 import *
 
 from InstructionReg import InstructionReg
 from ConditionReg import ConditionReg
@@ -21,7 +28,10 @@ class F100CPU:
         self.memory_write = memory_write
         self.memory_read = memory_read
         ## instance all the opcode classes, passing each a reference to the CPU resources 
-        self.opcode_classes = [ opcode(CPU=self) for opcode in [OpcodeF2, OpcodeF7, OpcodeF11, OpcodeF12, OpcodeF13, OpcodeF15 ] ]
+        self.opcode_classes = [ opcode(CPU=self) for opcode in [OpcodeF1, OpcodeF2, OpcodeF3, OpcodeF4,
+                                                                OpcodeF5, OpcodeF6, OpcodeF7,
+                                                                OpcodeF8, OpcodeF9, OpcodeF10,
+                                                                OpcodeF11, OpcodeF12, OpcodeF13, OpcodeF15 ] ]
         self.opcode_table = dict()
         for o in self.opcode_classes:
             self.opcode_table[o.F] = o
@@ -33,7 +43,7 @@ class F100CPU:
 
     def memory_fetch(self):
         result = self.memory_read(self.PC)
-        self.PC += 1
+        self.PC = ( self.PC + 1 )  & 0x7FFF
         return result
 
     def single_step(self):
