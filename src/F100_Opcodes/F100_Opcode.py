@@ -192,7 +192,8 @@ class F100_Opcode :
         ## Opcode_fn will be a dictionary of opcode names and F field values
         self.opcode_fn = opcode_fn
         ## Pack the names into a regexp for matching
-        self.opcode_regexp = re.compile(r'%s' % '|'.join(self.opcode_fn.keys()))    
+        self.opcode_regexp = re.compile(r'%s' % '|'.join(self.opcode_fn.keys()))
+        self.addr_mode = None
 
          
     def get_address_mode(self, operand):
@@ -297,22 +298,32 @@ class F100_Opcode :
         CR = self.CPU.CR
         
         operand = None
+        operand_address = None
         if ( IR.F != self.F):
             raise UserWarning("Cannot execute opcode %04X using opcode class %s" % (opcode, self.__name__) )
         elif IR.I==0 and IR.N==0:
+            self.addr_mode == ADM_IMMEDIATE
+            operand_address = self.CPU.PC
             operand = self.CPU.memory_fetch()
         elif IR.I==0:
-            operand = self.memory_read(IR.N)           
+            self.addr_mode == ADM_DIRECT
+            operand_address = IR.N         
+            operand = self.memory_read(operand_address)           
         elif IR.I==1 and IR.P==0:
-            operand = self.CPU.memory_fetch()
-            operand = self.CPU.memory_read(operand)
+            self.addr_mode == ADM_IMMEDIATE_INDIRECT
+            operand_address = self.CPU.memory_fetch()
+            operand = self.CPU.memory_read(operand_address)
         elif IR.I==1:
+            self.addr_mode == ADM_POINTER_INDIRECT                        
             if IR.R==1: 
                 IR.P += 1
-            operand = self.CPU.memory_read(IR.P)           
+                self.addr_mode == ADM_POINTER_INDIRECT_PREINC
+            operand_address = IR.P
+            operand = self.CPU.memory_read(operand_address)           
             if IR.R==3:
+                self.addr_mode == ADM_POINTER_INDIRECT_POSTDEC                
                 IR.P -= 1        
-        return (operand, cycles)
+        return (operand, operand_address, cycles)
 
 
     def exec(self):
@@ -482,13 +493,12 @@ class OpcodeClass0b(F100_Opcode) :
 class OpcodeClass013(F100_Opcode) :
     '''
     HALT
-    SJM
     RTN
     RTC
     '''
 
     def __init__ (self):
-        super().__init__(opcode_fn = { "HALT":0, "SJM":1, "RTN":3, "RTC":3 } )
+        super().__init__(opcode_fn = { "HALT":0, "RTN":3, "RTC":3 } )
 
     def assemble(self, opcode_token, operands, symbol_table, suppress_errors=False):
         warnings = []
@@ -502,37 +512,12 @@ class OpcodeClass013(F100_Opcode) :
 
         if opcode_token == "HALT":
             self.T = 1        
-        elif opcode_token == "SJM":
-            pass
         elif opcode_token == "RTN":
             self.I = 0
         elif opcode_token == "RTC":
             self.I = 1
 
         return( self.bitassemble(), warnings)
-
-
-
-        
-
-        
-class OpcodeClass4(F100_Opcode) :
-    '''
-    OPD   dDD     
-    OPD .mMMM     
-    OPD   /DD(+-) 
-    OPD ,DDDD     
-
-
-   where OPD is one of SUB, ADD, LDA, SBS, ADS, STO
-
-    
-    '''
-
-    def __init__ (self):
-        super().__init__( opcode_fn = { "SUB":10, "ADD":9, 
-                                        "LDA":8, "SBS":6, "ADS":5, 
-                                        "STO":4 } )
 
 
 

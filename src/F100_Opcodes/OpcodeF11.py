@@ -90,7 +90,7 @@ class OpcodeF11(F100_Opcode) :
 
     def exec(self):
         cycle_count = 0
-        (self.CPU.OR, cycle_count) = self.get_operand()           
+        (self.CPU.OR, operand_address, cycle_count) = self.get_operand()           
         result = self.CPU.OR - self.CPU.ACC
         if (self.CPU.CR.M==1) :
             result = result + self.CPU.CR.C - 1

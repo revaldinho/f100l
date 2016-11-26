@@ -62,7 +62,7 @@ class OpcodeF8(F100_Opcode) :
 
     def exec(self):
         cycle_count = 0
-        (self.CPU.ACC, cycle_count) = self.get_operand()
+        (self.CPU.ACC, operand_address, cycle_count) = self.get_operand()
 
         self.CPU.CR.Z = 1 if (self.CPU.ACC & 0xFFFF) == 0 else 0
         self.CPU.CR.S = 1 if (self.CPU.ACC & 0x8000) != 0 else 0
