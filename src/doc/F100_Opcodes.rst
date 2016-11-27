@@ -30,6 +30,10 @@ CMP - Compare Accumulator with Operand
 .. automodule:: F100_Opcodes.OpcodeF11
    :members:
 
+HALT - Stop Execution
+---------------------
+.. autoclass:: F100_Opcodes.OpcodeF0.OpcodeF0_Halt
+      
 ICZ - Jump to (PC) if non-zero
 ------------------------------
 .. automodule:: F100_Opcodes.OpcodeF7		

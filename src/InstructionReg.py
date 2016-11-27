@@ -18,7 +18,7 @@ class InstructionReg:
         self.B = self.content      & 0x000F
         self.P = self.content      & 0x00FF
         self.N = self.content      & 0x07FF
-        
+
     def tostring(self):
         list = [ "IR:  0x%04X   " % self.content]
         for m in [attr for attr in dir(self) ]:

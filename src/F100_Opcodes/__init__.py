@@ -1,4 +1,8 @@
 __all__ = [ "F100_Opcode",
+            "OpcodeF0_Shift",
+            "OpcodeF0_Bit",
+            "OpcodeF0_Halt",
+            "OpcodeF0_Jump",                                    
             "OpcodeF1",            
             "OpcodeF2",
             "OpcodeF4",

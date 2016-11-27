@@ -1,4 +1,4 @@
-
+from F100_Opcodes.F100_Opcode import F100HaltException
 from F100CPU import F100CPU
 
 class F100L_System:
@@ -36,7 +36,8 @@ if __name__ == "__main__":
             0xD000,0xFFFF,#   NEQ ,0xFFFF ; invert it
             0xD000,0xFF00,#   NEQ ,0xFF00 ; reset top bits
             0xF000,       #   JMP ,0x1234 ; aka a NOP
-            0xB000,0x8000,#   CMP ,0x8000 ; compare with 0x8000            
+            0xB000,0x8000,#   CMP ,0x8000 ; compare with 0x8000
+            0x0523,       #   HALT ,0x123
             0xF800,0x0800,#   JMP ,0x0800 ; loop back to start 
             ]:
         emu.RAM[a] = w
@@ -47,8 +48,12 @@ if __name__ == "__main__":
     # simple dummy loop - don't execute uninitialised RAM yet...
     i = 0
     while emu.memory_read(emu.CPU.PC) != 0xDEAD:
-        print(emu.CPU.tostring())    
-        emu.CPU.single_step()
+        print(emu.CPU.tostring())
+        try:
+            emu.CPU.single_step()
+        except F100HaltException as e:
+            print(e)
+            break
         i += 1
         if i> 100:
             break

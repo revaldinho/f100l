@@ -60,6 +60,7 @@ from F100_Opcodes.OpcodeF4 import *
 from F100_Opcodes.OpcodeF3 import *
 from F100_Opcodes.OpcodeF2 import *
 from F100_Opcodes.OpcodeF1 import *
+from F100_Opcodes.OpcodeF0 import *
 import string
 import re
 import getopt
@@ -94,8 +95,8 @@ class F100Asm():
     def __init__(self):
         self.st = SymbolTable()
         self.pc = 0
-        self.opcodes = [ o() for o in (OpcodeClass0a, OpcodeClass0b, OpcodeClass013,
-                                       OpcodeF1, OpcodeF2, OpcodeF3, FOpcodeF4, OpcodeF5,
+        self.opcodes = [ o() for o in (OpcodeF0_Jump, OpcodeF0_Shift, OpcodeF0_Halt, OpcodeF0_Bit,
+                                       OpcodeF1, OpcodeF2, OpcodeF3, OpcodeF4, OpcodeF5,
                                        OpcodeF6, OpcodeF7,  OpcodeF8, OpcodeF9,
                                        OpcodeF10, OpcodeF11, OpcodeF12, OpcodeF13, OpcodeF15 ) ]
 
