@@ -18,3 +18,11 @@ git push origin gh-pages
 
 
 
+# Checkin all changes (but not newly created files)
+# commit -am "message"
+
+# Merge branch develop into master
+#git checkout master
+#git pull               # to update the state to the latest remote master state
+#git merge develop      # to bring changes to local master from your develop branch
+#git push origin master # push current HEAD to remote master branch

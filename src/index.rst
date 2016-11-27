@@ -14,7 +14,8 @@ Contents:
 
    doc/F100CPU	     
    doc/F100_Opcodes   
-   doc/F100Asm	      
+   doc/F100Asm
+   doc/References
    doc/license
    
 Indices and tables

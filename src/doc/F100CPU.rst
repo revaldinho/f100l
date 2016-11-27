@@ -1,8 +1,8 @@
-=========================
-The F100-L Microprocessor
-=========================
+==================================
+The Ferranti F100-L Microprocessor
+==================================
 
-The F100-L is a single-address, single accumulator, fixed 16-bit word length
+The Ferranti F100-L is a single-address, single accumulator, fixed 16-bit word length
 microprocessor.
 
 Memory Space
