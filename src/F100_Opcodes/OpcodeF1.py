@@ -1,47 +1,48 @@
-from .F100_Opcode import *
+
 '''
 SJM - Switch Jump
 =================
+    
+The contents of the accumulator are added to the contents of the program counter (which has
+already been incremented to point to the next instruction). If the value of the accumulator 
+is zero then the program will continue execution in sequence.
+
+Note that the MSB of the result is always discarded, so that the program counter value will 
+never exceed the 15b address range of the machine.
+
+**Function**
+
+::
+   
+   SJM    PC <- PC + 1 + A
+
+**Instruction Encoding**
+
++-------+----+----+-----+-----------------+----------+----------------------+
+|              Opcode Word                | Function | Cycle count          |
++-------+----+----+-----+-----------------+          |                      |
+|       |    | N                          |          |                      |
+|       |    +----+-----+-----------------+          |                      |
+|  F    |  I |    | R   | P               |          |                      |
++-------+----+----+-----+-----------------+----------+----------------------+
+|4`b0001|         12`bxxxxxxxxxxxx        | SJM      | TBC                  |
++-------+----+----+-----+-----------------+----------+----------------------+ 
+ 
+**Condition Register**
+
++---+---+---+---+---+---+---+
+| F | M | C | S | V | Z | I |
++---+---+---+---+---+---+---+
+|\--|\--|\--|\--|\--|\--|\--| 
++---+---+---+---+---+---+---+ 
+
+* The Condition Register is unaffected by the addition in this instruction.
+   
 '''
+
+from .F100_Opcode import *
+
 class OpcodeF1(F100_Opcode) :
-    '''
-    
-    The contents of the accumulator are added to the contents of the program counter (which has
-    already been incremented to point to the next instruction). If the value of the accumulator 
-    is zero then the program will continue execution in sequence.
-
-    Note that the MSB of the result is always discarded, so that the program counter value will 
-    never exceed the 15b address range of the machine.
-
-    **Function**
-    
-    ::
-       
-       SJM    PC <- PC + 1 + A
-    
-    **Instruction Encoding**
-    
-     +-------+----+----+-----+-----------------+----------+----------------------+
-     |              Opcode Word                | Function | Cycle count          |
-     +-------+----+----+-----+-----------------+          |                      |
-     |       |    | N                          |          |                      |
-     |       |    +----+-----+-----------------+          |                      |
-     |  F    |  I |    | R   | P               |          |                      |
-     +-------+----+----+-----+-----------------+----------+----------------------+
-     |4`b0001|         12`bxxxxxxxxxxxx        | SJM      | TBC                  |
-     +-------+----+----+-----+-----------------+----------+----------------------+ 
-      
-     **Condition Register**
-    
-     +---+---+---+---+---+---+---+
-     | F | M | C | S | V | Z | I |
-     +---+---+---+---+---+---+---+
-     |\- |\- | \-| \-| \-| \-| \-| 
-     +---+---+---+---+---+---+---+ 
-
-     * The Condition Register is unaffected by the addition in this instruction.
-    
-    '''
     
     def __init__ (self, CPU=None):
         super().__init__( opcode_fn = { "SJM":1}, CPU=CPU )

@@ -1,56 +1,59 @@
+'''
+CAL - Call Subroutine
+=====================
+    
+Jump to subroutine location provided by operand, storing return address in the link stack
+    
+**Function**
+    
+::
+       
+   CAL N   (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- (N); LSP <- LSP+ 2
+   CAL ,D  (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- PC+1; LSP<- LSP + 2 
+   CAL /P  (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- (P); LSP<- LSP+2
+   CAL .W  (LSP+1) <- PC+2; (LSP+2) <- CR ; PC <- W; LSP<- LSP+2
+    
+Where LSP is link stack pointer held in memory location 0.
+
+NOTE: on entry the link stack pointer must always be an odd number.
+
+CAL ,D is a special case where only the link is stored in the link stack and the 'D' operand is 
+treated as the next instruction. In this form the assembler discards the provided operand.
+
+**Instruction Encoding**
+    
++-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
+|              Opcode Word                |     Operand Word   | Function| Cycle count          |
++-------+----+----+-----+-----------------+                    |         |                      |
+|       |    | N                          |                    |         |                      |
+|       |    +----+-----+-----------------+                    |         |                      |
+|  F    |  I |    | R   | P               |                    |         |                      |
++-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
+|4`b0010|1`b0|     11`b<non-zero addr>    |1`bx|15b'<jump addr>| CAL N   | TBC                  |
++-------+----+----+-----+-----------------+----+---------------+---------+----------------------+ 
+|4`b0010|1`b0|     11`b000000000000       |         none       | CAL ,D  | TBC                  |
++-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
+|4`b0010|1`b1|1`bx|2`bxx|8`b<non-zero ptr>|1`bx|15b'<jump addr>| CAL /P  | TBC                  |
++-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
+|4`b0010|1`b1|1`bx|2`bxx|8`b00000000      |1`bx|   15b'<addr>  | CAL .W  | TBC                  |
++-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
+
+    
+**Condition Register**
+    
++---+---+---+---+---+---+---+
+| F | M | C | S | V | Z | I |
++---+---+---+---+---+---+---+
+|\--| 0 |\--|\--|\--|\--|\--| 
++---+---+---+---+---+---+---+ 
+    
+* M is always cleared by this operation
+
+'''
+ 
 from .F100_Opcode import *
 
 class OpcodeF2(F100_Opcode) :
-    '''
-    CAL - Store Link in Link Stack
-    
-    Jump to location provided by operand, store link in link stack
-    
-    Function
-    
-    ::
-       
-       CAL N   (X+1) <- PC+1; (X+2) <- CR ; PC <- (N); X<- X+2
-       CAL ,D  (X+1) <- PC+1; (X+2) <- CR ; PC <- PC+1; X<- X+2
-       CAL /P  (X+1) <- PC+1; (X+2) <- CR ; PC <- (P); X<- X+2
-       CAL .W  (X+1) <- PC+2; (X+2) <- CR ; PC <- W; X<- X+2
-    
-    where X is the address stored in location 0 at the start of the operation
-
-    NB X MUST be an ODD number.
-
-    CAL ,D is a special case where only the link is stored in the link stack and the 'D' operand is 
-    treated as the next instruction.
-
-    Instruction Encoding
-    
-     +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
-     |              Opcode Word                |     Operand Word   | Function| Cycle count          |
-     +-------+----+----+-----+-----------------+                    |         |                      |
-     |       |    | N                          |                    |         |                      |
-     |       |    +----+-----+-----------------+                    |         |                      |
-     |  F    |  I |    | R   | P               |                    |         |                      |
-     +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
-     |4`b0010|1`b0|     11`b<non-zero addr>    |1`bx|15b'<jump addr>| CAL N   | TBC                  |
-     +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+ 
-     |4`b0010|1`b0|     11`b000000000000       |        none        | CAL ,D  | TBC                  |
-     +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
-     |4`b0010|1`b1|1`bx|2`bxx|8`b<non-zero ptr>|1`bx|15b'<jump addr>| CAL /P  | TBC                  |
-     +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
-     |4`b0010|1`b1|1`bx|2`bxx|8`b00000000      |1`bx|   15b'<addr>  | CAL .W  | TBC                  |
-     +-------+----+----+-----+-----------------+----+---------------+---------+----------------------+
-
-    
-     Condition Register
-    
-     +---+---+---+---+---+---+---+
-     | F | M | C | S | V | Z | I |
-     +---+---+---+---+---+---+---+
-     |\- | 0 |\- |\- |\- |\- |\- | 
-     +---+---+---+---+---+---+---+ 
-    
-     * M is always cleared by this operation
-    '''
     
     def __init__ (self, CPU=None):
         super().__init__( opcode_fn = { "CAL":2 }, CPU=CPU )

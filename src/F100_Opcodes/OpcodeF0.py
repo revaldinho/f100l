@@ -147,13 +147,9 @@ class OpcodeF0_Shift(F100_Opcode) :
 
 
 class OpcodeF0_Bit(F100_Opcode) :
-    '''
-    SRE  d  A|CR|mMMM
-    SLE  d  A|CR|mMMM
-    SRA  d  A|CR|mMMM
-    SLA  d  A|CR|mMMM
-    SRL  d  A|CR|mMMM
-    SLL  d  A|CR|mMMM
+    '''    
+    CLR  d  A|CR|mMMM
+    SET  d  A|CR|mMMM
     '''
 
     def __init__ (self, CPU=None):
@@ -242,7 +238,7 @@ class OpcodeF0_Halt(F100_Opcode) :
      +---+---+---+---+---+---+---+
      | F | M | C | S | V | Z | I |
      +---+---+---+---+---+---+---+
-     |\- | \-| \-| \-| \-| \-| \-|
+     |\--|\--|\--|\--|\--|\--|\--|
      +---+---+---+---+---+---+---+
 
      * The condition register is unaffected by this instruction

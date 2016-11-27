@@ -1,57 +1,57 @@
-from .F100_Opcode import *
 '''
 RTN, RTC - Return from Subroutine
 =================================
+
+These instructions perform a return from subroutine operation.
+
+**RTN** restores bits 0-5 of the Condition Register from the word pointed to by the link stack pointer 
+(location 0). The link stack pointer is then decremented to point to the return address, and this 
+is placed into the program counter. The link stack pointer is then decremented again to finish 
+the instruction pointing to the last valid stack entry.
+
+**RTC** operates in a similar manner but discards the Condition Register entry from the stack.
+
+NOTE: on entry the link stack pointer must always be an odd number.
+
+**Function**
+
+::
+   
+   RTN     CR[5:0] <- (LSP)[5:0] ; LSP <- LSP-1 ; PC <- (LSP) ; LSP <- LSP - 1
+   RTC     PC <- (LSP-1) ; LSP <- LSP - 2
+
+* Where LSP = Link Stack Pointer which is always held in location 0 in memory
+
+**Instruction Encoding**
+
++-------+----+----+-----+-----------------+----------+----------------------+
+|              Opcode Word                | Function | Cycle count          |
++-------+----+----+-----+-----------------+          |                      |
+|       |    | N                          |          |                      |
+|       |    +----+-----+-----------------+          |                      |
+|  F    |  I |    | R   | P               |          |                      |
++-------+----+----+-----+-----------------+----------+----------------------+
+|4`b0011|1`b0|    11`bxxxxxxxxxxx         | RTN      | TBC                  |
++-------+----+----+-----+-----------------+----------+----------------------+ 
+|4`b0011|1`b1|    11`bxxxxxxxxxxx         | RTC      | TBC                  |
++-------+----+----+-----+-----------------+----------+----------------------+ 
+ 
+**Condition Register**
+
++---+---+---+---+---+---+---+-----------------+
+| F | M | C | S | V | Z | I |  Instruction    |
++---+---+---+---+---+---+---+-----------------+
+|\--| * | * | * | * | * | * |  RTN            |
++---+---+---+---+---+---+---+-----------------+ 
+|\--|\--|\--|\--|\--|\--|\--|  RTC            |
++---+---+---+---+---+---+---+-----------------+
+
+* Bit 6, the Fail flag entry, is not overwritten by either of these instructions.
 '''
+
+from .F100_Opcode import *
+
 class OpcodeF3(F100_Opcode) :
-    '''
-
-    These instructions perform a return from subroutine operation.
-    
-    **RTN** restores bits 0-5 of the Condition Register from the word pointed to by the link stack pointer 
-    (location 0). The link stack pointer is then decremented to point to the return address, and this 
-    is placed into the program counter. The link stack pointer is then decremented again to finish 
-    the instruction pointing to the last valid stack entry.
-
-    **RTC** operates in a similar manner but discards the Condition Register entry from the stack.
-
-    NOTE: on entry the link stack pointer must always be an odd number.
-
-    **Function**
-
-    ::
-       
-       RTN     CR[5:0] <- (LSP)[5:0] ; LSP <- LSP-1 ; PC <- (LSP) ; LSP <- LSP - 1
-       RTC     PC <- (LSP-1) ; LSP <- LSP - 2
-
-    * Where LSP = Link Stack Pointer which is always held in location 0 in memory
-    
-    **Instruction Encoding**
-    
-     +-------+----+----+-----+-----------------+----------+----------------------+
-     |              Opcode Word                | Function | Cycle count          |
-     +-------+----+----+-----+-----------------+          |                      |
-     |       |    | N                          |          |                      |
-     |       |    +----+-----+-----------------+          |                      |
-     |  F    |  I |    | R   | P               |          |                      |
-     +-------+----+----+-----+-----------------+----------+----------------------+
-     |4`b0011|1`b0|    11`bxxxxxxxxxxx         | RTN      | TBC                  |
-     +-------+----+----+-----+-----------------+----------+----------------------+ 
-     |4`b0011|1`b1|    11`bxxxxxxxxxxx         | RTC      | TBC                  |
-     +-------+----+----+-----+-----------------+----------+----------------------+ 
-      
-     **Condition Register**
-    
-     +---+---+---+---+---+---+---+-----------------+
-     | F | M | C | S | V | Z | I |  Instruction    |
-     +---+---+---+---+---+---+---+-----------------+
-     |\- | * | * | * | * | * | * |  RTN            |
-     +---+---+---+---+---+---+---+-----------------+ 
-     |\- | \-| \-| \-| \-| \-| \-|  RTC            |
-     +---+---+---+---+---+---+---+-----------------+
-
-     * Bit 6, the Fail flag entry, is not overwritten by either of these instructions.
-    '''
     
     def __init__ (self, CPU=None):
         super().__init__( opcode_fn = { "RTN":3, "RTC":3}, CPU=CPU )
