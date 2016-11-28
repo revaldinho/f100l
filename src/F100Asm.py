@@ -3,7 +3,7 @@
 ##
 ## COPYRIGHT 2016 Richard Evans, Ed Spittles
 ##
-## This file is part of f100l - an set of utilities for programming and 
+## This file is part of f100l - an set of utilities for programming and
 ## emulation of the Ferranti F100-L CPU and peripheral components.
 ##
 ## f100l is free software: you can redistribute it and/or modify
@@ -16,14 +16,14 @@
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU Lesser General Public License for more details.
 ##
-## See  <http://www.gnu.org/licenses/> for a copy of the GNU Lesser General 
+## See  <http://www.gnu.org/licenses/> for a copy of the GNU Lesser General
 ## Public License
 ##
 ## ============================================================================
 '''
-USAGE: 
+USAGE:
 
-  F100Asm is an assembler for the Ferranti F100-L CPU. 
+  F100Asm is an assembler for the Ferranti F100-L CPU.
 
 REQUIRED SWITCHES ::
 
@@ -35,7 +35,7 @@ OPTIONAL SWITCHES ::
 
 EXAMPLES ::
 
-  python F100Asm -f testfile.asm 
+  python F100Asm -f testfile.asm
 
 
 BUGS ::
@@ -61,6 +61,9 @@ from F100_Opcodes.OpcodeF3 import *
 from F100_Opcodes.OpcodeF2 import *
 from F100_Opcodes.OpcodeF1 import *
 from F100_Opcodes.OpcodeF0 import *
+from F100_Opcodes.OpcodeF0_Halt import *
+from F100_Opcodes.OpcodeF0_Jump import *
+from F100_Opcodes.OpcodeF0_Bit import *
 import string
 import re
 import getopt
@@ -70,16 +73,16 @@ import sys
 
 header_text = '''
 # -------------------------------------------------------------------------------------------
-#     _____________  ____        __       ___                             __    __         
+#     _____________  ____        __       ___                             __    __
 #    / ____<  / __ \/ __ \      / /      /   |  _____________  ____ ___  / /_  / /__  _____
 #   / /_   / / / / / / / /_____/ /      / /| | / ___/ ___/ _ \/ __ `__ \/ __ \/ / _ \/ ___/
-#  / __/  / / /_/ / /_/ /_____/ /___   / ___ |(__  |__  )  __/ / / / / / /_/ / /  __/ /    
-# /_/    /_/\____/\____/     /_____/  /_/  |_/____/____/\___/_/ /_/ /_/_.___/_/\___/_/     
-# 
-# 
+#  / __/  / / /_/ / /_/ /_____/ /___   / ___ |(__  |__  )  __/ / / / / / /_/ / /  __/ /
+# /_/    /_/\____/\____/     /_____/  /_/  |_/____/____/\___/_/ /_/ /_/_.___/_/\___/_/
+#
+#
 # F 1 0 0 - L * A S S E M B L E R (c) 2016 Revaldinho & BigEd
 # -------------------------------------------------------------------------------------------
-# 
+#
 # LINE:       ADDR: CODE     SOURCE
 # ----:-----------:--------------------------------------------------------------------------'''
 line_sep = '''# -------------------------------------------------------------------------------------------'''
@@ -111,8 +114,8 @@ class F100Asm():
         warnings = []
         op =  self.is_valid_opcode(opcode)
         if op == None:
-            raise UserWarning("Unrecognized opcode %s" % opcode )  
-        (assembled_words, warnings) = op.assemble(opcode, operands, symbol_table, suppress_errors)            
+            raise UserWarning("Unrecognized opcode %s" % opcode )
+        (assembled_words, warnings) = op.assemble(opcode, operands, symbol_table, suppress_errors)
         return (assembled_words, warnings)
 
     def twopass_assemble(self, text):
@@ -129,9 +132,9 @@ class F100Asm():
         if pass_number > 0:
             print(header_text)
 
-        for textline in text:      
+        for textline in text:
 
-            warnings = []            
+            warnings = []
             line_pc = self.pc
             line_words = []
 
@@ -141,7 +144,7 @@ class F100Asm():
             if comment_start > -1 :
                 line = line[:comment_start].strip()
             ## Strip out label from the start of the line
-            if re.match("([a-zA-Z_][a-zA-Z0-9_]*:)", line):                
+            if re.match("([a-zA-Z_][a-zA-Z0-9_]*:)", line):
                 line_label = str.upper(re.match("([a-zA-Z_][a-zA-Z0-9_]*):", line).group(1))
                 self.st[line_label] = str(self.pc)
                 line = line[len(line_label)+1:].strip()
@@ -160,18 +163,18 @@ class F100Asm():
                             raise v
                 else:
                     try:
-                        (line_words, warnings) = self.line_assemble(t, fields[1:], self.st, suppress_errors = True if pass_number < 1 else False)            
+                        (line_words, warnings) = self.line_assemble(t, fields[1:], self.st, suppress_errors = True if pass_number < 1 else False)
                     except ValueError as v:
                         if pass_number >0:
                             # Ignore undefined symbols on first pass
                             error_count+= 1
-                            print(v)                        
-                    except UserWarning as e:                            
+                            print(v)
+                    except UserWarning as e:
                         error_count += 1
                         if pass_number > 0:
                             print("Error on line %d" % lineno)
                             print(e)
-                        
+
                     if len(warnings) > 0 :
                         for w in warnings:
                             if pass_number > 0 :
@@ -179,10 +182,10 @@ class F100Asm():
                     warning_count += len(warnings)
                     self.pc += len(line_words)
 
-            if pass_number > 0 :   
+            if pass_number > 0 :
                 ## Simple listing code
                 fields = []
-                fields.append(" %5d:" % lineno)                                
+                fields.append(" %5d:" % lineno)
                 if len(line_words) > 0 :
                     if len(line_words)>1:
                         fields.append("     %04X: %04X %04X "% (line_pc, line_words[0], line_words[1]))
@@ -196,13 +199,13 @@ class F100Asm():
                     print ("                   %04X " % d),
 
             lineno +=1
-        
+
         if pass_number > 0:
             print (line_sep)
             print ("# %d Error%s" % ( error_count, '' if error_count == 1 else 's'))
             print ("# %d Warning%s" % ( warning_count, '' if warning_count == 1 else 's'))
             print (line_sep)
-            print("# SymbolTable")         
+            print("# SymbolTable")
             for s in self.st.tostring().split('\n'):
                 print( "# %s" % s )
 
@@ -210,23 +213,23 @@ class F100Asm():
         new_pc = self.pc
         words = []
         if directive == ".EQU":
-            self.st[operands[0]] = ''.join(operands[1:])            
-        elif directive == ".ORG":        
+            self.st[operands[0]] = ''.join(operands[1:])
+        elif directive == ".ORG":
             new_pc = self.st.eval_expr(operands[0])
         elif directive == ".DATA" or directive == ".WORD":
             ## Need to resplit by commas rather than spaces
             data_words = (''.join(operands).split(','))
             new_pc += len(data_words)
-            
+
             for d in data_words:
                 ## Cant eval all expressions on first pass so return dummy data
                 try:
                     words.append(self.st.eval_expr(d))
                 except ValueError as v:
-                    words.append(0xFF)   
+                    words.append(0xFF)
 
-        return(new_pc, words)                
-                
+        return(new_pc, words)
+
 
 
 
@@ -241,7 +244,7 @@ if __name__ == "__main__":
     except getopt.GetoptError as  err:
         print(err)
         usage()
-        
+
     for opt, arg in opts:
         if opt in ( "-f", "--filename" ) :
             filename = arg

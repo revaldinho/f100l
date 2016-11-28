@@ -63,11 +63,11 @@ F100ASM supports the following directives, all of which start with the dot (.) c
   .EQU  STK_SIZE  0x0400
   .EQU  STK_BOT   MEMTOP - STK_SIZE
 
-F100ASM uses the Python ASR parser class to allow parsing of any valid Python expression. All expressions must evaulate to an integer number by the end of the first pass through the assembler. Expressions or symbols may be used anywhere a numerical value is allowed. 
+F100ASM uses the Python AST parser class to allow parsing of any valid Python expression. All expressions must evaulate to an integer number by the end of the first pass through the assembler. Expressions or symbols may be used anywhere a numerical value is allowed. 
 
 Like labels all variable names must start with an alphabetic character or an underscore but subsequent characters may be alphanumeric. All variable names are case insensitive.
 
-Note that the two symbols A and C are reserved words and may not be used as variable names.
+Note that the two symbols A and CR are reserved words and may not be used as variable names.
 
 Labels are treated like any other variable as far as expression parsing is concerned. 
 

@@ -14,6 +14,9 @@ from F100_Opcodes.OpcodeF3 import *
 from F100_Opcodes.OpcodeF2 import *
 from F100_Opcodes.OpcodeF1 import *
 from F100_Opcodes.OpcodeF0 import *
+from F100_Opcodes.OpcodeF0_Halt import *
+from F100_Opcodes.OpcodeF0_Jump import *
+from F100_Opcodes.OpcodeF0_Bit import *
 
 from InstructionReg import InstructionReg
 from ConditionReg import ConditionReg
@@ -28,7 +31,7 @@ class F100CPU:
         self.ACC= 0x0000
         self.memory_write = memory_write
         self.memory_read = memory_read
-        ## instance all the opcode classes, passing each a reference to the CPU resources 
+        ## instance all the opcode classes, passing each a reference to the CPU resources
         self.opcode_classes = [ opcode(CPU=self) for opcode in [OpcodeF0_Shift, OpcodeF0_Bit, OpcodeF0_Jump, OpcodeF0_Halt,
                                                                 OpcodeF1, OpcodeF2, OpcodeF3, OpcodeF4,
                                                                 OpcodeF5, OpcodeF6, OpcodeF7,
@@ -52,7 +55,7 @@ class F100CPU:
         cycle_count = 0
         self.IR.update(self.memory_fetch())
         if ( self.IR.F not in self.opcode_table):
-            raise UserWarning("Cannot execute Opcode with function field 0x%X" % self.IR.F ) 
+            raise UserWarning("Cannot execute Opcode with function field 0x%X" % self.IR.F )
         else:
             cycle_count += self.opcode_table[self.IR.F].exec()
         return cycle_count
@@ -65,7 +68,3 @@ class F100CPU:
         print (self.CR.tostring())
         print (self.IR.tostring())
         print ("----------------------------------------------------------")
-
-
-
-        

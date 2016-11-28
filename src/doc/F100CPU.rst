@@ -32,12 +32,12 @@ Memory above 0x0800 can be used for additional bulk data or program instruction 
  | Memory Area    | Primary Usage                           |
  +----------------+-----------------------------------------+
  |    0x0000      | Link Stack Pointer                      |
- +----------------+-----------------------------------------+ 
+ +----------------+-----------------------------------------+
  | 0x0001 - 0x00FF| Pointer area                            |
  +----------------+-----------------------------------------+
  | 0x0100 - 0x07FF| Directly addressed Data or Program Area |
  +----------------+-----------------------------------------+
- | 0x0800 - 0x7FFF| Data or Program Area                    | 
+ | 0x0800 - 0x7FFF| Data or Program Area                    |
  +----------------+-----------------------------------------+
 
 *Note: The user must always initialise the link stack pointer with an ODD value. The
@@ -58,14 +58,13 @@ address mode area - see above).
  |     0            |  0x4000                       |
  +------------------+-------------------------------+
  | 1 \(or floating\)|  0x0800                       |
- +------------------+-------------------------------+ 
+ +------------------+-------------------------------+
 
 
 The Condition Register
 ----------------------
 
-The Condition Register hold 7 flags (referred to as 'staticisers' in the F100-L
-documentation).
+The Condition Register hold 7 flag bits.
 
 +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
 | Bit | Flag | Reset State | Name              |       Function                                                          |
@@ -86,7 +85,9 @@ documentation).
 |     |      |             |                   | within an externally defined time.                                      |
 +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
 
- Once set the 'M' flag can only be reset by a CPU reset, interrupt or by using the CAL instruction.
+ The 'M' flag is cleared by a CPU reset, interrupt or execution of the CAL (Call subroutine)
+ instruction. It can also be cleared or set explicitly by the user through one of the bit set
+ or clear, rotate or shift instructions.
 
 
 Addressing Modes
@@ -96,9 +97,9 @@ The F100-L CPU supports 4 addressing modes and these are described below togethe
 with the assembler syntax.
 
 **Direct addressing**
-  
-The address of the operand data is encoded in an 11 bit field in the opcode word. In the 
-assembler this mode is denoted by providing just a bare operand. e.g. 
+
+The address of the operand data is encoded in an 11 bit field in the opcode word. In the
+assembler this mode is denoted by providing just a bare operand. e.g.
 
   ::
 
@@ -111,8 +112,8 @@ words where Direct Addressing, with a smaller operand, needs only one.
 
 **Immediate addressing**
 
-The 16 bit operand data is placed in the word immediately following the opcode. In the 
-assembler this mode is denoted by a comma (,) immediately before the operand e.g. 
+The 16 bit operand data is placed in the word immediately following the opcode. In the
+assembler this mode is denoted by a comma (,) immediately before the operand e.g.
 
   ::
 
@@ -120,12 +121,12 @@ assembler this mode is denoted by a comma (,) immediately before the operand e.g
 
 **Pointer addressing**
 
-The address of the operand data is encoded in an 8 bit field in the opcode word. 
-Optionally the value of this pointer can be pre-incremented or post-decremented. 
-This mode is denoted in the assembler by a slash (/) immediately in front of the 
+The address of the operand data is encoded in an 8 bit field in the opcode word.
+Optionally the value of this pointer can be pre-incremented or post-decremented.
+This mode is denoted in the assembler by a slash (/) immediately in front of the
 operand and optionally a plus (+) or minus (-) symbol following. e.g.
 
-  :: 
+  ::
 
     AND /0x44  ;  A <- A & (0x44)
     AND /0x44+ ;  (0x44) <- (0x44) + 1 ; A <- A & (0x44)
@@ -140,11 +141,3 @@ of the operand, e.g.
   ::
 
     AND .0x4444  ;  A <- A & (0x4444)
-
-
-
-
-
-
-
-      

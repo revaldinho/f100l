@@ -18,18 +18,31 @@ F100-L Instruction Set
    :members:
 
 .. CAL - Store Link in Link Stack
-.. automodule:: F100_Opcodes.OpcodeF2		
+.. automodule:: F100_Opcodes.OpcodeF2
+   :members:
+
+.. CLR, SET - Bit manipulation
+.. automodule:: F100_Opcodes.OpcodeF0_Bit
    :members:
 
 .. CMP - Compare Accumulator with Operand
 .. automodule:: F100_Opcodes.OpcodeF11
    :members:
 
-.. HALT - Stop Execution
-.. autoclass:: F100_Opcodes.OpcodeF0.OpcodeF0_Halt
-      
+.. HALT - Stop Program Execution
+.. automodule:: F100_Opcodes.OpcodeF0_Halt
+   :members:
+
 .. ICZ - Jump to (PC) if non-zero
-.. automodule:: F100_Opcodes.OpcodeF7		
+.. automodule:: F100_Opcodes.OpcodeF7
+   :members:
+
+.. JBC,JBS,JCS,JSC - Conditional Jump
+.. automodule:: F100_Opcodes.OpcodeF0_Jump
+   :members:
+
+.. JMP - Unconditional Jump
+.. automodule:: F100_Opcodes.OpcodeF15
    :members:
 
 .. LDA - Load Accumulator from Memory
@@ -46,11 +59,16 @@ F100-L Instruction Set
 
 .. SBS - Subtract (with Carry), Store to Memory
 .. automodule:: F100_Opcodes.OpcodeF6
-   :members:     
+   :members:
 
 .. SJM - Switch Jump
 .. automodule:: F100_Opcodes.OpcodeF1
-   :members:     
+   :members:
+
+.. SLA,SLE,SLL,SRA,SRE,SRL - Shift and Rotation
+.. automodule:: F100_Opcodes.OpcodeF0
+   :members:   
+      
       
 .. STO - Store Accumulator to Memory
 .. automodule:: F100_Opcodes.OpcodeF4

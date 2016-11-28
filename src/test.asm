@@ -1,13 +1,13 @@
             ;;
-            ;; test.asm 
+            ;; test.asm
             ;;
             ;; test assembly file including some intentional syntax/symbol errors
-        
 
-        .org 200 
-mylabel: 
-        .equ F1 23 ; some arbitrary constant 
-        .equ F2 F1 * 2 
+
+        .org 200
+mylabel:
+        .equ F1 23 ; some arbitrary constant
+        .equ F2 F1 * 2
 
         AND ,LABELWITHCODE
         AND ,labelwithcode
@@ -81,33 +81,37 @@ mylabel:
         RTC
 
         SJM
-        SJM 1 
+        SJM 1
         SJM 1 2
 	CAL ,0x1234 	; should assemble to a single word
         CAL .0x0FE
         CAL /F1*2
         JMP mylabel
         SBS .89
-        JMP mylabel 		
+        JMP mylabel
         .word 0x99,10, F1, F1*2, HERE
         SBS 0x55
-HERE: 
+HERE:
         ADS 0x88
         ADS .0x88
-        ADS /0x88 		
-LABELWITHCODE: SBS 0x88 
+        ADS /0x88
+LABELWITHCODE: SBS 0x88
         ADD 0x88 ; DIRECT
         STO ,0x88 ; IMMEDIATE
         STO /0x88 ; POINTER INDIRECT
         ADD /0x88+ ; POINTER INDIRECT PRE-INC
         ADD /0x88- ; POINTER INDIRECT POST-DEC
         ADD .0x88 ; IMMMEDIATE INDIRECT
-	
+
         SET 0x02 A
         CLR 0x01 CR
         SET 0x05 0x100
         SRA 0x02 0x450
-	
+        SRL.D 0x02 A
+        SRL.D 0x02 A
+        SRL   0x0D A
+        SRL.D 0x1E A	
+
         JBC 0x02 A 0x400
         JSC 0x01 CR 0x500
         JSC 0x05 0x100 0x100
@@ -115,8 +119,6 @@ LABELWITHCODE: SBS 0x88
         JCS 0x01 CR 0x200
         JSC 0x02 0x450 0x299
 	JMP ,0x1234 	; should assemble to a single word ignoring the operand
-               
+
         HALT
 	HALT ,0x123
-
-
