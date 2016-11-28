@@ -38,7 +38,7 @@ EXAMPLES ::
   python F100Asm -f testfile.asm
 
 
-BUGS ::
+BUGS :
 
 All output is sent only to a listing file currently.
 
