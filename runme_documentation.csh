@@ -11,13 +11,17 @@ git checkout master
 
 git pull
 git checkout -b gh-pages
+pushd src
+make html
+popd
+
 cp -r src/_build/html/* .
 cp -r src/_build/html/.nojekyll .
 git add _modules _sources _static doc genindex.html index.html objects.inv py-modindex.html search.html searchindex.js .nojekyll
 git commit -m "checkin documentation"
 rm -rf src/_build
 git branch --set-upstream-to=origin/gh-pages gh-pages
-git push origin gh-pages
+git push origin gh-pages -f
 
 
 

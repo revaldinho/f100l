@@ -27,20 +27,27 @@ USAGE:
 
 REQUIRED SWITCHES ::
 
-  -f  --filename  <filename>       specify the assembler source file
+  -f --filename  <filename>      specify the assembler source file
+
 
 OPTIONAL SWITCHES ::
 
-  -h  --help                       print this help message
+  -o --output    <filename>      specify file name for assembled code 
+
+  -g --format    <bin|ihex|hex>  set the file format for the assembled code
+                                 - default is hex
+
+  -e --endianness <little|big>   set endianness of byte oriented output 
+                                 - default is little-endian
+
+  -h --help                      print this help message
+
+  If no output filename is provided the assembler just produces the normal
+  listing output to stdout.
 
 EXAMPLES ::
 
-  python F100Asm -f testfile.asm
-
-
-BUGS :
-
-All output is sent only to a listing file currently.
+  python3.5 F100Asm.py -f test.asm -o file.bin -g bin -e little
 
 '''
 
@@ -64,11 +71,15 @@ from F100_Opcodes.OpcodeF0 import *
 from F100_Opcodes.OpcodeF0_Halt import *
 from F100_Opcodes.OpcodeF0_Jump import *
 from F100_Opcodes.OpcodeF0_Bit import *
+from hex2bin import Hex2Bin
 import string
 import re
 import getopt
 import time
 import sys
+
+BIG_ENDIAN = 0
+LITTLE_ENDIAN = 1
 
 
 header_text = '''
@@ -119,8 +130,10 @@ class F100Asm():
         return (assembled_words, warnings)
 
     def twopass_assemble(self, text):
+        assembled_words = dict()
         for i in range(0,2):
-            self.assemble(text, i)
+            assembled_words = self.assemble(text, i)
+        return assembled_words
 
     def assemble( self, text, pass_number ):
         ''' Build the text into lines of tokens and expressions'''
@@ -129,6 +142,8 @@ class F100Asm():
         warning_count = 0
         lineno = 1
 
+        assembled_words = dict()
+        
         if pass_number > 0:
             print(header_text)
 
@@ -199,7 +214,10 @@ class F100Asm():
                     print ("                   %04X " % d),
 
             lineno +=1
+            if pass_number > 0 :
+                assembled_words[line_pc] = line_words
 
+            
         if pass_number > 0:
             print (line_sep)
             print ("# %d Error%s" % ( error_count, '' if error_count == 1 else 's'))
@@ -208,6 +226,8 @@ class F100Asm():
             print("# SymbolTable")
             for s in self.st.tostring().split('\n'):
                 print( "# %s" % s )
+                
+        return assembled_words
 
     def process_directive(self, directive, operands ) :
         new_pc = self.pc
@@ -231,7 +251,39 @@ class F100Asm():
         return(new_pc, words)
 
 
-
+def write_file(output_file, oformat, assembled_words, endianness=LITTLE_ENDIAN) :
+    addr_lo = 0
+    addr_hi = 0
+    
+    # make a 64KByte memory image
+    h = Hex2Bin(64*1024)
+    # fill it from assembled words
+    for k in sorted(assembled_words.keys()):
+        # Need to multiply address by two to convert 16b word address to byte address
+        addr = k * 2 
+        words = assembled_words[k]
+        if addr < addr_lo:
+            addr_lo = addr
+        for i in words:
+            byte_lo = i & 0x000000FF
+            byte_hi = (i >> 8) & 0x000000FF
+            if endianness==LITTLE_ENDIAN:
+                h.write_byte(addr, byte_lo)
+                addr += 1
+                h.write_byte(addr, byte_hi)
+                addr += 1
+            else:
+                h.write_byte(addr, byte_lo)
+                addr += 1
+                h.write_byte(addr, byte_hi)
+                addr += 1
+        if addr > addr_hi:
+            addr_hi = addr
+            
+    result = h.write_file( output_filename, oformat=output_format, first_address=0, number_of_bytes=addr_hi)
+    if result == False:
+        raise UserWarning("Error writing to %s " % output_filename)
+    
 
 
 if __name__ == "__main__":
@@ -239,8 +291,10 @@ if __name__ == "__main__":
     Command line option parsing.
     """
     filename = ""
+    output_filename = ""
+    output_format = "hex"
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "f:h", ["filename=","help"])
+        opts, args = getopt.getopt( sys.argv[1:], "f:o:g:h", ["filename=","output=","format=""help"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -248,6 +302,13 @@ if __name__ == "__main__":
     for opt, arg in opts:
         if opt in ( "-f", "--filename" ) :
             filename = arg
+        if opt in ( "-o", "--output" ) :
+            output_filename = arg
+        if opt in ( "-g", "--format" ) :
+            if (arg in ("hex", "bin", "ihex")):
+                output_format = arg
+            else:
+                usage()
         elif opt in ("-h", "--help" ) :
             usage()
 
@@ -257,7 +318,9 @@ if __name__ == "__main__":
             text = f.readlines()
         f.close()
         s = time.time()
-        asm.twopass_assemble(text)
+        assembled_words = asm.twopass_assemble(text)
+        if output_filename != "" :
+            write_file(output_filename, output_format, assembled_words)
         e = time.time()
         print ("# Run time = %1.3f s" % (e-s))
         print (line_sep)
