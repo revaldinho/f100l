@@ -251,7 +251,7 @@ class F100Asm():
         return(new_pc, words)
 
 
-def write_file(output_file, oformat, assembled_words, endianness=LITTLE_ENDIAN) :
+def write_file(output_file, oformat, assembled_words, endianness="little") :
     addr_lo = 0
     addr_hi = 0
     
@@ -267,7 +267,7 @@ def write_file(output_file, oformat, assembled_words, endianness=LITTLE_ENDIAN) 
         for i in words:
             byte_lo = i & 0x000000FF
             byte_hi = (i >> 8) & 0x000000FF
-            if endianness==LITTLE_ENDIAN:
+            if endianness=="little":
                 h.write_byte(addr, byte_lo)
                 addr += 1
                 h.write_byte(addr, byte_hi)
@@ -293,8 +293,9 @@ if __name__ == "__main__":
     filename = ""
     output_filename = ""
     output_format = "hex"
+    endianness = "little"
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "f:o:g:h", ["filename=","output=","format=""help"])
+        opts, args = getopt.getopt( sys.argv[1:], "e:f:o:g:h", ["endianness=", "filename=","output=","format=""help"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -304,6 +305,8 @@ if __name__ == "__main__":
             filename = arg
         if opt in ( "-o", "--output" ) :
             output_filename = arg
+        if opt in ( "-e", "--endianness" ) :
+            endianness = arg
         if opt in ( "-g", "--format" ) :
             if (arg in ("hex", "bin", "ihex")):
                 output_format = arg
@@ -320,7 +323,7 @@ if __name__ == "__main__":
         s = time.time()
         assembled_words = asm.twopass_assemble(text)
         if output_filename != "" :
-            write_file(output_filename, output_format, assembled_words)
+            write_file(output_filename, output_format, assembled_words, endianness=endianness)
         e = time.time()
         print ("# Run time = %1.3f s" % (e-s))
         print (line_sep)
