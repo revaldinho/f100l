@@ -3,8 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to F100L's documentation!
-=================================
+Welcome to the F100-L Project
+=============================
+
+.. image:: doc/F100_panorama.png
+   :alt: F100-L Die Photograph
+   :scale: 80%
 
 Contents:
 
@@ -12,17 +16,16 @@ Contents:
    :titlesonly:
    :maxdepth: 2
 
-   doc/F100CPU	     
-   doc/F100_Opcodes   
+   doc/F100CPU
+   doc/F100_Opcodes
    doc/F100Asm
-   doc/F100Emu   
+   doc/F100Emu
    doc/References
    doc/license
-   
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

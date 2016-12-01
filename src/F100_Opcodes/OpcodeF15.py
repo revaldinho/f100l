@@ -88,10 +88,12 @@ class OpcodeF15(F100_Opcode) :
         elif IR.I==1 and IR.P==0:
             self.CPU.PC = self.CPU.memory_fetch() & 0x7FFF
         elif IR.I==1:
+            pointer_val = self.memory_read(IR.P)
             if IR.R==1:
-                IR.P += 1
-            self.CPU.PC = self.CPU.memory_read(IR.P) & 0x7FFF
+                pointer_val += 1
+            self.CPU.PC = self.CPU.memory_read(pointer_val) & 0x7FFF
             if IR.R==3:
-                IR.P -= 1
+                pointer_val -= 1
+            self.memory_write(IR.P, pointer_val)
 
         return cycle_count

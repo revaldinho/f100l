@@ -1,9 +1,9 @@
 ## ============================================================================
-## F100_Opcode.py 
+## F100_Opcode.py
 ##
 ## COPYRIGHT 2016 Richard Evans, Ed Spittles
 ##
-## This file is part of f100l - an set of utilities for programming and 
+## This file is part of f100l - an set of utilities for programming and
 ## emulation of the Ferranti F100-L CPU and peripheral components.
 ##
 ## f100l is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU Lesser General Public License for more details.
 ##
-## See  <http://www.gnu.org/licenses/> for a copy of the GNU Lesser General 
+## See  <http://www.gnu.org/licenses/> for a copy of the GNU Lesser General
 ## Public License
 ##
 ## ============================================================================
@@ -34,7 +34,7 @@ All instruction encodings are defined as overlapping but mutually exclusive bit 
 The bit fields are defined as follows
 
   +------+---------------+---------------+----------------------------------------------------------------+
-  |Field |Number of bits | Bit positions | Comment                                                        | 
+  |Field |Number of bits | Bit positions | Comment                                                        |
   +------+---------------+---------------+----------------------------------------------------------------+
   |  F   |      4        |  15..12       | Instruction class or function                                  |
   +------+---------------+---------------+----------------------------------------------------------------+
@@ -42,7 +42,7 @@ The bit fields are defined as follows
   +------+---------------+---------------+----------------------------------------------------------------+
   |  T   |      2        |   11,10       | General field to qualify F=0 instructions                      |
   +------+---------------+---------------+----------------------------------------------------------------+
-  |  R   |      2        |     9,8       | Register field or auto-index mode for indirect addressing      | 
+  |  R   |      2        |     9,8       | Register field or auto-index mode for indirect addressing      |
   +------+---------------+---------------+----------------------------------------------------------------+
   |  S   |      2        |     7,6       | General field to qualify F=0 instructions                      |
   +------+---------------+---------------+----------------------------------------------------------------+
@@ -55,7 +55,7 @@ The bit fields are defined as follows
   |  B   |      4        |    3..0       | Shift number or bit significance                               |
   +------+---------------+---------------+----------------------------------------------------------------+
 
-Where a don't care (x) bit is presented in the tables, the assembler will consistently use a '0'. The 
+Where a don't care (x) bit is presented in the tables, the assembler will consistently use a '0'. The
 emulator will ignore this field during decoding.
 
 
@@ -77,14 +77,15 @@ Abbrieviations
 
 Definitions ::
 
-  N   11 bit memory address (associated with opcode field N above)
-  P    8 bit memory address (associated with opcode field P above)
-  W   15 bit memory address
-  D   16 bit immediate data 
-  \(N\)   Contents of memory location N
-  \(P\)   Contents of memory location P
-  \(W\)   Contents of memory location W
- 
+  N      11 bit memory address (associated with opcode field N above)
+  P       8 bit memory address (associated with opcode field P above)
+  W      15 bit memory address
+  D      16 bit immediate data
+  (N)    Contents of memory location N
+  (P)    Contents of memory location P
+  (W)    Contents of memory location W
+  PC     Value of the Program Counter (when pointing at the opcode word)
+  (PC+d) Contents of memory location offset by d words from the opcode
 
 '''
 import re
@@ -97,20 +98,22 @@ ADM_POINTER_INDIRECT_PREINC = 4
 ADM_POINTER_INDIRECT_POSTDEC = 5
 
 prefix_postfix_re = re.compile( r'([\.\/\,])?((?:.*(?=[+-]$))|(?:.*))([+-])?')
-address_mode_keys = { 
-    None: ADM_DIRECT, 
-    ',' : ADM_IMMEDIATE, 
-    '.' : ADM_IMMEDIATE_INDIRECT, 
-    '/' : ADM_POINTER_INDIRECT,    
-    '+' : ADM_POINTER_INDIRECT_PREINC, 
+address_mode_keys = {
+    None: ADM_DIRECT,
+    ',' : ADM_IMMEDIATE,
+    '.' : ADM_IMMEDIATE_INDIRECT,
+    '/' : ADM_POINTER_INDIRECT,
+    '+' : ADM_POINTER_INDIRECT_PREINC,
     '-' : ADM_POINTER_INDIRECT_POSTDEC }
 
 
 def validate_operand( operand, lo=0, hi=0, bits=0 ):
+    if operand < 0:
+        operand = operand & 0xFFFF
     if not ( lo <= operand <= hi ):
         raise UserWarning("Error: Operand 0x%04X out of range for this addressing mode, %d bit operand must be between 0x%04X and 0x%04X." % (operand, bits, lo, hi))
     return True
-                          
+
 def get_operand_value( operand_string, symbol_table, suppress_errors):
     try:
         operand_val = symbol_table.eval_expr(operand_string)
@@ -137,7 +140,7 @@ class F100_Opcode :
         self.S = None   #                 "
         self.D = None   # 16 bit immediate data
         self.B = None   # Shift Number of bit significance
-        self.opcode_regexp = re.compile(r'AND')    
+        self.opcode_regexp = re.compile(r'AND')
         self.code = []
         self.CPU = CPU  # CPU resources for use in emulation
         ## Opcode_fn will be a dictionary of opcode names and F field values
@@ -146,11 +149,11 @@ class F100_Opcode :
         self.opcode_regexp = re.compile(r'%s' % '|'.join(self.opcode_fn.keys()))
         self.addr_mode = None
 
-         
+
     def get_address_mode(self, operand):
         # Determine the address mode and strip the prefix/postfix from the operand string
         (prefix, stripped_operand, postfix) = prefix_postfix_re.match(operand.strip()).groups()
-        mode = address_mode_keys[prefix] 
+        mode = address_mode_keys[prefix]
         if mode == ADM_POINTER_INDIRECT and postfix:
             mode = address_mode_keys[postfix]
         elif postfix:
@@ -159,7 +162,7 @@ class F100_Opcode :
 
     def assemble(self, opcode_token, operands, symbol_table, suppress_errors=False):
         ## This is the method to override to process the token and raw operands
-        ## into an array of data to return to the calling process. The generic 
+        ## into an array of data to return to the calling process. The generic
         ## definition is the one which covers the vast majority of opcodes
         (addr_mode, first_operand ) = self.get_address_mode(operands[0])
 
@@ -174,8 +177,8 @@ class F100_Opcode :
             self.F = self.opcode_fn[opcode_token]
         else:
             raise UserWarning( "Error: Cannot deal with opcode %s" % opcode_token)
-            
-        # Cannot use direct mode with operand of 0 so silently transform to more suitable mode        
+
+        # Cannot use direct mode with operand of 0 so silently transform to more suitable mode
         if addr_mode == ADM_DIRECT and first_operand_val == 0:
             addr_mode = ADM_IMMEDIATE_INDIRECT
             warnings.append("Warning: Cannot use direct mode with operand of 0 so will assemble to immediate indirect instead")
@@ -184,11 +187,11 @@ class F100_Opcode :
         if addr_mode == ADM_DIRECT:
             validate_operand(first_operand_val, 1, 0x7FF, 11)
             self.N = first_operand_val
-            self.I = 0       
+            self.I = 0
         elif addr_mode == ADM_IMMEDIATE:
             validate_operand(first_operand_val, 0, 0xFFFF, 16)
             self.N = 0
-            self.I = 0       
+            self.I = 0
             self.D = first_operand_val
         elif addr_mode in ( ADM_POINTER_INDIRECT, ADM_POINTER_INDIRECT_PREINC, ADM_POINTER_INDIRECT_POSTDEC):
             validate_operand(first_operand_val, 1, 0xFF, 8)
@@ -206,20 +209,20 @@ class F100_Opcode :
 
         return (self.bitassemble(), warnings)
 
-    def bitassemble( self ) :        
+    def bitassemble( self ) :
         # assemble the opcode bits and pieces
-        self.code = []    
+        self.code = []
 
         opcode = self.F << 12
         if self.T :
             opcode |= self.T << 10
-        if self.R : 
+        if self.R :
             opcode |= self.R << 8
-        if self.S : 
+        if self.S :
             opcode |= self.S << 6
-        if self.J : 
+        if self.J :
             opcode |= self.J << 4
-        if self.B : 
+        if self.B :
             opcode |= self.B
         if self.I:
             opcode |= self.I << 11
@@ -227,7 +230,7 @@ class F100_Opcode :
             opcode |= self.P
         if self.N:
             opcode |= self.N
-            
+
         self.code.append(opcode)
 
         if self.D != None:
@@ -236,10 +239,10 @@ class F100_Opcode :
             if W != None:
                 self.code.append(W)
 
-        return self.code   
+        return self.code
 
 
-    
+
     def get_operand(self):
         '''
         Return operand for use with standard addressing modes in emulation
@@ -247,7 +250,7 @@ class F100_Opcode :
         cycles = 0
         IR = self.CPU.IR
         CR = self.CPU.CR
-        
+
         operand = None
         operand_address = None
         if ( IR.F != self.F):
@@ -258,22 +261,24 @@ class F100_Opcode :
             operand = self.CPU.memory_fetch()
         elif IR.I==0:
             self.addr_mode == ADM_DIRECT
-            operand_address = IR.N         
-            operand = self.memory_read(operand_address)           
+            operand_address = IR.N
+            operand = self.CPU.memory_read(operand_address)
         elif IR.I==1 and IR.P==0:
             self.addr_mode == ADM_IMMEDIATE_INDIRECT
             operand_address = self.CPU.memory_fetch()
             operand = self.CPU.memory_read(operand_address)
         elif IR.I==1:
-            self.addr_mode == ADM_POINTER_INDIRECT                        
-            if IR.R==1: 
-                IR.P += 1
+            self.addr_mode == ADM_POINTER_INDIRECT
+            pointer_val = IR.P
+            if IR.R==1:
+                pointer_val += 1
                 self.addr_mode == ADM_POINTER_INDIRECT_PREINC
-            operand_address = IR.P
-            operand = self.CPU.memory_read(operand_address)           
+            operand_address = pointer_val
+            operand = self.CPU.memory_read(operand_address)
             if IR.R==3:
-                self.addr_mode == ADM_POINTER_INDIRECT_POSTDEC                
-                IR.P -= 1        
+                self.addr_mode == ADM_POINTER_INDIRECT_POSTDEC
+                pointer_val -= 1
+            self.CPU.memory_write(IR.P, pointer_val)
         return (operand, operand_address, cycles)
 
 
@@ -282,8 +287,8 @@ class F100_Opcode :
         On entry the CPU instruction register is already populated and the PC is pointing
         to the next instruction or the first operand
         '''
-        pass    
-    
+        pass
+
     def disassemble(self):
         pass
 

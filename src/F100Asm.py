@@ -32,12 +32,12 @@ REQUIRED SWITCHES ::
 
 OPTIONAL SWITCHES ::
 
-  -o --output    <filename>      specify file name for assembled code 
+  -o --output    <filename>      specify file name for assembled code
 
   -g --format    <bin|ihex|hex>  set the file format for the assembled code
                                  - default is hex
 
-  -e --endianness <little|big>   set endianness of byte oriented output 
+  -e --endianness <little|big>   set endianness of byte oriented output
                                  - default is little-endian
 
   -h --help                      print this help message
@@ -67,7 +67,7 @@ from F100_Opcodes.OpcodeF4 import *
 from F100_Opcodes.OpcodeF3 import *
 from F100_Opcodes.OpcodeF2 import *
 from F100_Opcodes.OpcodeF1 import *
-from F100_Opcodes.OpcodeF0 import *
+from F100_Opcodes.OpcodeF0_Shift import *
 from F100_Opcodes.OpcodeF0_Halt import *
 from F100_Opcodes.OpcodeF0_Jump import *
 from F100_Opcodes.OpcodeF0_Bit import *
@@ -143,7 +143,7 @@ class F100Asm():
         lineno = 1
 
         assembled_words = dict()
-        
+
         if pass_number > 0:
             print(header_text)
 
@@ -203,21 +203,21 @@ class F100Asm():
                 fields.append(" %5d:" % lineno)
                 if len(line_words) > 0 :
                     if len(line_words)>1:
-                        fields.append("     %04X: %04X %04X "% (line_pc, line_words[0], line_words[1]))
+                        fields.append("     %04X: %04X %04X "% (line_pc, line_words[0] & 0xFFFF, line_words[1] & 0xFFFF))
                     else:
-                        fields.append("     %04X: %04X      "% (line_pc, line_words[0]))
+                        fields.append("     %04X: %04X      "% (line_pc, line_words[0] & 0xFFFF))
                 else:
                     fields.append(' '*21)
                 fields.append(textline.strip())
                 print (' '.join(fields))
                 for d in line_words[2:]:
-                    print ("                   %04X " % d),
+                    print ("                   %04X " % d & 0xFFFF),
 
             lineno +=1
             if pass_number > 0 :
                 assembled_words[line_pc] = line_words
 
-            
+
         if pass_number > 0:
             print (line_sep)
             print ("# %d Error%s" % ( error_count, '' if error_count == 1 else 's'))
@@ -226,7 +226,7 @@ class F100Asm():
             print("# SymbolTable")
             for s in self.st.tostring().split('\n'):
                 print( "# %s" % s )
-                
+
         return assembled_words
 
     def process_directive(self, directive, operands ) :
@@ -254,13 +254,13 @@ class F100Asm():
 def write_file(output_file, oformat, assembled_words, endianness="little") :
     addr_lo = 0
     addr_hi = 0
-    
+
     # make a 64KByte memory image
     h = Hex2Bin(64*1024)
     # fill it from assembled words
     for k in sorted(assembled_words.keys()):
         # Need to multiply address by two to convert 16b word address to byte address
-        addr = k * 2 
+        addr = k * 2
         words = assembled_words[k]
         if addr < addr_lo:
             addr_lo = addr
@@ -279,11 +279,11 @@ def write_file(output_file, oformat, assembled_words, endianness="little") :
                 addr += 1
         if addr > addr_hi:
             addr_hi = addr
-            
+
     result = h.write_file( output_filename, oformat=output_format, first_address=0, number_of_bytes=addr_hi)
     if result == False:
         raise UserWarning("Error writing to %s " % output_filename)
-    
+
 
 
 if __name__ == "__main__":

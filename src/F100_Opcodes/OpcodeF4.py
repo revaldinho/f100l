@@ -1,5 +1,5 @@
 '''
-STO - Store accumulator to memory
+STO - Store Accumulator to Memory
 ---------------------------------
 
 Store the value in the accumulator to the specified memory location
@@ -8,12 +8,12 @@ Store the value in the accumulator to the specified memory location
 
 ::
 
-   STO N      (N) <- A 
-   STO ,D     (PC+1) <- A 
-   STO /P     (P) <- A 
+   STO N      (N) <- A
+   STO ,D     (PC+1) <- A
+   STO /P     (P) <- A
    STO /P+    P <- P + 1 ; (P) <- A
    STO /P-    (P) <- A ;  P <- P - 1 ;
-   STO .W     (W) <- A 
+   STO .W     (W) <- A
 
 **Instruction Encoding**
 
@@ -26,15 +26,15 @@ Store the value in the accumulator to the specified memory location
 | F  |I| | R| P               |                  |          |                      |
 +----+-+-+--+-----------------+-+----------------+----------+----------------------+
 |0100|0|  11'b<non-zero addr> |        none      | STO N    | TBC                  |
-+----+-+-+--+-----------------+-+----------------+----------+----------------------+ 
++----+-+-+--+-----------------+-+----------------+----------+----------------------+
 |0100|0|  11'b000000000000    |     16`b<data>   | STO ,D   | TBC                  |
 +----+-+-+--+-----------------+-+----------------+----------+----------------------+
 |0100|1|x|x0|8`b<non-zero ptr>|        none      | STO /P   | TBC                  |
 +----+-+-+--+-----------------+-+----------------+----------+----------------------+
 |0100|1|x|01|8`b<non-zero ptr>|        none      | STO /P+  | TBC                  |
-+----+-+-+--+-----------------+-+----------------+----------+----------------------+ 
++----+-+-+--+-----------------+-+----------------+----------+----------------------+
 |0100|1|x|11|8`b<non-zero ptr>|        none      | STO /P-  | TBC                  |
-+----+-+-+--+-----------------+-+----------------+----------+----------------------+ 
++----+-+-+--+-----------------+-+----------------+----------+----------------------+
 |0100|1|x|xx|8`b00000000      |x|   15`b<addr>   | STO .W   | TBC                  |
 +----+-+-+--+-----------------+-+----------------+----------+----------------------+
 
@@ -43,8 +43,8 @@ Store the value in the accumulator to the specified memory location
 +---+---+---+---+---+---+---+
 | F | M | C | S | V | Z | I |
 +---+---+---+---+---+---+---+
-|\--|\--|\--| * | 0 | * |\--| 
-+---+---+---+---+---+---+---+ 
+|\--|\--|\--| * | 0 | * |\--|
++---+---+---+---+---+---+---+
 
 * Z is set if the accumulator value is all-zeroes, otherwise cleared
 * S is set if the MSB of the accumulator is a '1', otherwise cleared
@@ -62,18 +62,38 @@ class OpcodeF4(F100_Opcode) :
 
     def exec(self):
         cycle_count = 0
-        (self.CPU.OR, operand_address, cycle_count) = self.get_operand()
 
-        if self.addr_mode == ADM_IMMEDIATE:
-            # Special handling for the immediate data mode where the Accumulator is stored in
-            # already incremented PC rather than using the immediate data
+        IR = self.CPU.IR
+        CR = self.CPU.CR
+
+        operand = None
+        operand_address = None
+        if ( IR.F != self.F):
+            raise UserWarning("Cannot execute opcode %04X using opcode class %s" % (opcode, self.__name__) )
+        elif IR.I==0 and IR.N==0:
+            self.addr_mode == ADM_IMMEDIATE
             self.CPU.OR = self.CPU.PC
+        elif IR.I==0:
+            self.addr_mode == ADM_DIRECT
+            self.CPU.OR = IR.N
+        elif IR.I==1 and IR.P==0:
+            self.addr_mode == ADM_IMMEDIATE_INDIRECT
+            self.CPU.OR = self.CPU.memory_fetch()
+        elif IR.I==1:
+            self.addr_mode == ADM_POINTER_INDIRECT
+            pointer_val = self.CPU.memory_read(IR.P)
+            if IR.R==1:
+                pointer_val += 1
+                self.addr_mode == ADM_POINTER_INDIRECT_PREINC
+            self.CPU.OR = self.CPU.memory_read(pointer_val)
+            if IR.R==3:
+                self.addr_mode == ADM_POINTER_INDIRECT_POSTDEC
+                pointer_val -= 1
+            # Update the pointer location whether or not it has changed value
+            self.CPU.memory_write(IR.P, pointer_val)
 
         self.CPU.memory_write(self.CPU.OR, self.CPU.ACC)
         self.CPU.CR.Z = 1 if (self.CPU.ACC & 0xFFFF) == 0 else 0
         self.CPU.CR.S = 1 if (self.CPU.ACC & 0x8000) != 0 else 0
         self.CPU.CR.V = 0
-        return cycle_count        
-        
-
-
+        return cycle_count

@@ -37,8 +37,10 @@ OPTIONAL SWITCHES ::
   -a --adsel      <0|1>          specify the state of the AdSel pin
                                  - defaults to 1 if not specified
 
-  -e --endianness <little|big>   set endianness of byte oriented input file 
+  -e --endianness <little|big>   set endianness of byte oriented input file
                                  - default is little-endian
+
+  -t --traceon                   print all memory transactions to stdout
 
   -h --help                      print this help message
 
@@ -51,11 +53,11 @@ EXAMPLES ::
 banner =\
 '''
 # -------------------------------------------------------------------------------------------
-#    _____________  ____        __       ______                __      __            
+#    _____________  ____        __       ______                __      __
 #   / ____<  / __ \/ __ \      / /      / ____/___ ___  __  __/ /___ _/ /_____  _____
 #  / /_   / / / / / / / /_____/ /      / __/ / __ `__ \/ / / / / __ `/ __/ __ \/ ___/
-# / __/  / / /_/ / /_/ /_____/ /___   / /___/ / / / / / /_/ / / /_/ / /_/ /_/ / /    
-#/_/    /_/\____/\____/     /_____/  /_____/_/ /_/ /_/\__,_/_/\__,_/\__/\____/_/     
+# / __/  / / /_/ / /_/ /_____/ /___   / /___/ / / / / / /_/ / / /_/ / /_/ /_/ / /
+#/_/    /_/\____/\____/     /_____/  /_____/_/ /_/ /_/\__,_/_/\__,_/\__/\____/_/
 #
 #
 # F 1 0 0 - L * E M U L A T O R (c) 2016 Revaldinho & BigEd
@@ -74,18 +76,24 @@ def print_header():
     print("# -------------------------------------------------------------------------------------------")
 
 class F100Emu:
-    def __init__ (self, ramsize=32768, adsel=1):
+    def __init__ (self, ramsize=32768, adsel=1, traceon=False):
         self.CPU = F100CPU(adsel=adsel, memory_read=self.memory_read, memory_write=self.memory_write)
         self.RAM = [0xDEAD]*ramsize
         self.MEMTOP = ramsize-1
+        self.traceon = traceon
 
     def memory_read(self, address):
+        if self.traceon == True:
+            print ("READ 0x%04X 0x%04X" % ( address & 0xFFFF, self.RAM[address] & 0xFFFF))
+
         if 0 <= address <= self.MEMTOP:
             return self.RAM[address]
         else:
             raise UserWarning("Memory out of range error for address 0x%04X" % address )
 
     def memory_write(self, address, data):
+        if self.traceon == True:
+            print ("STORE 0x%04X 0x%04X" % ( address & 0xFFFF, data & 0xFFFF))
         if 0 <= address <= self.MEMTOP:
             self.RAM[address] = data & 0xFFFF
         else:
@@ -108,8 +116,9 @@ if __name__ == "__main__" :
     file_format = ""
     adsel = 1
     endianness = "little"
+    traceon = False
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:h", ["adsel=","endianness=", "filename=","format=""help"])
+        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:h:t", ["adsel=","endianness=", "filename=","format=","help","traceon"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -126,13 +135,15 @@ if __name__ == "__main__" :
                 file_format = arg
             else:
                 usage()
+        if opt in ("-t", "--traceon") :
+            traceon = True
         elif opt in ("-h", "--help" ) :
             usage()
     if filename=="" or file_format=="":
         usage()
-            
 
-    emu = F100Emu(adsel=adsel)
+
+    emu = F100Emu(adsel=adsel, traceon=traceon)
 
     # Initialise the hex2bin object with a 64Kbyte address space
     h = Hex2Bin(64*1024)
@@ -142,12 +153,12 @@ if __name__ == "__main__" :
         local_addr = i >> 1
         if endianness == "little":
             (byte_lo,valid) = h.read_byte(i)
-            i+=1 
+            i+=1
             (byte_hi,valid) = h.read_byte(i)
             i+=1
         else:
             (byte_hi,valid) = h.read_byte(i)
-            i+=1 
+            i+=1
             (byte_lo,valid) = h.read_byte(i)
             i+=1
         emu.RAM[local_addr] = ((byte_hi << 8) | byte_lo ) & 0xFFFF

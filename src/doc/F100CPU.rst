@@ -5,19 +5,76 @@ The Ferranti F100-L Microprocessor
 The Ferranti F100-L is a single-address, single accumulator, fixed 16-bit word length
 microprocessor.
 
+.. figure:: F100L_CPU_Diagram.png
+   :alt: F100-L Block Diagram
+
+   **F100-L Simplified CPU Block Diagram**
+
+Datapath Registers and Function Unit
+------------------------------------
+
+The datapath side of the machine has only 3 registers
+
+  * the 16-bit accumulator (ACC)
+  * the 16-bit operand register (OR)
+  * the 7-bit condition register (CR)
+
+
+All arithmetic and logical operations are performed on one or more of these registers.
+Any instructions specifying a memory location as an operand will access that memory location
+and store the result in the operand register before processing. Once all operands are in place
+the function unit will perform the required operation and save the result either to the
+accumulator, or first to the OR and then to memory if a memory location is the final
+destination.
+
+Although the OR is usually a very transitory point, it is possible to access and set the
+contents of this register directly by using one of the double-word shift instructions.
+
+The function unit itself is a bit-serial unit. All operations are processed one bit at
+a time, and every instruction requires at least 18 logic cycles in addition to any memory
+accesses.
+
+The Condition Register
+----------------------
+
+The Condition Register hold 7 flag bits.
+
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+ | Bit | Flag | Reset State | Name              |       Function                                                          |
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+ |  0  |   I  |  0          | Interrupt Disable | disables interrupts when set                                            |
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+ |  1  |   Z  |  X          | Zero              | indicates zero results                                                  |
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+ |  2  |   V  |  X          | Overflow          | indicates overflow in arithmetic and shift operations                   |
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+ |  3  |   N  |  X          | Negative sign     | indicates sign of results                                               |
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+ |  4  |   C  |  X          | Carry             | carry bit, set at the end of arithmetic and shift operations            |
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+ |  5  |   M  |  0          | Multi-Length      | enables use of the carry bit as input to arithmetic and shift operations|
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+ |  6  |   F  |  0          | Fail              | set if an external function , DMA or IO cycle does not complete         |
+ |     |      |             |                   | within an externally defined time.                                      |
+ +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
+
+The 'M' flag is cleared by a CPU reset, interrupt or execution of the CAL (Call subroutine) instruction.
+It can also be cleared or set explicitly by the user through one of the bit set or clear, rotate or shift instructions.
+
+
+
 Memory Space
 ------------
 
-Although all words are 16-bits wide, the program counter and addressing logic is
-only capable of addressing a 15-bit space: the maximum addressable memory size
-then is 64KBytes, arranged as 32K by 16-bit words.
+The program counter and addressing logic are only 15 rather than 16-bits wide, so
+the maximum addressable memory size is 64 KBytes, arranged as 32K by 16-bit words.
 
-In this 32K word space, the lower portion of the address range is treated differently
-to the rest of the range. In particular the first 256 words of memory can be used as
-pointers for Pointer Indirect Addressing modes,  with pre-increment and post-decrementing
-available for the pointers themselves.
+In this address space, the lower portion of the address range is treated differently
+to the rest of the range.
 
-Locations 1-255 are available for user programs; location 0 is reserved
+The first 256 words of memory can be used as pointers for Pointer Indirect Addressing modes,
+with pre-increment and post-decrementing available for the pointers themselves. Locations
+1-255 are available for user programs; location 0 is reserved
 for use as the processor's link stack pointer since the CPU has no internal
 stack pointer state of its own. The various jump to and return from subroutines
 will always adjust the value of the stack pointer in location 0 appropriately.
@@ -61,34 +118,6 @@ address mode area - see above).
  +------------------+-------------------------------+
 
 
-The Condition Register
-----------------------
-
-The Condition Register hold 7 flag bits.
-
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-| Bit | Flag | Reset State | Name              |       Function                                                          |
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-|  0  |   I  |  0          | Interrupt Disable | disables interrupts when set                                            |
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-|  1  |   Z  |  X          | Zero              | indicates zero results                                                  |
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-|  2  |   V  |  X          | Overflow          | indicates overflow in arithmetic and shift operations                   |
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-|  3  |   N  |  X          | Negative sign     | indicates sign of results                                               |
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-|  4  |   C  |  X          | Carry             | carry bit, set at the end of arithmetic and shift operations            |
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-|  5  |   M  |  0          | Multi-Length      | enables use of the carry bit as input to arithmetic and shift operations|
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-|  6  |   F  |  0          | Fail              | set if an external function , DMA or IO cycle does not complete         |
-|     |      |             |                   | within an externally defined time.                                      |
-+-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-
- The 'M' flag is cleared by a CPU reset, interrupt or execution of the CAL (Call subroutine)
- instruction. It can also be cleared or set explicitly by the user through one of the bit set
- or clear, rotate or shift instructions.
-
 
 Addressing Modes
 ----------------
@@ -119,7 +148,7 @@ assembler this mode is denoted by a comma (,) immediately before the operand e.g
 
     AND ,0x4444 ; A <- A & 0x4444
 
-**Pointer addressing**
+**Pointer Addressing**
 
 The address of the operand data is encoded in an 8 bit field in the opcode word.
 Optionally the value of this pointer can be pre-incremented or post-decremented.
@@ -132,7 +161,7 @@ operand and optionally a plus (+) or minus (-) symbol following. e.g.
     AND /0x44+ ;  (0x44) <- (0x44) + 1 ; A <- A & (0x44)
     AND /0x44- ;  A <- A & (0x44) ; (0x44) <- (0x44) -1
 
-**Immediate indirect addressing**
+**Immediate Indirect Addressing - Double Word Operations**
 
 The 15 bit address of the operand data is placed in the word immediately following
 the opcode. This mode is denoted in the assembler by a dot (.) immediately in front
@@ -141,3 +170,21 @@ of the operand, e.g.
   ::
 
     AND .0x4444  ;  A <- A & (0x4444)
+
+Behaviour is slightly different for jump instructions where the provided operand
+will be used as the jump address, e.g.
+
+  ::
+
+     JMP .0x4444 ; PC <- 0x4444
+
+**Immediate Indirect Addressing - Three Word Operations**
+
+Bit Conditional jump operations can use another variation of this addressing mode,
+where a jump is conditional on the value of a bit in a memory location, so that
+two operand words are needed, one for the memory location to be inspected and a
+second for the jump destination. e.g.
+
+  ::
+
+     JBS  0x2 0x4444 0x5555 ; PC <- 0x5555 if (0x4444)[4]==1 else PC+1

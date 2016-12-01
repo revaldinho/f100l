@@ -8,7 +8,7 @@ Invoking The Assembler
 .. automodule:: F100Asm
    :members:
 
-      
+
 Assembler File Format
 =====================
 
@@ -63,13 +63,13 @@ F100ASM supports the following directives, all of which start with the dot (.) c
   .EQU  STK_SIZE  0x0400
   .EQU  STK_BOT   MEMTOP - STK_SIZE
 
-F100ASM uses the Python AST parser class to allow parsing of any valid Python expression. All expressions must evaulate to an integer number by the end of the first pass through the assembler. Expressions or symbols may be used anywhere a numerical value is allowed. 
+F100ASM uses the Python ASR parser class to allow parsing of any valid Python expression. All expressions must evaulate to an integer number by the end of the first pass through the assembler. Expressions or symbols may be used anywhere a numerical value is allowed.
 
 Like labels all variable names must start with an alphabetic character or an underscore but subsequent characters may be alphanumeric. All variable names are case insensitive.
 
-Note that the two symbols A and CR are reserved words and may not be used as variable names.
+Note that the two symbols A and C are reserved words and may not be used as variable names.
 
-Labels are treated like any other variable as far as expression parsing is concerned. 
+Labels are treated like any other variable as far as expression parsing is concerned.
 
 .DATA and .WORD
 ^^^^^^^^^^^^^^^
@@ -89,16 +89,16 @@ Example
 ::
 
   # -------------------------------------------------------------------------------------------
-  #     _____________  ____        __       ___                             __    __         
+  #     _____________  ____        __       ___                             __    __
   #    / ____<  / __ \/ __ \      / /      /   |  _____________  ____ ___  / /_  / /__  _____
   #   / /_   / / / / / / / /_____/ /      / /| | / ___/ ___/ _ \/ __ `__ \/ __ \/ / _ \/ ___/
-  #  / __/  / / /_/ / /_/ /_____/ /___   / ___ |(__  |__  )  __/ / / / / / /_/ / /  __/ /    
-  # /_/    /_/\____/\____/     /_____/  /_/  |_/____/____/\___/_/ /_/ /_/_.___/_/\___/_/     
-  # 
-  # 
+  #  / __/  / / /_/ / /_/ /_____/ /___   / ___ |(__  |__  )  __/ / / / / / /_/ / /  __/ /
+  # /_/    /_/\____/\____/     /_____/  /_/  |_/____/____/\___/_/ /_/ /_/_.___/_/\___/_/
+  #
+  #
   # F 1 0 0 - L * A S S E M B L E R (c) 2016 Revaldinho & BigEd
   # -------------------------------------------------------------------------------------------
-  # 
+  #
   # LINE:       ADDR: CODE     SOURCE
   # ----:-----------:--------------------------------------------------------------------------
        1:                       .EQU  _TMP 0x3E8
@@ -119,7 +119,7 @@ Example
       16:      002C: 4800 03EC  STO .pong
       17:      002E: 8800 03EA  LDA .ping
       18:      0030: D000 0262  NEQ ,610
-      19:      0032: 0181 0020  JBC 0x01 C L1
+      19:      0032: 0181 0020  JBC 0x01 CR L1
   # -------------------------------------------------------------------------------------------
   # 0 Errors
   # 0 Warnings
@@ -136,7 +136,3 @@ Example
   # --------------------------------: -------------------------------- : ----------------------
   # Run time = 0.004 s
   # -------------------------------------------------------------------------------------------
-
-
-   
-

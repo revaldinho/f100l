@@ -14,6 +14,7 @@ from F100_Opcodes.OpcodeF3 import *
 from F100_Opcodes.OpcodeF2 import *
 from F100_Opcodes.OpcodeF1 import *
 from F100_Opcodes.OpcodeF0 import *
+from F100_Opcodes.OpcodeF0_Shift import *
 from F100_Opcodes.OpcodeF0_Halt import *
 from F100_Opcodes.OpcodeF0_Jump import *
 from F100_Opcodes.OpcodeF0_Bit import *
@@ -32,7 +33,7 @@ class F100CPU:
         self.memory_write = memory_write
         self.memory_read = memory_read
         ## instance all the opcode classes, passing each a reference to the CPU resources
-        self.opcode_classes = [ opcode(CPU=self) for opcode in [OpcodeF0_Shift, OpcodeF0_Bit, OpcodeF0_Jump, OpcodeF0_Halt,
+        self.opcode_classes = [ opcode(CPU=self) for opcode in [OpcodeF0,
                                                                 OpcodeF1, OpcodeF2, OpcodeF3, OpcodeF4,
                                                                 OpcodeF5, OpcodeF6, OpcodeF7,
                                                                 OpcodeF8, OpcodeF9, OpcodeF10,
@@ -59,12 +60,3 @@ class F100CPU:
         else:
             cycle_count += self.opcode_table[self.IR.F].exec()
         return cycle_count
-
-    def tostring(self):
-        print ("----------------------------------------------------------")
-        print ("PC:  0x%04X" % self.PC)
-        print ("ACC: 0x%04X" % self.ACC)
-        print ("OR:  0x%04X" % self.OR)
-        print (self.CR.tostring())
-        print (self.IR.tostring())
-        print ("----------------------------------------------------------")

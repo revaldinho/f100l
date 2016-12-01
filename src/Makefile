@@ -50,6 +50,7 @@ clean:
 	find . -name '*~' -exec rm {} \;
 	find . -name '*pyc' -exec rm {} \;
 	find . -name 'pycache*' -exec rm {} \;
+	find . -name '*bak' -exec rm {} \;
 
 
 .PHONY: html
