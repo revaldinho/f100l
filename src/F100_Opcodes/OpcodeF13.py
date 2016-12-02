@@ -57,7 +57,7 @@ from .F100_Opcode import *
 class OpcodeF13(F100_Opcode) :
 
     def __init__ (self, CPU=None):
-        super().__init__( opcode_fn = { "NEQ":13, "XOR":13}, CPU=CPU )
+        super().__init__( opcode_fn = { "NEQ":13}, CPU=CPU )
         self.F = 13
 
     def exec(self):

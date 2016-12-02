@@ -40,6 +40,9 @@ OPTIONAL SWITCHES ::
   -e --endianness <little|big>   set endianness of byte oriented input file
                                  - default is little-endian
 
+  -n --nolisting                 suppress the listing to stdout while the
+                                 program runs
+
   -t --traceon                   print all memory transactions to stdout
 
   -h --help                      print this help message
@@ -67,7 +70,12 @@ from F100_Opcodes.F100_Opcode import F100HaltException
 from F100CPU import F100CPU
 from hex2bin import Hex2Bin
 import getopt
+import time
 import sys
+
+def usage():
+    print( __doc__ )
+    sys.exit(0)
 
 def print_header():
     print(banner)
@@ -81,11 +89,16 @@ class F100Emu:
         self.RAM = [0xDEAD]*ramsize
         self.MEMTOP = ramsize-1
         self.traceon = traceon
+        self.read_count = 0
+        self.write_count = 0
+        self.instr_count = 0
+        self.cycle_count = 0
 
     def memory_read(self, address):
         if self.traceon == True:
             print ("READ 0x%04X 0x%04X" % ( address & 0xFFFF, self.RAM[address] & 0xFFFF))
 
+        self.read_count += 1
         if 0 <= address <= self.MEMTOP:
             return self.RAM[address]
         else:
@@ -94,6 +107,8 @@ class F100Emu:
     def memory_write(self, address, data):
         if self.traceon == True:
             print ("STORE 0x%04X 0x%04X" % ( address & 0xFFFF, data & 0xFFFF))
+        self.write_count += 1
+
         if 0 <= address <= self.MEMTOP:
             self.RAM[address] = data & 0xFFFF
         else:
@@ -104,11 +119,18 @@ class F100Emu:
 
     def print_machine_state(self):
         CPU = self.CPU
-        PC = self.CPU.PC
-        CR = self.CPU.CR
-        print("  %04X : %04X %04X %04X : %04X %04X %d %d %d %d %d %d %d  :" % \
+        PC = CPU.PC
+        CR = CPU.CR
+        IR = CPU.IR
+        IR.update(self.RAM[PC])
+        if ( IR.F not in CPU.opcode_table):
+            raise UserWarning("Cannot execute Opcode with function field 0x%X" % IR.F )
+        else:
+            IR.name = CPU.opcode_table[IR.F].disassemble()
+
+        print("  %04X : %04X %04X %04X : %04X %04X %d %d %d %d %d %d %d  : %s" % \
         (PC & 0xFFFF,self.RAM[PC] & 0xFFFF ,self.RAM[PC+1] & 0xFFFF, self.RAM[PC+2] & 0xFFFF,\
-         CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.I,CR.Z,CPU.CR.V,CR.S,CR.C,CR.M,CR.F ))
+         CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.I,CR.Z,CPU.CR.V,CR.S,CR.C,CR.M,CR.F, IR.name ))
 
 
 if __name__ == "__main__" :
@@ -117,8 +139,9 @@ if __name__ == "__main__" :
     adsel = 1
     endianness = "little"
     traceon = False
+    listingon = True
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:h:t", ["adsel=","endianness=", "filename=","format=","help","traceon"])
+        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:hnt", ["adsel=","endianness=", "filename=","format=","help","nolisting","traceon"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -135,6 +158,8 @@ if __name__ == "__main__" :
                 file_format = arg
             else:
                 usage()
+        if opt in ("-n", "--nolisting") :
+            listingon = False
         if opt in ("-t", "--traceon") :
             traceon = True
         elif opt in ("-h", "--help" ) :
@@ -166,15 +191,30 @@ if __name__ == "__main__" :
     emu.CPU.reset()
 
     # simple dummy loop - don't execute uninitialised RAM yet...
-    i = 0
     print_header()
+
+    st = time.time()
     while emu.memory_read(emu.CPU.PC) != 0xDEAD:
-        emu.print_machine_state()
+        if listingon:
+            emu.print_machine_state()
         try:
-            emu.CPU.single_step()
+            emu.cycle_count += emu.CPU.single_step()
         except F100HaltException as e:
             print(e)
             break
-        i += 1
-        if i> 100:
-            break
+        emu.instr_count += 1
+    et = time.time()
+    print("# -------------------------------------------------------------------------------------------")
+    print("# Program execution Statistics")
+    print("# -------------------------------------------------------------------------------------------")
+    print("#          Instruction count: %7d" % emu.instr_count)
+    print("#          Logic cycle count: %7d" % emu.cycle_count)
+    print("#      Total Memory accesses: %7d" % (emu.read_count + emu.write_count) )
+    print("#               memory reads: %7d" % emu.read_count )
+    print("#              memory writes: %7d" % emu.write_count )
+    print("# -------------------------------------------------------------------------------------------")
+    print("# Emulator Performance Statistics")
+    print("# -------------------------------------------------------------------------------------------")
+    print("# Run time                  : %10.2f s" % (et - st))
+    print("# Instructions per second   : %10.2f MIPS" % (emu.instr_count/(1000000 * (et-st))))
+    print("# -------------------------------------------------------------------------------------------")

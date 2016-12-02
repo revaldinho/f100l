@@ -32,6 +32,8 @@ class F100CPU:
         self.ACC= 0x0000
         self.memory_write = memory_write
         self.memory_read = memory_read
+        self.cycle_count = 0
+        self.instr_count = 0
         ## instance all the opcode classes, passing each a reference to the CPU resources
         self.opcode_classes = [ opcode(CPU=self) for opcode in [OpcodeF0,
                                                                 OpcodeF1, OpcodeF2, OpcodeF3, OpcodeF4,
@@ -42,6 +44,7 @@ class F100CPU:
         for o in self.opcode_classes:
             self.opcode_table[o.F] = o
         self.cycle_count = 0
+        self.instr_count = 0
         self.reset()
 
     def reset(self):

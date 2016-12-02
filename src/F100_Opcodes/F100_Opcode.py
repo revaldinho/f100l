@@ -290,7 +290,7 @@ class F100_Opcode :
         pass
 
     def disassemble(self):
-        pass
+        return ', '.join(list(self.opcode_fn.keys()))
 
 
 class F100HaltException(Exception):

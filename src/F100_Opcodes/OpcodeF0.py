@@ -31,6 +31,18 @@ class OpcodeF0(F100_Opcode) :
         super().__init__(self.opcode_fn, CPU=CPU )
         self.F = 0
 
+    def disassemble(self):
+        IR = self.CPU.IR
+        if IR.T == 1:
+            opcode_fn = self.ohalt.opcode_fn
+        elif IR.S == 2:
+            opcode_fn = self.ojump.opcode_fn
+        elif IR.S == 3:
+            opcode_fn = self.obit.opcode_fn
+        else:
+            opcode_fn = self.oshift.opcode_fn
+        return ', '.join(list(opcode_fn.keys()))
+
     def exec(self):
         # No real function here, just need to determine where to send the exec task
         IR = self.CPU.IR
