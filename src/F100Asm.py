@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ## ============================================================================
 ## F100Asm.py - Assembler for the Ferranti F100-L CPU
 ##
@@ -129,13 +130,13 @@ class F100Asm():
         (assembled_words, warnings) = op.assemble(opcode, operands, symbol_table, suppress_errors)
         return (assembled_words, warnings)
 
-    def twopass_assemble(self, text):
+    def twopass_assemble(self, text,listingon=True):
         assembled_words = dict()
         for i in range(0,2):
-            assembled_words = self.assemble(text, i)
+            assembled_words = self.assemble(text, i,listingon)
         return assembled_words
 
-    def assemble( self, text, pass_number ):
+    def assemble( self, text, pass_number,listingon=True):
         ''' Build the text into lines of tokens and expressions'''
 
         error_count = 0
@@ -197,7 +198,7 @@ class F100Asm():
                     warning_count += len(warnings)
                     self.pc += len(line_words)
 
-            if pass_number > 0 :
+            if pass_number > 0 and listingon:
                 ## Simple listing code
                 fields = []
                 fields.append(" %5d:" % lineno)
@@ -211,7 +212,7 @@ class F100Asm():
                 fields.append(textline.strip())
                 print (' '.join(fields))
                 for d in line_words[2:]:
-                    print ("                   %04X " % d & 0xFFFF),
+                    print ("                   %04X " % (d & 0xFFFF)),
 
             lineno +=1
             if pass_number > 0 :
@@ -294,8 +295,9 @@ if __name__ == "__main__":
     output_filename = ""
     output_format = "hex"
     endianness = "little"
+    listingon = True
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "e:f:o:g:h", ["endianness=", "filename=","output=","format=""help"])
+        opts, args = getopt.getopt( sys.argv[1:], "e:f:o:g:hn", ["endianness=", "filename=","output=","format=","help","nolisting"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -312,6 +314,8 @@ if __name__ == "__main__":
                 output_format = arg
             else:
                 usage()
+        if opt in ("-n", "--nolisting"):
+            listingon = False
         elif opt in ("-h", "--help" ) :
             usage()
 
@@ -321,10 +325,11 @@ if __name__ == "__main__":
             text = f.readlines()
         f.close()
         s = time.time()
-        assembled_words = asm.twopass_assemble(text)
+        assembled_words = asm.twopass_assemble(text,listingon)
         if output_filename != "" :
             write_file(output_filename, output_format, assembled_words, endianness=endianness)
         e = time.time()
+        print (line_sep)
         print ("# Run time = %1.3f s" % (e-s))
         print (line_sep)
     else:
