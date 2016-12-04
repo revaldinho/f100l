@@ -41,6 +41,9 @@ OPTIONAL SWITCHES ::
   -e --endianness <little|big>   set endianness of byte oriented output
                                  - default is little-endian
 
+  -n --nolisting                 suppress the listing to stdout while the
+                                 program runs
+
   -h --help                      print this help message
 
   If no output filename is provided the assembler just produces the normal

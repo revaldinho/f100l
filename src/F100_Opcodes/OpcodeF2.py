@@ -8,10 +8,10 @@ Jump to subroutine location provided by operand, storing return address in the l
 
 ::
 
-   CAL N   (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- (N); LSP <- LSP+ 2
-   CAL ,D  (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- PC+1; LSP<- LSP + 2
-   CAL /P  (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- (P); LSP<- LSP+2
-   CAL .W  (LSP+1) <- PC+2; (LSP+2) <- CR ; PC <- W; LSP<- LSP+2
+   CAL N   (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- (N); LSP <- LSP+2
+   CAL ,D  (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- PC+1; LSP <- LSP+2
+   CAL /P  (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- (P); LSP <- LSP+2
+   CAL .W  (LSP+1) <- PC+2; (LSP+2) <- CR ; PC <- W; LSP <- LSP+2
 
 Where LSP is link stack pointer held in memory location 0.
 
@@ -74,4 +74,30 @@ class OpcodeF2(F100_Opcode) :
 
 
     def exec(self):
-        raise UserWarning("Execution for Opcode F2 (CAL) not yet implemented")
+
+        cycles = 0
+        IR = self.CPU.IR
+        operand = None
+        lsp = self.CPU.memory_read(0)
+
+        if IR.I==0 and IR.N!=0:
+            self.addr_mode == ADM_DIRECT
+            operand = self.CPU.memory_read(IR.N)
+        elif IR.I==0:
+            self.addr_mode == ADM_IMMEDIATE
+            operand = self.CPU.PC
+        elif IR.I==1 and IR.P==0:
+            self.addr_mode == ADM_IMMEDIATE_INDIRECT
+            operand = self.CPU.memory_fetch()
+        elif IR.I==1:
+            self.addr_mode == ADM_POINTER_INDIRECT
+            pointer_val = IR.P
+            operand = self.CPU.memory_read(pointer_val)
+
+        # save next PC (already incremented)
+        self.CPU.memory_write(lsp+1, self.CPU.PC)
+        self.CPU.memory_write(lsp+2, self.CPU.CR.toint())
+        self.CPU.memory_write(0, lsp+2)
+        self.CPU.PC = operand
+
+        return cycles

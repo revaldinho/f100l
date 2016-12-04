@@ -249,8 +249,6 @@ class F100_Opcode :
         '''
         cycles = 0
         IR = self.CPU.IR
-        CR = self.CPU.CR
-
         operand = None
         operand_address = None
         if ( IR.F != self.F):

@@ -73,9 +73,7 @@ class OpcodeF15(F100_Opcode) :
 
     def exec(self):
         cycle_count = 0
-
         IR = self.CPU.IR
-        CR = self.CPU.CR
 
         operand = None
         if ( IR.F != self.F):

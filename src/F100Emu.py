@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ## ============================================================================
 ## F100Emu.py - Emulator for the Ferranti F100-L CPU
 ##
@@ -110,7 +111,7 @@ class F100Emu:
         self.write_count += 1
 
         if 0 <= address <= self.MEMTOP:
-            self.RAM[address] = data & 0xFFFF
+            self.RAM[address] = (data & 0xFFFF)
         else:
             raise UserWarning("Memory out of range error for address 0x%04X" % address )
 
@@ -208,7 +209,7 @@ if __name__ == "__main__" :
     print("# Program execution Statistics")
     print("# -------------------------------------------------------------------------------------------")
     print("#          Instruction count: %7d" % emu.instr_count)
-    print("#          Logic cycle count: %7d" % emu.cycle_count)
+#    print("#          Logic cycle count: %7d" % emu.cycle_count)
     print("#      Total Memory accesses: %7d" % (emu.read_count + emu.write_count) )
     print("#               memory reads: %7d" % emu.read_count )
     print("#              memory writes: %7d" % emu.write_count )

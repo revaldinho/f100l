@@ -116,22 +116,15 @@ class OpcodeF7(F100_Opcode) :
 
 
     def exec(self):
-
         cycle_count = 0
-
         IR = self.CPU.IR
-        OR = self.CPU.OR
-
         # Get the first operand - address or value of counter
         (self.CPU.OR, operand_address, cycle_count) = self.get_operand()
         # fetch the second operand
-
         jump_addr = self.CPU.memory_fetch()
         result = (self.CPU.OR + 1) & 0xFFFF
         # only the direct addressing case does not return the result to the operand source location
-        if IR.I==0 and IR.N==0:
-            pass
-        else:
+        if not(IR.I==0 and IR.N==0):
             self.CPU.memory_write(operand_address, result)
         if result != 0:
             self.CPU.PC = jump_addr

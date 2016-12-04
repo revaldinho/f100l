@@ -7,7 +7,7 @@ Perform a bitwise logical AND of accumulator with the specified operand.
 **Function**
 
 ::
-   
+
    AND N      A <- A & (N)
    AND ,D     A <- A & D
    AND /P     A <- A & (P)

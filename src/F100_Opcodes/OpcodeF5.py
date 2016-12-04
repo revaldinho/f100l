@@ -84,10 +84,7 @@ class OpcodeF5(F100_Opcode) :
 
     def exec(self):
         cycle_count = 0
-
-
         (operand, operand_address, cycles) = self.get_operand()
-
         result = operand + self.CPU.ACC
         if (self.CPU.CR.M==1) :
             result = result + self.CPU.CR.C
