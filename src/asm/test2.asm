@@ -3,7 +3,7 @@
   .org 0
   .word     0x1001 ; must make the LSP an odd number
 
-	
+
 	.org 0x800
 
 	.equ LOOPCTR 0x010 ;
@@ -22,4 +22,15 @@ HALT ,0x123
 
 SUBROUT1:
 	       NEQ ,0x00FF
+         LDA ,0xFFFF
+         CLR 0 A
+         CLR 1 A
+         CLR 2 A
+         CLR 3 A
+         SET 0 A
+         SET 1 A
+         SET 2 A
+         SET 3 A
+         SET 6 CR
+         CLR 6 CR
 				 RTN

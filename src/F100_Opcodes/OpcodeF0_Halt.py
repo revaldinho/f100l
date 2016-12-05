@@ -61,8 +61,18 @@ class OpcodeF0_Halt(F100_Opcode) :
 
         return( self.bitassemble(), warnings)
 
+    def disassemble(self, IR):
+        if IR.T == 1:
+            return "HALT"
+        else:
+            return "EXT"
+
     def exec(self):
         cycle_count = 0
-        halt_number = self.CPU.IR.content & 0x03FF
-        raise F100HaltException("CPU Halted with halt number 0x%04X" % halt_number )
+        if self.CPU.IR.T >1 :
+            raise UserException("External Function operation in F=0 class not yet implemented")
+        else:
+            halt_number = self.CPU.IR.content & 0x03FF
+            raise F100HaltException("CPU Halted with halt number 0x%04X" % halt_number )
+
         return cycle_count

@@ -66,10 +66,9 @@ F100-L Instruction Set
    :members:
 
 .. SLA,SLE,SLL,SRA,SRE,SRL - Shift and Rotation
-.. automodule:: F100_Opcodes.OpcodeF0
-   :members:   
-      
-      
+.. automodule:: F100_Opcodes.OpcodeF0_Shift
+   :members:
+
 .. STO - Store Accumulator to Memory
 .. automodule:: F100_Opcodes.OpcodeF4
    :members:

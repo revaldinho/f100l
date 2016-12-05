@@ -33,15 +33,18 @@ class OpcodeF0(F100_Opcode) :
 
     def disassemble(self):
         IR = self.CPU.IR
+        result = ""
         if IR.T == 1:
-            opcode_fn = self.ohalt.opcode_fn
+            result = self.ohalt.disassemble(IR)
         elif IR.S == 2:
             opcode_fn = self.ojump.opcode_fn
+            result = ', '.join(list(opcode_fn.keys()))
         elif IR.S == 3:
-            opcode_fn = self.obit.opcode_fn
+            result = self.obit.disassemble(IR)
         else:
             opcode_fn = self.oshift.opcode_fn
-        return ', '.join(list(opcode_fn.keys()))
+            result = ', '.join(list(opcode_fn.keys()))
+        return result
 
     def exec(self):
         # No real function here, just need to determine where to send the exec task

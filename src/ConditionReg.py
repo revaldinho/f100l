@@ -20,17 +20,13 @@ class ConditionReg:
         '''
         Unpack an integer value into the individual flag components
         '''
-        for flag in [
-                self.I,
-                self.Z,
-                self.V,
-                self.S,
-                self.C,
-                self.M,
-                self.F
-                ]:
-            flag = val & 0x1
-            val = val >> 1
+        self.I = (val >> 0) & 0x01
+        self.Z = (val >> 1) & 0x01
+        self.V = (val >> 2) & 0x01
+        self.S = (val >> 3) & 0x01
+        self.C = (val >> 4) & 0x01
+        self.M = (val >> 5) & 0x01
+        self.F = (val >> 6) & 0x01
 
     def toint(self) :
         result = 0

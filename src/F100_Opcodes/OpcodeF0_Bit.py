@@ -89,5 +89,35 @@ class OpcodeF0_Bit(F100_Opcode) :
 
         return( self.bitassemble(), warnings)
 
+    def disassemble(self, IR):
+        if IR.J == 3:
+            return "CLR"
+        else:
+            return "SET"
+
     def exec(self):
-        raise UserWarning("Execution for Opcode F0 (CLR/SET) not yet implemented")
+        cycle_count = 0
+        bitmask = 0x01 << self.CPU.IR.B
+
+        if self.CPU.IR.J == 3: # CLR
+            if self.CPU.IR.R == 3:
+                operand = self.CPU.memory_fetch()
+                value = self.CPU.memory_read(operand) & ~bitmask
+                self.CPU.memory_write(operand, value)
+            elif self.CPU.IR.R == 1:
+                self.CPU.CR.fromint(self.CPU.CR.toint() & ~bitmask)
+            else:
+                self.CPU.ACC = self.CPU.ACC & ~bitmask
+        elif self.CPU.IR.J == 2:
+            if self.CPU.IR.R == 3:
+                operand = self.CPU.memory_fetch()
+                value = self.CPU.memory_read(operand) | bitmask
+                self.CPU.memory_write(operand, value)
+            elif self.CPU.IR.R == 1:
+                self.CPU.CR.fromint(self.CPU.CR.toint() | bitmask)
+            else:
+                self.CPU.ACC = self.CPU.ACC | bitmask
+        else:
+            raise UserWarning("Error illegal field J in BIT/CLR opcode")
+
+        return cycle_count

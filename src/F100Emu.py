@@ -81,7 +81,7 @@ def usage():
 def print_header():
     print(banner)
     print("#                                   Condition Reg.")
-    print("# PC   : Memory         : Acc. OR.  I Z V S C M F  : Instruction ")
+    print("# PC   : Memory         : Acc. OR.  F M C S V Z I  : Instruction ")
     print("# -------------------------------------------------------------------------------------------")
 
 class F100Emu:
@@ -131,7 +131,7 @@ class F100Emu:
 
         print("  %04X : %04X %04X %04X : %04X %04X %d %d %d %d %d %d %d  : %s" % \
         (PC & 0xFFFF,self.RAM[PC] & 0xFFFF ,self.RAM[PC+1] & 0xFFFF, self.RAM[PC+2] & 0xFFFF,\
-         CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.I,CR.Z,CPU.CR.V,CR.S,CR.C,CR.M,CR.F, IR.name ))
+         CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.F,CR.M,CR.C,CR.S,CR.V,CR.Z,CR.I, IR.name ))
 
 
 if __name__ == "__main__" :
@@ -190,12 +190,10 @@ if __name__ == "__main__" :
         emu.RAM[local_addr] = ((byte_hi << 8) | byte_lo ) & 0xFFFF
 
     emu.CPU.reset()
-
-    # simple dummy loop - don't execute uninitialised RAM yet...
     print_header()
 
     st = time.time()
-    while emu.memory_read(emu.CPU.PC) != 0xDEAD:
+    while True:
         if listingon:
             emu.print_machine_state()
         try:
