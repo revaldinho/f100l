@@ -34,33 +34,8 @@ The function unit itself is a bit-serial unit. All operations are processed one 
 a time, and every instruction requires at least 18 logic cycles in addition to any memory
 accesses.
 
-The Condition Register
-----------------------
-
-The Condition Register hold 7 flag bits.
-
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
- | Bit | Flag | Reset State | Name              |       Function                                                          |
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
- |  0  |   I  |  0          | Interrupt Disable | disables interrupts when set                                            |
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
- |  1  |   Z  |  X          | Zero              | indicates zero results                                                  |
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
- |  2  |   V  |  X          | Overflow          | indicates overflow in arithmetic and shift operations                   |
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
- |  3  |   N  |  X          | Negative sign     | indicates sign of results                                               |
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
- |  4  |   C  |  X          | Carry             | carry bit, set at the end of arithmetic and shift operations            |
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
- |  5  |   M  |  0          | Multi-Length      | enables use of the carry bit as input to arithmetic and shift operations|
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
- |  6  |   F  |  0          | Fail              | set if an external function , DMA or IO cycle does not complete         |
- |     |      |             |                   | within an externally defined time.                                      |
- +-----+------+-------------+-------------------+-------------------------------------------------------------------------+
-
-The 'M' flag is cleared by a CPU reset, interrupt or execution of the CAL (Call subroutine) instruction.
-It can also be cleared or set explicitly by the user through one of the bit set or clear, rotate or shift instructions.
-
+.. automodule:: ConditionReg
+   :members:
 
 
 Memory Space

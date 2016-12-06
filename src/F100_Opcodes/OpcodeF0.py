@@ -37,8 +37,7 @@ class OpcodeF0(F100_Opcode) :
         if IR.T == 1:
             result = self.ohalt.disassemble(IR)
         elif IR.S == 2:
-            opcode_fn = self.ojump.opcode_fn
-            result = ', '.join(list(opcode_fn.keys()))
+            result = self.ojump.disassemble(IR)
         elif IR.S == 3:
             result = self.obit.disassemble(IR)
         else:

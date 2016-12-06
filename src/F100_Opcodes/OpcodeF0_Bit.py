@@ -97,23 +97,25 @@ class OpcodeF0_Bit(F100_Opcode) :
 
     def exec(self):
         cycle_count = 0
-        bitmask = 0x01 << self.CPU.IR.B
 
-        if self.CPU.IR.J == 3: # CLR
-            if self.CPU.IR.R == 3:
+        IR = self.CPU.IR
+        bitmask = 0x01 << IR.B
+
+        if IR.J == 3: # CLR
+            if IR.R == 3:
                 operand = self.CPU.memory_fetch()
                 value = self.CPU.memory_read(operand) & ~bitmask
                 self.CPU.memory_write(operand, value)
-            elif self.CPU.IR.R == 1:
+            elif IR.R == 1:
                 self.CPU.CR.fromint(self.CPU.CR.toint() & ~bitmask)
             else:
                 self.CPU.ACC = self.CPU.ACC & ~bitmask
-        elif self.CPU.IR.J == 2:
-            if self.CPU.IR.R == 3:
+        elif IR.J == 2:
+            if IR.R == 3:
                 operand = self.CPU.memory_fetch()
                 value = self.CPU.memory_read(operand) | bitmask
                 self.CPU.memory_write(operand, value)
-            elif self.CPU.IR.R == 1:
+            elif IR.R == 1:
                 self.CPU.CR.fromint(self.CPU.CR.toint() | bitmask)
             else:
                 self.CPU.ACC = self.CPU.ACC | bitmask

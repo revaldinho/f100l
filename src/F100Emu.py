@@ -95,6 +95,26 @@ class F100Emu:
         self.instr_count = 0
         self.cycle_count = 0
 
+    def load_memory(self, filename, file_format):
+        # Initialise the hex2bin object with a 64Kbyte address space
+        h = Hex2Bin(0x10000)
+        h.read_file(filename, file_format, 0, 0x10000)
+        # Now convert into the local RAM
+        for i in range(0, 64*1024,2):
+            local_addr = i >> 1
+            if endianness == "little":
+                (byte_lo,valid) = h.read_byte(i)
+                i+=1
+                (byte_hi,valid) = h.read_byte(i)
+                i+=1
+            else:
+                (byte_hi,valid) = h.read_byte(i)
+                i+=1
+                (byte_lo,valid) = h.read_byte(i)
+                i+=1
+            self.RAM[local_addr] = ((byte_hi << 8) | byte_lo ) & 0xFFFF
+
+
     def memory_read(self, address):
         if self.traceon == True:
             print ("READ 0x%04X 0x%04X" % ( address & 0xFFFF, self.RAM[address] & 0xFFFF))
@@ -170,28 +190,10 @@ if __name__ == "__main__" :
 
 
     emu = F100Emu(adsel=adsel, traceon=traceon)
-
-    # Initialise the hex2bin object with a 64Kbyte address space
-    h = Hex2Bin(64*1024)
-    h.read_file(filename, file_format, 0, 64*1024)
-    # Now convert into the local RAM
-    for i in range(0, 64*1024,2):
-        local_addr = i >> 1
-        if endianness == "little":
-            (byte_lo,valid) = h.read_byte(i)
-            i+=1
-            (byte_hi,valid) = h.read_byte(i)
-            i+=1
-        else:
-            (byte_hi,valid) = h.read_byte(i)
-            i+=1
-            (byte_lo,valid) = h.read_byte(i)
-            i+=1
-        emu.RAM[local_addr] = ((byte_hi << 8) | byte_lo ) & 0xFFFF
-
+    emu.load_memory(filename, file_format)
     emu.CPU.reset()
-    print_header()
 
+    print_header()
     st = time.time()
     while True:
         if listingon:
@@ -203,6 +205,7 @@ if __name__ == "__main__" :
             break
         emu.instr_count += 1
     et = time.time()
+
     print("# -------------------------------------------------------------------------------------------")
     print("# Program execution Statistics")
     print("# -------------------------------------------------------------------------------------------")
