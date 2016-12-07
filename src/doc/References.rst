@@ -17,6 +17,11 @@ Conference & Journal Papers
   
   http://dx.doi.org/10.1088/0305-4624/8/5/I02
 
+"16-bit Microprocessor for the Hard Environment"
+  R.E. Fox, Microelectronics Reliability, Vol. 19, Issues5-6, pp 599-610
+  
+  http://www.sciencedirect.com/science/article/pii/0026271479906073
+
 Editorial and Press Releases
 ----------------------------
 

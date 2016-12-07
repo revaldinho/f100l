@@ -247,6 +247,55 @@ For logical shift operations *not* specifying the Condition Register:
 from .F100_Opcode import *
 
 
+def d_sra(a,o,num):
+    # Double shift right arithmetic of 16b ACC + OR returning
+    # two new 16 bit numbers
+    operand = ((a<<16) | o ) >> num
+    if a & 0x8000 :
+        sign = 0xFFFFFFFF << (32-num)
+        operand |= sign
+    return (operand>>16 & 0xFFFF, operand & 0xFFFF)
+
+def d_srl(a,o,num):
+    # Double shift right logical of 16b ACC + OR returning
+    # two new 16 bit numbers
+    operand = (a<<16) | o
+    operand = (operand >> num)
+    return (operand>>16 & 0xFFFF, operand & 0xFFFF)
+
+def d_sll(a,o,num):
+    # Double shift left logical of 16b ACC + OR returning
+    # two new 16 bit numbers
+    operand = (a<<16) | o
+    operand = (operand << num)
+    return (operand>>16 & 0xFFFF, operand & 0xFFFF)
+
+def rotl(a,num):
+    # Single 16b rotate left of 16b number by 0-15 places
+    operand = a<<16 | a
+    return ( operand >> (16-num) ) & 0xFFFF
+
+def rotr(a,num):
+    # Single 16b rotate right of 16b number by 0-15 places
+    operand = a<<16 | a
+    return ( operand >> num) & 0xFFFF
+
+def sra( a, num):
+    # Single shift right arithmetic of 16b number by 0-15 places
+    operand = a | (0xFFFF0000 if a & 0x8000 else 0)
+    return (operand >> num) & 0xFFFF
+
+def srl( a, num):
+    # Single shift right logical of 16b number by 0-15 places
+    operand = a
+    return (operand >> num) & 0xFFFF
+
+def sll( a, num):
+    # Single shift left arithmetic of 16b number by 0-15 places
+    operand = a << num
+    return operand  & 0xFFFF
+
+
 class OpcodeF0_Shift(F100_Opcode) :
 
 
@@ -324,5 +373,86 @@ class OpcodeF0_Shift(F100_Opcode) :
 
         return( self.bitassemble(), warnings)
 
+
+    def disassemble(self, IR):
+        mnemonic = ""
+        if self.CPU.CR.M == 0:
+            if IR.S == 0 and IR.J <2:
+                mnemonic = "SRA"
+            elif IR.S == 0 and IR.J == 2:
+                mnemonic = "SRL"
+            elif IR.S == 0 and IR.J == 3:
+                mnemonic = "SRE"
+            elif IR.S == 1 and IR.J == 2:
+                mnemonic = "SLL"
+            elif IR.S == 1 and IR.J < 2:
+                mnemonic = "SLA"
+            elif IR.S == 1 and IR.J == 3:
+                mnemonic = "SLE"
+        else:
+            if IR.S == 0 and IR.J <2:
+                mnemonic = "SRA.D"
+            elif IR.S == 0:
+                mnemonic = "SRL.D"
+            elif IR.J < 2:
+                mnemonic = "SLA.D"
+            else:
+                mnemonic = "SLL.D"
+        return mnemonic
+
     def exec(self):
-        raise UserWarning("Execution for Opcode F0 (SRE,SRA,SRL,SLE,SLA,SLL) not yet implemented")
+        cycle_count = 0
+
+        CPU = self.CPU
+        CR = self.CPU.CR
+        IR = self.CPU.IR
+
+        if CR.M == 0 :
+            # Single length shifts and rotates
+            if IR.R == 1:
+                operand = CR.toint()
+            elif IR.R == 3:
+                operand_addr = CPU.memory_fetch()
+                operand = CPU.memory_read(operand_addr)
+            else:
+                operand = CPU.ACC
+
+            if IR.S == 0 and IR.J <2:
+                result = sra(operand, IR.B)
+                CR.S = 1 if result & 0x8000 else 0
+                CR.V = 1 if (result & 0x8000) != (operand & 0x8000) else 0
+            elif IR.S == 0 and IR.J == 2:
+                result = srl(operand, IR.B)
+            elif IR.S == 0 and IR.J == 3:
+                result = rotr(operand, IR.B)
+            elif IR.S == 1 and IR.J != 3:
+                result = sll(operand, IR.B)
+                if IR.J != 2:
+                    CR.S = 1 if result & 0x8000 else 0
+                    CR.V = 1 if (result & 0x8000) != (operand & 0x8000) else 0
+            elif IR.S == 1 and IR.J == 3:
+                result = rotl(operand, IR.B)
+
+            if IR.R == 1:
+                CR.fromint(result)
+            elif IR.R ==3:
+                memory_write(operand_addr, result)
+            else:
+                CPU.ACC = result
+
+        else:
+            # Double length shifts use LSB of J field to extend shift number
+            shift_dist = ( (IR.J << 4) | IR.B )  & 0x1F
+            if IR.S == 0 and IR.J <2:
+                (result, result1) = d_sra(CPU.ACC, CPU.OR, shift_dist)
+            elif IR.S == 0:
+                (result, result1) = d_srl(CPU.ACC, CPU.OR, shift_dist)
+            else:
+                (result, result1) = d_sll(CPU.ACC, CPU.OR, shift_dist)
+            if IR.J < 2:
+                CR.S = 1 if result & 0x8000 else 0
+                CR.V = 1 if (result & 0x8000) != (CPU.ACC & 0x8000) else 0
+
+            CPU.ACC = result
+            CR.fromint(result1)
+        return cycle_count

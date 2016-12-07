@@ -41,8 +41,7 @@ class OpcodeF0(F100_Opcode) :
         elif IR.S == 3:
             result = self.obit.disassemble(IR)
         else:
-            opcode_fn = self.oshift.opcode_fn
-            result = ', '.join(list(opcode_fn.keys()))
+            result = self.oshift.disassemble(IR)
         return result
 
     def exec(self):

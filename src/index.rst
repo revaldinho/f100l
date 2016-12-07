@@ -21,6 +21,7 @@ Contents:
    doc/F100Asm
    doc/F100Emu
    doc/References
+   doc/Appendices
    doc/license
 
 Indices and tables
