@@ -1,3 +1,7 @@
+==========
+Appendices
+==========
+
 Appendix 1 - F100-L Handset Assembly Language Summary
 -----------------------------------------------------
 
@@ -8,4 +12,3 @@ History, Cambridge, UK: Box704_.
 .. _Box704: http://www.computinghistory.org.uk/det/16974/Box-704-Ferranti-Marconi/
 
 .. image:: ./F100HandsetTable.png
-   
