@@ -8,7 +8,7 @@ Unconditional jump to the location provided by the operand.
 
 ::
 
-   JMP N      PC <- (N)
+   JMP N      PC <- N
    JMP ,D     PC <- PC + 1
    JMP /P     PC <- (P)
    JMP /P+    P <- P+1 ; PC <- (P)
@@ -82,7 +82,7 @@ class OpcodeF15(F100_Opcode) :
             # PC has already been incremented
             pass
         elif IR.I==0:
-            self.CPU.PC = self.memory_read(IR.N) & 0x7FFF
+            self.CPU.PC = IR.N
         elif IR.I==1 and IR.P==0:
             self.CPU.PC = self.CPU.memory_fetch() & 0x7FFF
         elif IR.I==1:

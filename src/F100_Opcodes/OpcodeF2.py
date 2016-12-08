@@ -8,7 +8,7 @@ Jump to subroutine location provided by operand, storing return address in the l
 
 ::
 
-   CAL N   (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- (N); LSP <- LSP+2
+   CAL N   (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- N; LSP <- LSP+2
    CAL ,D  (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- PC+1; LSP <- LSP+2
    CAL /P  (LSP+1) <- PC+1; (LSP+2) <- CR ; PC <- (P); LSP <- LSP+2
    CAL .W  (LSP+1) <- PC+2; (LSP+2) <- CR ; PC <- W; LSP <- LSP+2
@@ -82,7 +82,7 @@ class OpcodeF2(F100_Opcode) :
 
         if IR.I==0 and IR.N!=0:
             self.addr_mode == ADM_DIRECT
-            operand = self.CPU.memory_read(IR.N)
+            operand = IR.N
         elif IR.I==0:
             self.addr_mode == ADM_IMMEDIATE
             operand = self.CPU.PC
