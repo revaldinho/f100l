@@ -9,29 +9,41 @@ Books & Manuals
 "The Ferranti F100-L Hardware Data Book",
   Ferranti Ltd., 1977, Bracknell, UK
 
+[6]"Ferranti Quick Reference Guide"
+  Ferranti Ltd., 1983, Bracknell, UK
+
+  http://www.datasheetarchive.co.uk/dl/324f4896c5dea5c15053884e0e4d677bf56a57/O/F115-L
+
 Conference & Journal Papers
 ---------------------------
 
-"Case Study in Development: The Ferranti Bipolar Microprocessor"
+[10] "Case Study in Development: The Ferranti Bipolar Microprocessor"
   D. L. Grundy, Physics in Technology, September 1977
 
   http://dx.doi.org/10.1088/0305-4624/8/5/I02
 
-"16-bit Microprocessor for the Hard Environment"
-  R.E. Fox, Microelectronics Reliability, Vol. 19, Issues5-6, pp 599-610
+[5] "16-bit Microprocessor for the Hard Environment"
+  R.E. Fox, Microelectronics Reliability, Vol. 19, Issues5-6, pp. 599-610
 
   http://www.sciencedirect.com/science/article/pii/0026271479906073
 
-"Pseudo-emulation facilities for the Ferranti FDS-10 Development System"
-  N.F. Grant et al., Software & Microsystems, Vol3, Nos 5 & 6, October/December 1984, pp106-110
+[9] "A low-power 16-bit computer for space applications and UOSAT",
+  C.L.F. Haynes, The Radio and Electronic Engineer, Vol. 52, No. 8/9, August/September 1982, pp.391-397
 
-"An Advanced Helicopter Enginer Control System"
+"Pseudo-emulation facilities for the Ferranti FDS-10 Development System"
+  N.F. Grant et al., Software & Microsystems, Vol3, Nos 5 & 6, October/December 1984, pp. 106-110
+
+"An Advanced Helicopter Engine Control System"
   A.F. Saunders, Journal of the American Society of Mechanical Engineers, 1982
+
+[12] "EVALUATION OF THE RADIATION HARDNESS OF THE FERRANTI FIOO-L MICROPROCESSOR IN AN OPERATING SYSTEM",
+  N.E. Baxter; Collings; G.J. Hill and B.C. Roberts,
+  IEEE Transactions on Nuclear Science, Vol. NS-29, No. 6, December 1982
 
 Editorial and Press Releases
 ----------------------------
 
-"Ferranti First in Europe"
+[1] "Ferranti First in Europe"
   IEE Electronics & Power, October 1976, p. 661
 
 "Ferranti's Smallest Microprocessor",
@@ -44,13 +56,19 @@ Editorial and Press Releases
 
   https://books.google.co.uk/books?id=5rH7T60TWMAC&lpg=PA695&dq=europe%20first%20home%20grown%20microprocessor&pg=PA695#v=onepage&q=europe%20first%20home%20grown%20microprocessor&f=false
 
-"First British and European Microprocessor"
+[3]"First British and European Microprocessor"
   Wireless World, November 1976, p. 47
 
-"Ferranti push for bigger share of 16-bit market",
+[4]"Ferranti push for bigger share of 16-bit market",
   Microprocessors, Volume 1, Issue 7, October 1977, pp. 448-449
 
   http://documents.tips/documents/ferranti-push-for-bigger-share-of-16-bit-market.html
+
+[6] "Will Britain's Micro Ever Make the Big Time?",
+  New Scientist, 11 January 1979, p. 98
+
+[7] "BYTE News...",
+  Byte Magazine, Byte Publications Inc, USA, May 1979, p.117
 
 "British micro power for engines",
   New Scientist, 17 May 1979, p. 548
@@ -59,3 +77,16 @@ Editorial and Press Releases
 
 "Microcomputers in Space"
   Wireless World, April 1981, p. 44
+
+[14] "UK gets defence chip"
+  Microprocessors and Microsystems, Volume 8, Issue 6, July–August 1984, Page 315
+
+[2] "PLESSEY TO PAY UKP30m FOR FERRANTI’s CHIP BUSINESS",
+  Computer Business Review, November 1987
+
+  http://www.cbronline.com/news/plessey_to_pay_ukp30m_for_ferrantis_chip_business/
+
+[8] Personal Computer World Magazine, Vol. 1, No. 1, 1978
+
+[13] "Ferranti Packs it in"
+  Microprocessors and Microsystems, Vol. 4, No. 3, April 1980, p120

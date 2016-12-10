@@ -6,8 +6,8 @@
 Welcome to the F100-L Project
 =============================
 
-.. image:: doc/F100_panorama.png
-   :alt: F100-L Die Photograph
+.. image:: doc/MOSI_F100.png
+   :alt: F100-L Memento from Manchester Museum of Science & Industry
    :scale: 80%
 
 Contents:
@@ -17,6 +17,7 @@ Contents:
    :maxdepth: 2
 
    doc/F100CPU
+   doc/F100Arch
    doc/F100_Opcodes
    doc/F100Asm
    doc/F100Emu

@@ -2,164 +2,159 @@
 The Ferranti F100-L Microprocessor
 ==================================
 
-The Ferranti F100-L is a single-address, single accumulator, fixed 16-bit word length
-microprocessor.
+The Ferranti F100-L was the first European designed and manufactured
+16-bit microprocessor[1].
 
-.. figure:: F100L_CPU_Diagram.png
-   :alt: F100-L Block Diagram
+Launched in 1976, the F100-L was designed by Ferranti Computer Systems Ltd in
+their Bracknell, UK design centre. The chips were then fabricated in Ferranti
+Electronics Ltd's Gem Mill works in Manchester.
 
-   **F100-L Simplified CPU Block Diagram**
+The F100-L project started in the early 1970s with the intention of creating
+complete microprocessor based solutions for military applications as well as serving
+the needs of various Ferranti divisons.[5] The military requirement included the ability to operate over
+a wide temperature range of -55C to +125C and to be resistant to the effects of
+radiation. The 16 bit word size was chosen as the system was seen to be a way of
+downsizing existing applications running using mini-computers and software.
 
-Datapath Registers and Function Unit
-------------------------------------
+As well as being one of the first of the 16 bit processors the F100-L was
+unusual in that it was designed using a bipolar technology (Common Diffusion
+Isolation, or CDI) when other manufacturers had already turned to planar
+MOS processes to improve component densities. The choice of bipolar
+technology was driven by the radiation hardness requirement and
+eventually it was shown that the F100-L was almost totally latch-up
+resistant even after significant doses of radiation.[11] Fortunately
+then, Ferranti were already technology leaders in the fabrication and application of
+bipolar design for both linear and logical applications through their
+Common Diffusion Isolation (CDI) process.
 
-The datapath side of the machine has only 3 registers
+Although not the original inventors of the CDI process, Ferranti had refined the
+manufacturing process to the extent that they were more successful with it
+than Fairchild, to whom they continued to pay licensing costs of £150K pa. Part
+of this success was attributable to the manufacturing process where Ferranti
+introduced projection printing of masks and better slice cleaning techniques[10];
+part of the success was more business oriented when Ferranti became market leaders
+with their uncommitted logic arrays (ULAs) offering customers mixed signal
+capabilities on chips with low cost and fast turnaround.
 
-  * the 16-bit accumulator (ACC)
-  * the 16-bit operand register (OR)
-  * the 7-bit condition register (CR)
+F100-L Family Support Chips
+---------------------------
 
+Although the F100-L was a self-contained microprocessor, it was always intended
+to be part of a chip set. By the time the CPU was in production in 1977 two only
+two of these companion chips were available, the F111 and F112. Additional
+family members were added starting with the F113, F114 and ZN1001 in 1978.[6]
 
-All arithmetic and logical operations are performed on one or more of these registers.
-Any instructions specifying a memory location as an operand will access that memory location
-and store the result in the operand register before processing. Once all operands are in place
-the function unit will perform the required operation and save the result either to the
-accumulator, or first to the OR and then to memory if a memory location is the final
-destination.
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| Part No| Function                                                                                                                               | Pkg   |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| ZN1001 | Clock Generator a general purpose oscillator requiring a crystal to define the clock rate and an RC network to define pulse width.     | DIP16 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F101-L | Single chip co-processor implementing 2's complement multipy and divide functions                                                      | DIP40 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F111-L | Control interface chip, usually sold together with the F112-L to handle all system interfacing including DMA channel control DIP40     | DIP40 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F112-L | Data interface chip used to connect any system device to the IO bus.                                                                   | DIP40 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F113-L | High speed memory interface providing all necessary control signals for ROM and RAM handling with no requirement for additional 'glue' | DIP24 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F114-L | Medium speed, lower power memory interface with similar features to the F113-L above                                                   | DIP24 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F115-L | Real Time Interrupt handler, can be used with an external crystal to generate real time interrupt at one of 15 rates selectable by     |       |
+|        | hardware or software control. An external device and also generate interrupts using the F115 logic.                                    | DIP24 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F117-L | Two channel interrupt controller provides full vectored interrupt capability for two external devices connected to an F100-L system.   | DIP24 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
 
-Although the OR is usually a very transitory point, it is possible to access and set the
-contents of this register directly by using one of the double-word shift instructions.
+The chip sets were designed to allow F100-L systems to be constructed with a
+minimum of glue logic. Like the F100-L the rest of the chipset also needed
+to be radiation hard, and so was also built in CDI technology. Unlike the
+processor however, a good number and possibly all of the the support chips
+were implemented as gate arrays. Certainly the F111, F112, F113 and F115 are
+implemented on 2000 series ULAs.
 
-The function unit itself is a bit-serial unit. All operations are processed one bit at
-a time, and every instruction requires at least 18 logic cycles in addition to any memory
-accesses.
+The most common combination of chips was also available as a multi-chip-module. This thick film module was sold
+as the FBH5092 and packaged up an F100-L, F101-L, clock generator and two F112-L data interfaces onto a leadless ceramic
+chip carrier which in turn was bonded to the lead frame of a ceramic 64 pin package.
 
-.. automodule:: ConditionReg
-   :members:
+Pricing and Commercial History
+------------------------------
 
+At the launch in 1976 the CPU alone was priced at 57UKP
+in quantities of 100. [1,3] By 1978 prices had reduced somewhat to 39UKP for the processor and
+a support chip set of an F111-L and 2 F112-L's available for an additional 18KUP.[4] This was expensive
+at that time when compared with the proliferation of 8 bit micros around. The Zilog Z80 for example
+was an nominally an 8 bit processor but had 16 bit addressing and even a good number of 16 bit
+operations implemented with double width registers and instructions and was available at retail
+in the UK for just 15.50 UKP. Continuing the comparison, by 1979 it was estimated that only
+5000 F100-L parts had been manufactured in total[6]. Zilog on the other hand sold
+100,000 Z80s into Tandy in 1978 alone for inclusion in their Tandy TRS-80 computer[7].
 
-Memory Space
+Ferranti made and sold their own computer system based around the F100-L. This went
+on sale in 1980 at a single unit cost of 5800UKP for a system with two floppy drives[13].
+Although no other third party commercial computer offerings were based on this CPU, Ferranti
+didn't miss out completely on the home and personal computer boom: their dominant position
+as a provider of semi-custom ICs using their ULA technology made them the first
+choice for many manufacturers in cost reducing their own designs. Ferranti
+ULAs powered many of the largest selling European machines, including most of
+those from Sinclair and Acorn.
+
+Selling into its originally intended military markets the F100-L appears to have had some longevity and
+even spawned a successor with expanded memory addressing abilities in 1984 - the F200-L.[14]
+Almost simultaneously with Ferranti's ill-fated acquisition
+of the US technology company International Signal and Control in 1987, their
+chip business was sold to Plessey for £30M[2]. At that time both F200 and F100, as well
+as the ULA business, were listed as noteworthy assets. Plessey (later merged with GEC to form GPT) were
+still building some number of F200's in 1992, and support chips including the F113 as late as 1995.
+So, although little information is publicly available on Ferranti turn-key systems for military
+applications, these generated sufficient demand to keep the processor and
+support chips in production from the original 1976 launch right up into the mid 1990s.
+
+Applications
 ------------
 
-The program counter and addressing logic are only 15 rather than 16-bits wide, so
-the maximum addressable memory size is 64 KBytes, arranged as 32K by 16-bit words.
+The F100-L was the subject of a number of application studies and trials although
+it's not clear how many of these resulted in sales of more than sample quantities.
 
-In this address space, the lower portion of the address range is treated differently
-to the rest of the range.
+The most reported application was the F100-L's inclusion in the University of Surrey's
+UoSAT program, where the F100-L was the heart of the secondary computer unit launched
+into space. [9]
 
-The first 256 words of memory can be used as pointers for Pointer Indirect Addressing modes,
-with pre-increment and post-decrementing available for the pointers themselves. Locations
-1-255 are available for user programs; location 0 is reserved
-for use as the processor's link stack pointer since the CPU has no internal
-stack pointer state of its own. The various jump to and return from subroutines
-will always adjust the value of the stack pointer in location 0 appropriately.
+This section will list briefly a number of other application trials reported in
+the literature including uses
 
-Additionally when using any kind of indirection, the instruction word is able
-to encode up to 11 bits of address in a single word opcode (Direct addressing). Therefore
-it is preferred to use memory locations up to 0x07FF as data or additional pointers.
+* in Helicopter Engine Management control
+* in gas turbine engine control
+* as a standard spacecraft compute module
+* for control of nuclear test equipment
 
-Memory above 0x0800 can be used for additional bulk data or program instruction code.
+Silicon Implementation
+----------------------
 
- +----------------+-----------------------------------------+
- | Memory Area    | Primary Usage                           |
- +----------------+-----------------------------------------+
- |    0x0000      | Link Stack Pointer                      |
- +----------------+-----------------------------------------+
- | 0x0001 - 0x00FF| Pointer area                            |
- +----------------+-----------------------------------------+
- | 0x0100 - 0x07FF| Directly addressed Data or Program Area |
- +----------------+-----------------------------------------+
- | 0x0800 - 0x7FFF| Data or Program Area                    |
- +----------------+-----------------------------------------+
+Although the F100-L uses the same CDI technology as the company's ULA, the
+CPU itself is a full-custom design. The die is approximately square, 5.8mm per side giving an
+area of 33.64sqmm. The die contains around 7000 individual components. [10] The following figure
+(recreated from a new die photograph but using Grundy's original labelling) shows
+the main areas of the chip as described in the Architecture section later.
 
-*Note: The user must always initialise the link stack pointer with an ODD value. The
-return from stack operations assume that the top of the stack is odd and
-access this location and the one immediately below by simply zeroing
-the LSB when popping off the condition register and return address contents.*
+.. image:: SiliconDiagram.png
 
-Processor Start Up
-------------------
+Preservation
+------------
 
-When the processor is reset, program execution begins at one of two addresses
-selected by the state of the AdSel pin (both of which are above the Direct
-address mode area - see above).
+Since the F100-L didn't make it into any notable computer systems, there are no significant
+displays of the hardware in any science or technology museums.
 
- +------------------+-------------------------------+
- | AdSel Pin        | Program Counter Initial State |
- +------------------+-------------------------------+
- |     0            |  0x4000                       |
- +------------------+-------------------------------+
- | 1 \(or floating\)|  0x0800                       |
- +------------------+-------------------------------+
+The Museum of Science and Industry (MOSI) in Manchester has a paperweight memento of a
+single packaged chip encased in perspex with the legend "F100-L the world's most advanced
+16 bit microprocessor." MOSI also holds the Ferranti Archive, including company documents, sales
+and marketing materials relating to the product line.
 
+The Centre for Computing History (CCH) in Cambridge has a couple of hardware artifacts but
+these are held in storage rather than on general display. Of the items they hold, the
+control handset from the F100-L microcomputer system is the most accessible. This unit
+has a complete instruction set summary table printed in the reverse and a transcript of
+that is included in the Appendices here. Other than the handset they also have a board,
+possibly from an F100-L computer system with F112-L and F101-L ICs.
 
-
-Addressing Modes
-----------------
-
-The F100-L CPU supports 4 addressing modes and these are described below together
-with the assembler syntax.
-
-**Direct addressing**
-
-The address of the operand data is encoded in an 11 bit field in the opcode word. In the
-assembler this mode is denoted by providing just a bare operand. e.g.
-
-  ::
-
-    AND 0x444  ;  A <- A & (0x444)
-
-If an operand is used which is larger than 11 bits, the assembler will emit a warning
-and instead assemble the instruction using the Immediate Indirect Addressing mode below.
-This will always achieve the correct behaviour, but the latter mode requires two instruction
-words where Direct Addressing, with a smaller operand, needs only one.
-
-**Immediate addressing**
-
-The 16 bit operand data is placed in the word immediately following the opcode. In the
-assembler this mode is denoted by a comma (,) immediately before the operand e.g.
-
-  ::
-
-    AND ,0x4444 ; A <- A & 0x4444
-
-**Pointer Addressing**
-
-The address of the operand data is encoded in an 8 bit field in the opcode word.
-Optionally the value of this pointer can be pre-incremented or post-decremented.
-This mode is denoted in the assembler by a slash (/) immediately in front of the
-operand and optionally a plus (+) or minus (-) symbol following. e.g.
-
-  ::
-
-    AND /0x44  ;  A <- A & (0x44)
-    AND /0x44+ ;  (0x44) <- (0x44) + 1 ; A <- A & (0x44)
-    AND /0x44- ;  A <- A & (0x44) ; (0x44) <- (0x44) -1
-
-**Immediate Indirect Addressing - Double Word Operations**
-
-The 15 bit address of the operand data is placed in the word immediately following
-the opcode. This mode is denoted in the assembler by a dot (.) immediately in front
-of the operand, e.g.
-
-  ::
-
-    AND .0x4444  ;  A <- A & (0x4444)
-
-Behaviour is slightly different for jump instructions where the provided operand
-will be used as the jump address, e.g.
-
-  ::
-
-     JMP .0x4444 ; PC <- 0x4444
-
-**Immediate Indirect Addressing - Three Word Operations**
-
-Bit Conditional jump operations can use another variation of this addressing mode,
-where a jump is conditional on the value of a bit in a memory location, so that
-two operand words are needed, one for the memory location to be inspected and a
-second for the jump destination. e.g.
-
-  ::
-
-     JBS  0x2 0x4444 0x5555 ; PC <- 0x5555 if (0x4444)[4]==1 else PC+1
+  * http://www.computinghistory.org.uk/det/16974/Box-704-Ferranti-Marconi/
+  * http://www.computinghistory.org.uk/det/23397/Box-812-Various/
