@@ -27,14 +27,6 @@ then, Ferranti were already technology leaders in the fabrication and applicatio
 bipolar design for both linear and logical applications through their
 Common Diffusion Isolation (CDI) process.
 
-Although not the original inventors of the CDI process, Ferranti had refined the
-manufacturing process to the extent that they were more successful with it
-than Fairchild, to whom they continued to pay licensing costs of £150K pa. Part
-of this success was attributable to the manufacturing process where Ferranti
-introduced projection printing of masks and better slice cleaning techniques[10];
-part of the success was more business oriented when Ferranti became market leaders
-with their uncommitted logic arrays (ULAs) offering customers mixed signal
-capabilities on chips with low cost and fast turnaround.
 
 F100-L Family Support Chips
 ---------------------------
@@ -42,7 +34,7 @@ F100-L Family Support Chips
 Although the F100-L was a self-contained microprocessor, it was always intended
 to be part of a chip set. By the time the CPU was in production in 1977 two only
 two of these companion chips were available, the F111 and F112. Additional
-family members were added starting with the F113, F114 and ZN1001 in 1978.[6]
+family members were added starting with the F113, F114 and ZN1001 in 1978.[16]
 
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
 | Part No| Function                                                                                                                               | Pkg   |
@@ -68,9 +60,9 @@ family members were added starting with the F113, F114 and ZN1001 in 1978.[6]
 The chip sets were designed to allow F100-L systems to be constructed with a
 minimum of glue logic. Like the F100-L the rest of the chipset also needed
 to be radiation hard, and so was also built in CDI technology. Unlike the
-processor however, a good number and possibly all of the the support chips
-were implemented as gate arrays. Certainly the F111, F112, F113 and F115 are
-implemented on 2000 series ULAs.
+processor however, a good number of the the support chips
+were implemented as gate arrays. For example the F111, F112, F113 and F115 are
+all implemented on 2000 series ULAs.
 
 The most common combination of chips was also available as a multi-chip-module. This thick film module was sold
 as the FBH5092 and packaged up an F100-L, F101-L, clock generator and two F112-L data interfaces onto a leadless ceramic
@@ -81,22 +73,59 @@ Pricing and Commercial History
 
 At the launch in 1976 the CPU alone was priced at 57UKP
 in quantities of 100. [1,3] By 1978 prices had reduced somewhat to 39UKP for the processor and
-a support chip set of an F111-L and 2 F112-L's available for an additional 18KUP.[4] This was expensive
-at that time when compared with the proliferation of 8 bit micros around. The Zilog Z80 for example
-was an nominally an 8 bit processor but had 16 bit addressing and even a good number of 16 bit
-operations implemented with double width registers and instructions and was available at retail
-in the UK for just 15.50 UKP. Continuing the comparison, by 1979 it was estimated that only
-5000 F100-L parts had been manufactured in total[6]. Zilog on the other hand sold
+a support chip set of an F111-L and 2 F112-L's available for an additional 18KUP.[4] The table below
+shows costs for a selection of microprocessors available in 1978[15]
+
++----------------------+--------------+--------------+-------------+---------------+
+|                      |              | Datapath/    |     Cost (Qty of 100)       |
++                      +              + Address bus  +-------------+---------------+
+|Manufacturer          | Chip Number  | Width        |  Mil  Spec  | Commercial    |
++----------------------+--------------+--------------+-------------+---------------+
+|Ferranti              | F100-L       | 16/15        |    $31      |    $31        |
++----------------------+--------------+--------------+-------------+---------------+
+|Texas Instruments     | SBP9900NJ    | 16/15        |   $425      |    $71        |
++----------------------+--------------+--------------+-------------+---------------+
+|Intersil              | IMS6100      | 12/12        |    $53      |    $15        |
++----------------------+--------------+--------------+-------------+---------------+
+|Zilog                 | Z80          |  8/16        |   $165      |    $25        |
++----------------------+--------------+--------------+-------------+---------------+
+|Motorola              | MC6800       |  8/16        |    $76      |    $18        |
++----------------------+--------------+--------------+-------------+---------------+
+|MOS Technology        | MCS6502      |  8/16        |    N/A      |    $11        |
++----------------------+--------------+--------------+-------------+---------------+
+|Intel                 | MCS8080A     |  8/16        |    $32      |    $13        |
++----------------------+--------------+--------------+-------------+---------------+
+|Nat. Semiconductor    | SC/MP        |  8/12        |    N/A      |     $9        |
++----------------------+--------------+--------------+-------------+---------------+
+|Advaned Micro. Devices| Am2901A      |  4/design.   |    $71      |    $15        |
+|                      |              |  dependent   |             |               |
++----------------------+--------------+--------------+-------------+---------------+
+
+The F100-L represented very good value for a military spec part, but was less competitive
+with parts from other manufacturers designed and packaged for less rigorous commercial requirements, e.g.
+having an operating range requirement of 0C to +85C rather than -55C to +125C. This
+made the F100-L less attractive for use in the nascent personal computer market created
+by the 8 bit processors. Additionally many of these 8 bit processors actually provided 16 bit
+addressing and even some 16 bit (double word) data processing. The Zilog Z80 is a good example
+of this with a number of internal registers which can be paired to perform 16 bit operations.
+Continuing this comparison, by 1979 it was estimated that only 5000 F100-L parts had been
+manufactured in total[6]. Zilog on the other hand sold
 100,000 Z80s into Tandy in 1978 alone for inclusion in their Tandy TRS-80 computer[7].
 
-Ferranti made and sold their own computer system based around the F100-L. This went
-on sale in 1980 at a single unit cost of 5800UKP for a system with two floppy drives[13].
 Although no other third party commercial computer offerings were based on this CPU, Ferranti
 didn't miss out completely on the home and personal computer boom: their dominant position
 as a provider of semi-custom ICs using their ULA technology made them the first
 choice for many manufacturers in cost reducing their own designs. Ferranti
 ULAs powered many of the largest selling European machines, including most of
 those from Sinclair and Acorn.
+
+Ferranti made and sold their own computer system based around the F100-L. This went
+on sale in 1980 at a single unit cost of 5800UKP for a system with two floppy drives[13].
+The Science Museum has a photograph_ of this system being used in City University, London:
+
+.. _photograph: http://ingenious.org.uk/See/Scienceandtechnology/Physicsoptics/?target=SeeLarge&ObjectID=%7B170D0C25-A24B-658A-A0DD-7D6DCCAE1A20%7D&source=Search&SearchCategoryID=%7BC30DE785-2657-4A36-A5A6-000000042538%7D&viewby=images
+
+.. image:: F100L_micro.png
 
 Selling into its originally intended military markets the F100-L appears to have had some longevity and
 even spawned a successor with expanded memory addressing abilities in 1984 - the F200-L.[14]
@@ -117,12 +146,12 @@ it's not clear how many of these resulted in sales of more than sample quantitie
 
 The most reported application was the F100-L's inclusion in the University of Surrey's
 UoSAT program, where the F100-L was the heart of the secondary computer unit launched
-into space. [9]
+into space. [9,11]
 
 This section will list briefly a number of other application trials reported in
 the literature including uses
 
-* in Helicopter Engine Management control
+* in Helicopter Engine Management control [17]
 * in gas turbine engine control
 * as a standard spacecraft compute module
 * for control of nuclear test equipment

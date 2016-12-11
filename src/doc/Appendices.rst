@@ -27,9 +27,6 @@ History, Cambridge, UK: Box704_.
 Appendix 2 - Comparison Table of Contemporary Microprocessors
 -------------------------------------------------------------
 
-The following table is reproduced from
-
-"The Microprocessor Data Manual",
-  Dave Bursky, Hayden Bk. Co., US, Dec 1978
+The following table is reproduced from [15]
 
 .. image:: ./MicroprocessorTable.png

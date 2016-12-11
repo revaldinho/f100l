@@ -1,3 +1,38 @@
+'''
+
+Instruction Encoding
+--------------------
+
+All instruction encodings are defined as overlapping but mutually exclusive bit fields.
+
+The bit fields are defined as follows
+
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |Field |Number of bits | Bit positions | Comment                                                        |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  F   |      4        |  15..12       | Instruction class or function                                  |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  I   |      1        |      11       | Address Mode                                                   |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  T   |      2        |   11,10       | General field to qualify F=0 instructions                      |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  R   |      2        |     9,8       | Register field or auto-index mode for indirect addressing      |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  S   |      2        |     7,6       | General field to qualify F=0 instructions                      |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  J   |      2        |     5,4       | General field to qualify F=0 instructions                      |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  N   |     11        |   10..0       | Memory address for direct addressing                           |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  P   |      8        |    7..0       | Memory address used as pointer for pointer indirect addressing |
+  +------+---------------+---------------+----------------------------------------------------------------+
+  |  B   |      4        |    3..0       | Shift number or bit significance                               |
+  +------+---------------+---------------+----------------------------------------------------------------+
+
+Where a don't care (x) bit is presented in the tables, the assembler will consistently use a '0'. The
+emulator will ignore this field during decoding.
+'''
+
 import re
 
 class InstructionReg:

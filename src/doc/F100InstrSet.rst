@@ -1,9 +1,43 @@
-======================
-F100-L Instruction Set
-======================
+==========================
+The F100-L Instruction Set
+==========================
 
-.. automodule:: F100_Opcodes.F100_Opcode
-   :members:
+The following pages present complete descriptions for all instructions implemented in the F100-L.
+
+.. automodule:: InstructionReg
+  :members:
+
+
+Instruction Timings
+-------------------
+
+All instruction timings are defined using the following definitions
+
+  * Ra1 = Program memory read access time
+  * Ra2 = Data memory read access time
+  * Rc1 = Program memory read cycle time
+  * Rc2 = Data memory read cycle time
+  * M   = Read-modify-write cycle time
+  * Wc  = Data memory write cycle time
+  * L   = 1 Logic cycle time (2x period of the CPU clock input)
+
+Abbrieviations
+--------------
+
+Definitions ::
+
+  N      11 bit memory address (associated with opcode field N above)
+  P       8 bit memory address (associated with opcode field P above)
+  W      15 bit memory address
+  D      16 bit immediate data
+  (N)    Contents of memory location N
+  (P)    Contents of memory location P
+  (W)    Contents of memory location W
+  PC     Value of the Program Counter (when pointing at the opcode word)
+  (PC+d) Contents of memory location offset by d words from the opcode
+
+Instruction Definitions
+=======================
 
 .. ADD - Add (with Carry)
 .. automodule:: F100_Opcodes.OpcodeF9

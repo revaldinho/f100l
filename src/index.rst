@@ -18,7 +18,7 @@ Contents:
 
    doc/F100CPU
    doc/F100Arch
-   doc/F100_Opcodes
+   doc/F100InstrSet
    doc/F100Asm
    doc/F100Emu
    doc/References
