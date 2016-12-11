@@ -56,7 +56,7 @@ References
   Wireless World, April 1981, p. 44
 
 
-[12] "EVALUATION OF THE RADIATION HARDNESS OF THE FERRANTI FIOO-L MICROPROCESSOR IN AN OPERATING SYSTEM",
+[12] "Evaluation of the Radiation Hardness of the Ferranti F1OO-L microprocessor in an Operating System",
   N.E. Baxter; Collings; G.J. Hill and B.C. Roberts,
   IEEE Transactions on Nuclear Science, Vol. NS-29, No. 6, December 1982
 
@@ -112,6 +112,7 @@ Journal and Conference Papers
 
 "Pseudo-emulation facilities for the Ferranti FDS-10 Development System"
   N.F. Grant et al., Software & Microsystems, Vol3, Nos 5 & 6, October/December 1984, pp. 106-110
+
 
 Books & Manuals
 ---------------

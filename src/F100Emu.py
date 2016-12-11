@@ -93,7 +93,6 @@ class F100Emu:
         self.read_count = 0
         self.write_count = 0
         self.instr_count = 0
-        self.cycle_count = 0
 
     def load_memory(self, filename, file_format):
         # Initialise the hex2bin object with a 64Kbyte address space
@@ -134,9 +133,6 @@ class F100Emu:
             self.RAM[address] = (data & 0xFFFF)
         else:
             raise UserWarning("Memory out of range error for address 0x%04X" % address )
-
-    def single_step(self):
-        return self.CPU.single_step()
 
     def print_machine_state(self):
         CPU = self.CPU
@@ -188,7 +184,6 @@ if __name__ == "__main__" :
     if filename=="" or file_format=="":
         usage()
 
-
     emu = F100Emu(adsel=adsel, traceon=traceon)
     emu.load_memory(filename, file_format)
     emu.CPU.reset()
@@ -199,7 +194,7 @@ if __name__ == "__main__" :
         if listingon:
             emu.print_machine_state()
         try:
-            emu.cycle_count += emu.CPU.single_step()
+            emu.CPU.single_step()
         except F100HaltException as e:
             print(e)
             break

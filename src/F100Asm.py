@@ -108,6 +108,41 @@ def usage():
     print( __doc__ )
     sys.exit(0)
 
+
+def write_file(output_file, oformat, assembled_words, endianness="little") :
+    addr_lo = 0
+    addr_hi = 0
+
+    # make a 64KByte memory image
+    h = Hex2Bin(64*1024)
+    # fill it from assembled words
+    for k in sorted(assembled_words.keys()):
+        # Need to multiply address by two to convert 16b word address to byte address
+        addr = k * 2
+        words = assembled_words[k]
+        if addr < addr_lo:
+            addr_lo = addr
+        for i in words:
+            byte_lo = i & 0x000000FF
+            byte_hi = (i >> 8) & 0x000000FF
+            if endianness=="little":
+                h.write_byte(addr, byte_lo)
+                addr += 1
+                h.write_byte(addr, byte_hi)
+                addr += 1
+            else:
+                h.write_byte(addr, byte_lo)
+                addr += 1
+                h.write_byte(addr, byte_hi)
+                addr += 1
+        if addr > addr_hi:
+            addr_hi = addr
+
+    result = h.write_file( output_filename, oformat=output_format, first_address=0, number_of_bytes=addr_hi)
+    if result == False:
+        raise UserWarning("Error writing to %s " % output_filename)
+
+
 class F100Asm():
 
     def __init__(self):
@@ -253,40 +288,6 @@ class F100Asm():
                     words.append(0xFF)
 
         return(new_pc, words)
-
-
-def write_file(output_file, oformat, assembled_words, endianness="little") :
-    addr_lo = 0
-    addr_hi = 0
-
-    # make a 64KByte memory image
-    h = Hex2Bin(64*1024)
-    # fill it from assembled words
-    for k in sorted(assembled_words.keys()):
-        # Need to multiply address by two to convert 16b word address to byte address
-        addr = k * 2
-        words = assembled_words[k]
-        if addr < addr_lo:
-            addr_lo = addr
-        for i in words:
-            byte_lo = i & 0x000000FF
-            byte_hi = (i >> 8) & 0x000000FF
-            if endianness=="little":
-                h.write_byte(addr, byte_lo)
-                addr += 1
-                h.write_byte(addr, byte_hi)
-                addr += 1
-            else:
-                h.write_byte(addr, byte_lo)
-                addr += 1
-                h.write_byte(addr, byte_hi)
-                addr += 1
-        if addr > addr_hi:
-            addr_hi = addr
-
-    result = h.write_file( output_filename, oformat=output_format, first_address=0, number_of_bytes=addr_hi)
-    if result == False:
-        raise UserWarning("Error writing to %s " % output_filename)
 
 
 

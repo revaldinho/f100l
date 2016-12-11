@@ -202,7 +202,7 @@ class F100_Opcode :
             operand = self.CPU.memory_read(operand_address)
         elif IR.I==1:
             self.addr_mode == ADM_POINTER_INDIRECT
-            pointer_val = IR.P
+            pointer_val = self.CPU.memory_read(IR.P)
             if IR.R==1:
                 pointer_val += 1
                 self.addr_mode == ADM_POINTER_INDIRECT_PREINC

@@ -75,7 +75,7 @@ Pricing and Commercial History
 ------------------------------
 
 At the launch in 1976 the CPU alone was priced at 57UKP
-in quantities of 100. [1,3] By 1978 prices had reduced somewhat to 39UKP for the processor and
+in quantities of 100. [1,3] By 1978 prices had reduced somewhat to 39UKP for the processor, with
 a support chip set of an F111-L and 2 F112-L's available for an additional 18KUP.[4] The table below
 shows costs for a selection of microprocessors available in 1978[15]
 
@@ -112,8 +112,8 @@ by the 8 bit processors. Additionally many of these 8 bit processors actually pr
 addressing and even some 16 bit (double word) data processing. The Zilog Z80 is a good example
 of this with a number of internal registers which can be paired to perform 16 bit operations.
 Continuing this comparison, by 1979 it was estimated that only 5000 F100-L parts had been
-manufactured in total[6]. Zilog on the other hand sold
-100,000 Z80s into Tandy in 1978 alone for inclusion in their Tandy TRS-80 computer[7].
+manufactured in total[6]. Zilog on the other hand sold 100,000 Z80s into Tandy in
+1978 alone for inclusion in their Tandy TRS-80 computer[7].
 
 Although no other third party commercial computer offerings were based on this CPU, Ferranti
 didn't miss out completely on the home and personal computer boom: their dominant position
@@ -127,8 +127,6 @@ on sale in 1980 at a single unit cost of 5800UKP for a system with two floppy dr
 The Science Museum has a photograph_ of this system being used in City University, London:
 
 .. _photograph: http://ingenious.org.uk/See/Scienceandtechnology/Physicsoptics/?target=SeeLarge&ObjectID=%7B170D0C25-A24B-658A-A0DD-7D6DCCAE1A20%7D&source=Search&SearchCategoryID=%7BC30DE785-2657-4A36-A5A6-000000042538%7D&viewby=images
-
-.. image:: F100L_micro.png
 
 Selling into its originally intended military markets the F100-L appears to have had some longevity and
 even spawned a successor with expanded memory addressing abilities in 1984 - the F200-L.[14]

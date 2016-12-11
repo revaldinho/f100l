@@ -56,10 +56,9 @@ class F100CPU:
         return result
 
     def single_step(self):
-        cycle_count = 0
         self.IR.update(self.memory_fetch())
         if ( self.IR.F not in self.opcode_table):
             raise UserWarning("Cannot execute Opcode with function field 0x%X" % self.IR.F )
         else:
-            cycle_count += self.opcode_table[self.IR.F].exec()
-        return cycle_count
+            self.opcode_table[self.IR.F].exec()
+        return

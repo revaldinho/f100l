@@ -72,27 +72,27 @@ class OpcodeF4(F100_Opcode) :
             raise UserWarning("Cannot execute opcode %04X using opcode class %s" % (opcode, self.__name__) )
         elif IR.I==0 and IR.N==0:
             self.addr_mode == ADM_IMMEDIATE
-            self.CPU.OR = self.CPU.PC
+            operand_address = self.CPU.PC
         elif IR.I==0:
             self.addr_mode == ADM_DIRECT
-            self.CPU.OR = IR.N
+            operand_address = IR.N
         elif IR.I==1 and IR.P==0:
             self.addr_mode == ADM_IMMEDIATE_INDIRECT
-            self.CPU.OR = self.CPU.memory_fetch()
+            operand_address = self.CPU.memory_fetch()
         elif IR.I==1:
             self.addr_mode == ADM_POINTER_INDIRECT
             pointer_val = self.CPU.memory_read(IR.P)
             if IR.R==1:
                 pointer_val += 1
                 self.addr_mode == ADM_POINTER_INDIRECT_PREINC
-            self.CPU.OR = self.CPU.memory_read(pointer_val)
+            operand_address = pointer_val
             if IR.R==3:
                 self.addr_mode == ADM_POINTER_INDIRECT_POSTDEC
                 pointer_val -= 1
             # Update the pointer location whether or not it has changed value
             self.CPU.memory_write(IR.P, pointer_val)
 
-        self.CPU.memory_write(self.CPU.OR, self.CPU.ACC)
+        self.CPU.memory_write(operand_address, self.CPU.ACC)
         self.CPU.CR.Z = 1 if (self.CPU.ACC & 0xFFFF) == 0 else 0
         self.CPU.CR.S = 1 if (self.CPU.ACC & 0x8000) != 0 else 0
         self.CPU.CR.V = 0

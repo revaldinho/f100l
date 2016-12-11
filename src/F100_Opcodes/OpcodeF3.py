@@ -73,7 +73,7 @@ class OpcodeF3(F100_Opcode) :
         return( self.bitassemble(), warnings)
 
     def disassemble(self):
-        if self.I == 0:
+        if self.CPU.IR.I == 0:
             return "RTN"
         else:
             return "RTC"

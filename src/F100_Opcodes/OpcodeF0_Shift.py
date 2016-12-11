@@ -436,7 +436,7 @@ class OpcodeF0_Shift(F100_Opcode) :
             if IR.R == 1:
                 CR.fromint(result)
             elif IR.R ==3:
-                memory_write(operand_addr, result)
+                CPU.memory_write(operand_addr, result)
             else:
                 CPU.ACC = result
 
@@ -454,5 +454,5 @@ class OpcodeF0_Shift(F100_Opcode) :
                 CR.V = 1 if (result & 0x8000) != (CPU.ACC & 0x8000) else 0
 
             CPU.ACC = result
-            CR.fromint(result1)
+            CPU.OR = result1
         return cycle_count
