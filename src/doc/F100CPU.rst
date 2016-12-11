@@ -41,15 +41,18 @@ family members were added starting with the F113, F114 and ZN1001 in 1978.[16]
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
 | ZN1001 | Clock Generator a general purpose oscillator requiring a crystal to define the clock rate and an RC network to define pulse width.     | DIP16 |
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
-| F101-L | Single chip co-processor implementing 2's complement multipy and divide functions                                                      | DIP40 |
+| F101-L | Single chip co-processor implementing 2's complement multipy and divide functions, performing a 16 bit multiply in around 8uS and a    | DIP40 |
+|        | division in around 10uS [5]                                                                                                            |       |
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
-| F111-L | Control interface chip, usually sold together with the F112-L to handle all system interfacing including DMA channel control DIP40     | DIP40 |
+| F111-L | Control interface chip, usually sold together with the F112-L to handle all system interfacing including DMA channel control.          | DIP40 |
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
 | F112-L | Data interface chip used to connect any system device to the IO bus.                                                                   | DIP40 |
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
-| F113-L | High speed memory interface providing all necessary control signals for ROM and RAM handling with no requirement for additional 'glue' | DIP24 |
+| F113-L | High speed memory interface providing all necessary control signals for ROM and RAM handling with no requirement for additional 'glue'.| DIP24 |
+|        | The F113 provided the highest speed memory access for circuits implemented with TTL technologies and dissipated around 350mW[5].       |       |
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
-| F114-L | Medium speed, lower power memory interface with similar features to the F113-L above                                                   | DIP24 |
+| F114-L | Medium speed, lower power memory interface with similar features to the F113-L above. This part was more suitable for battery operation| DIP24 |
+|        | with reduced performance but also a reduced power draw of just 25mW[5].                                                                |       |
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
 | F115-L | Real Time Interrupt handler, can be used with an external crystal to generate real time interrupt at one of 15 rates selectable by     |       |
 |        | hardware or software control. An external device and also generate interrupts using the F115 logic.                                    | DIP24 |

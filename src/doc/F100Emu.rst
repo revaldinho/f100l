@@ -2,6 +2,10 @@
 The F100-L Emulator
 ===================
 
+The F100-L Emulator is written in Python and is still a work in progress. Currently
+it is able to run all internal instructions (the external functions for co-processor
+handling are not yet addressed) but testing has been minimal.
+
 Invoking The Emulator
 =====================
 

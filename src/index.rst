@@ -16,6 +16,7 @@ Contents:
    :titlesonly:
    :maxdepth: 2
 
+   doc/F100Project
    doc/F100CPU
    doc/F100Arch
    doc/F100InstrSet

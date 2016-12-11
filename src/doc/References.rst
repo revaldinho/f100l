@@ -15,12 +15,6 @@ References
   http://www.cbronline.com/news/plessey_to_pay_ukp30m_for_ferrantis_chip_business/
 
 
-[5] "16-bit Microprocessor for the Hard Environment"
-  R.E. Fox, Microelectronics Reliability, Vol. 19, Issues5-6, pp. 599-610
-
-  http://www.sciencedirect.com/science/article/pii/0026271479906073
-
-
 [3] "First British and European Microprocessor"
   Wireless World, November 1976, p. 47
 
@@ -29,6 +23,12 @@ References
   Microprocessors, Volume 1, Issue 7, October 1977, pp. 448-449
 
   http://documents.tips/documents/ferranti-push-for-bigger-share-of-16-bit-market.html
+
+
+[5] "16-bit Microprocessor for the Hard Environment"
+  R.E. Fox, Microelectronics Reliability, Vol. 19, Issues5-6, pp. 599-610
+
+  http://www.sciencedirect.com/science/article/pii/0026271479906073
 
 
 [6] "Will Britain's Micro Ever Make the Big Time?",
