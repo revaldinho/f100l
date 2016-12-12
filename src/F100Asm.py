@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ## ============================================================================
 ## F100Asm.py - Assembler for the Ferranti F100-L CPU
 ##

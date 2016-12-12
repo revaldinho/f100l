@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ## ============================================================================
 ## F100Emu.py - Emulator for the Ferranti F100-L CPU
 ##
