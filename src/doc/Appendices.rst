@@ -2,7 +2,7 @@
 Appendices
 ==========
 
-Appendix1_ - F100-L Handset Assembly Language Summary
+Appendix1_ - The F100-L Microcomputer Control Handset
 
 Appendix2_ - F100-L Handset Assembly Language Summary
 

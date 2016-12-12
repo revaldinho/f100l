@@ -5,7 +5,7 @@ F100-L Microprocessor Architecture
 The Ferranti F100-L is a single-address, single accumulator, 16-bit word length
 microprocessor with 2's complement fixed-point arithmetic.
 
-The processor has 28 basic instructions, which can be subdivided into six
+The processor has 29 basic instructions, which can be subdivided into six
 main categories:
 
  * arithmetic and logical,
