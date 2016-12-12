@@ -58,6 +58,8 @@ def get_operand_value( operand_string, symbol_table, suppress_errors):
             return(operand_val, v)
         else:
             raise(v)
+    except SyntaxError as s:
+        raise s
     return(operand_val, None)
 
 class F100_Opcode :

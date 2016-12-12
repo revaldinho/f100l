@@ -180,7 +180,8 @@ class F100Asm():
         error_count = 0
         warning_count = 0
         lineno = 1
-
+        label_list = dict()
+        
         assembled_words = dict()
 
         if pass_number > 0:
@@ -200,6 +201,11 @@ class F100Asm():
             ## Strip out label from the start of the line
             if re.match("([a-zA-Z_][a-zA-Z0-9_]*:)", line):
                 line_label = str.upper(re.match("([a-zA-Z_][a-zA-Z0-9_]*):", line).group(1))
+                if line_label in label_list:
+                    error_count +=1
+                    print("Error, label %s on line %d has already been defined" %( line_label, lineno))
+                else:
+                    label_list[line_label] = True
                 self.st[line_label] = str(self.pc)
                 line = line[len(line_label)+1:].strip()
             ## Left now with a line which is either blank, directive or opcode
@@ -215,6 +221,9 @@ class F100Asm():
                         else:
                             error_count += 1
                             raise v
+                    except SyntaxError as s:
+                            error_count += 1
+                            print("Syntax Error on line %d: %s" % (lineno, s))
                 else:
                     try:
                         (line_words, warnings) = self.line_assemble(t, fields[1:], self.st, suppress_errors = True if pass_number < 1 else False)
@@ -223,12 +232,11 @@ class F100Asm():
                             # Ignore undefined symbols on first pass
                             error_count+= 1
                             print(v)
-                    except UserWarning as e:
+                    except (UserWarning, SyntaxError) as e:
                         error_count += 1
                         if pass_number > 0:
                             print("Error on line %d" % lineno)
                             print(e)
-
                     if len(warnings) > 0 :
                         for w in warnings:
                             if pass_number > 0 :
@@ -286,6 +294,8 @@ class F100Asm():
                     words.append(self.st.eval_expr(d))
                 except ValueError as v:
                     words.append(0xFF)
+
+
 
         return(new_pc, words)
 
