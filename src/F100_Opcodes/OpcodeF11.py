@@ -69,7 +69,7 @@ Condition Register
 |\--| 1 | * | * | * | * |\--|
 +---+---+---+---+---+---+---+
 
-* C is set if the operation results in a borrow (carry), otherwise cleared
+* C is cleared if the operation results in a borrow (carry), otherwise set
 * M is always set to 1
 * Z is set if the result is all-zeroes, otherwise cleared
 * S is set if the MSB of the result is a '1', otherwise cleared
@@ -87,14 +87,14 @@ class OpcodeF11(F100_Opcode) :
         super().__init__( opcode_fn = { "CMP":11}, CPU=CPU)
         self.F = 11
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         (self.CPU.OR, operand_address, cycle_count) = self.get_operand()
         result = self.CPU.OR - self.CPU.ACC
         if (self.CPU.CR.M==1) :
             result = result + self.CPU.CR.C - 1
 
-        self.CPU.CR.C = 1 if (result & 0x010000) > 0 else 0
+        self.CPU.CR.C = 0 if (result & 0x010000) > 0 else 1
         self.CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
         self.CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
         self.CPU.CR.V = 1 if (result & 0x8000) == (self.CPU.ACC & 0x8000) else 0

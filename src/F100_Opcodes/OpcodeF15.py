@@ -71,7 +71,7 @@ class OpcodeF15(F100_Opcode) :
 
         return (code, warnings)
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         IR = self.CPU.IR
 

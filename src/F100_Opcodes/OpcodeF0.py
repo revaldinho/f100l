@@ -44,15 +44,15 @@ class OpcodeF0(F100_Opcode) :
             result = self.oshift.disassemble(IR)
         return result
 
-    def exec(self):
+    def execute(self):
         # No real function here, just need to determine where to send the exec task
         IR = self.CPU.IR
         if IR.T == 1:
-            execfn = self.ohalt.exec
+            execfn = self.ohalt.execute
         elif IR.S == 2:
-            execfn = self.ojump.exec
+            execfn = self.ojump.execute
         elif IR.S == 3:
-            execfn = self.obit.exec
+            execfn = self.obit.execute
         else:
-            execfn = self.oshift.exec
+            execfn = self.oshift.execute
         return execfn()

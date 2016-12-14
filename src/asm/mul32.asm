@@ -3,7 +3,7 @@
 	.equ  USP     0x0001     	; User Stack Pointer
 	.equ  DATAPTR 0x0002     	; another pointer
 	.equ  CARRY   0x04		; carry is bit 4 of the CR
-	.equ  MULTI   0x05      	; multi-word flag is bit 4 of CR
+	.equ  MULTI   0x05      	; multi-word flag is bit 5 of CR
 
 	.equ  LINK_STACK 0x4001  	; initial value for link stack (must be ODD)
 	.equ  USER_STACK 0x4100  	; initial value for user stack

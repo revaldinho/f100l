@@ -78,7 +78,7 @@ class OpcodeF3(F100_Opcode) :
         else:
             return "RTC"
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         # Note that the PC has already been incremented during the instruction fetch
         stack_pointer = self.CPU.memory_read(0)

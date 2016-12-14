@@ -57,7 +57,7 @@ class OpcodeF1(F100_Opcode) :
 
         return( self.bitassemble(), warnings)
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         # Note that the PC has already been incremented during the instruction fetch
         self.CPU.PC = (self.CPU.PC + self.CPU.ACC ) & 0x7FFF

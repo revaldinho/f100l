@@ -67,7 +67,7 @@ after the opcode, and the the result is returned to that location.
 |\--|\--| * | * | * | * |\--| 
 +---+---+---+---+---+---+---+ 
 
-* C is set if the operation results in a borrow (carry), otherwise cleared
+* C is cleared if the operation results in a borrow (carry), otherwise set
 * Z is set if the result is all-zeroes, otherwise cleared
 * S is set if the MSB of the result is a '1', otherwise cleared
 * V is set if the subtraction of two numbers of different sign results in 
@@ -84,7 +84,7 @@ class OpcodeF6(F100_Opcode) :
         super().__init__( opcode_fn = { "SBS":6}, CPU=CPU )
         self.F = 6
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         
         (operand, operand_address, cycles) = self.get_operand()
@@ -95,7 +95,7 @@ class OpcodeF6(F100_Opcode) :
 
         self.CPU.memory_write(operand_address, result)     
             
-        self.CPU.CR.C = 1 if (result & 0x010000) > 0 else 0
+        self.CPU.CR.C = 0 if (result & 0x010000) > 0 else 1
         self.CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
         self.CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
         if ((self.CPU.ACC & 0x8000) != (self.CPU.OR & 0x8000)) and ((result & 0x8000) == (self.CPU.ACC & 0x8000)):

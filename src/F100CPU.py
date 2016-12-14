@@ -60,5 +60,5 @@ class F100CPU:
         if ( self.IR.F not in self.opcode_table):
             raise UserWarning("Cannot execute Opcode with function field 0x%X" % self.IR.F )
         else:
-            self.opcode_table[self.IR.F].exec()
+            self.opcode_table[self.IR.F].execute()
         return

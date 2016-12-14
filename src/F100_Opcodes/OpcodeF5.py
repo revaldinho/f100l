@@ -82,7 +82,7 @@ class OpcodeF5(F100_Opcode) :
         super().__init__( opcode_fn = { "ADS":5}, CPU=CPU)
         self.F = 5
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         (operand, operand_address, cycles) = self.get_operand()
         result = operand + self.CPU.ACC

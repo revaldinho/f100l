@@ -59,7 +59,7 @@ class OpcodeF8(F100_Opcode) :
         super().__init__( opcode_fn = { "LDA":8}, CPU=CPU)
         self.F = 8
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         (self.CPU.ACC, operand_address, cycle_count) = self.get_operand()
 

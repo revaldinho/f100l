@@ -95,7 +95,7 @@ class OpcodeF0_Bit(F100_Opcode) :
         else:
             return "SET"
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
 
         IR = self.CPU.IR

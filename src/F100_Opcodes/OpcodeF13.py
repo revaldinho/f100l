@@ -60,7 +60,7 @@ class OpcodeF13(F100_Opcode) :
         super().__init__( opcode_fn = { "NEQ":13}, CPU=CPU )
         self.F = 13
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
 
         (self.CPU.OR, operand_address, cycle_count) = self.get_operand()

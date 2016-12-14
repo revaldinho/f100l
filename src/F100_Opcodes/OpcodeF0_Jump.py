@@ -142,7 +142,7 @@ class OpcodeF0_Jump(F100_Opcode) :
         return mnemonics[IR.J]
 
 
-    def exec(self):
+    def execute(self):
 
         cycle_count = 0
 

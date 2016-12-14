@@ -73,7 +73,7 @@ class OpcodeF2(F100_Opcode) :
         return (code, warnings)
 
 
-    def exec(self):
+    def execute(self):
 
         cycles = 0
         IR = self.CPU.IR

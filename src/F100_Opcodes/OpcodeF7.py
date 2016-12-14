@@ -115,7 +115,7 @@ class OpcodeF7(F100_Opcode) :
         return (self.bitassemble(), warnings)
 
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         IR = self.CPU.IR
         # Get the first operand - address or value of counter

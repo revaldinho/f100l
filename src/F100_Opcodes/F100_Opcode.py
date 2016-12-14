@@ -217,7 +217,7 @@ class F100_Opcode :
         return (operand, operand_address, cycles)
 
 
-    def exec(self):
+    def execute (self):
         '''
         On entry the CPU instruction register is already populated and the PC is pointing
         to the next instruction or the first operand

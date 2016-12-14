@@ -400,7 +400,7 @@ class OpcodeF0_Shift(F100_Opcode) :
                 mnemonic = "SLL.D"
         return mnemonic
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
 
         CPU = self.CPU

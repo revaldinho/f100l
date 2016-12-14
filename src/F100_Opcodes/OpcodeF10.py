@@ -63,7 +63,7 @@ When M is set, include the carry from a previous operation in the subtraction
 |\--|\--| * | * | * | * |\--|
 +---+---+---+---+---+---+---+
 
-* C is set if the operation results in a borrow (carry), otherwise cleared
+* C is cleared if the operation results in a borrow (carry), otherwise set
 * Z is set if the result is all-zeroes, otherwise cleared
 * S is set if the MSB of the result is a '1', otherwise cleared
 * V is set if the subtraction of two numbers of different sign results in
@@ -78,7 +78,7 @@ class OpcodeF10(F100_Opcode) :
         super().__init__( opcode_fn = { "SUB":10}, CPU=CPU )
         self.F = 10
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
 
         (self.CPU.OR, operand_address, cycle_count) = self.get_operand()
@@ -88,7 +88,7 @@ class OpcodeF10(F100_Opcode) :
             result = result + self.CPU.CR.C - 1
         self.CPU.ACC = result
 
-        self.CPU.CR.C = 1 if (result & 0x010000) > 0 else 0
+        self.CPU.CR.C = 0 if (result & 0x010000) > 0 else 1
         self.CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
         self.CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
         if ((self.CPU.ACC & 0x8000) != (self.CPU.OR & 0x8000)) and ((result & 0x8000) == (self.CPU.ACC & 0x8000)):

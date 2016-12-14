@@ -61,7 +61,7 @@ class OpcodeF12(F100_Opcode) :
         super().__init__( opcode_fn = { "AND":12}, CPU=CPU )
         self.F = 12
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
         (self.CPU.OR, operand_address, cycle_count) = self.get_operand()
         result = self.CPU.ACC ^ self.CPU.OR

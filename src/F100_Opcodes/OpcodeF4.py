@@ -60,7 +60,7 @@ class OpcodeF4(F100_Opcode) :
         super().__init__( opcode_fn = { "STO":4}, CPU=CPU)
         self.F = 4
 
-    def exec(self):
+    def execute(self):
         cycle_count = 0
 
         IR = self.CPU.IR
