@@ -199,8 +199,6 @@ if __name__ == "__main__" :
             print(e)
             break
         emu.instr_count += 1
-        if emu.instr_count > 10000:
-            break
     et = time.time()
 
     print("# -------------------------------------------------------------------------------------------")
