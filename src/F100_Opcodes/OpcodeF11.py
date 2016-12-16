@@ -22,7 +22,7 @@ When 'M' is clear, single length comparison
 
    CMP N      x <- (N) - A
    CMP ,D     x <- D - A
-   CMP /P     A <- (P) - A
+   CMP /P     x <- (P) - A
    CMP /P+    P <- P + 1 ; x <- (P) - A
    CMP /P-    x <- (P) - A ;  P <- P - 1 ;
    CMP .W     x <- (W) - A
@@ -33,7 +33,7 @@ When 'M' is set
 
    CMP N      x <- (N) - A + C - 1
    CMP ,D     x <- D - A + C - 1
-   CMP /P     A <- (P) - A + C - 1
+   CMP /P     x <- (P) - A + C - 1
    CMP /P+    P <- P + 1 ; x <- (P) - A + C - 1
    CMP /P-    x <- (P) - A + C - 1;  P <- P - 1 ;
    CMP .W     x <- (W) - A + C - 1
