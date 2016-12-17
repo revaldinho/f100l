@@ -280,7 +280,7 @@ M32_SKIPADD:
         STO .M32_bb_03
         SLL.D 16 A
         STO .M32_bb_02
-        ; check the MSB of word 01 and if set need to add that into word O2
+        ; check the MSB of word 01 and if set need to add 1 into word O2, ie it is shifted into the next word
         JBC 15 M32_bb_01 M32_SKIPADJ
         CLR CARRY CR
         LDA ,0x1
@@ -335,7 +335,7 @@ M32_LVAR:
         ;;
         ;; Local var. space: 6 words
         ;; ------------------------------------------------------
-MUL16D:
+MUL16:
         LDA ,-15
         STO .M16_count
 
