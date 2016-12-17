@@ -46,6 +46,18 @@ OPTIONAL SWITCHES ::
 
   -t --traceon                   print all memory transactions to stdout
 
+  -m  --memorydump <filename>    dump memory to file at end of run.
+
+                                 Memory dump will by default write address and data for all
+                                 memory locations written during program execution. Use the
+                                 -p/-q switches to override this and instead dump a fixed
+                                 block if required.
+
+
+  -p  --memorystart <int>        start of memory dump range
+
+  -q  --memoryend   <int>        end of memory dump range
+
   -h --help                      print this help message
 
 EXAMPLES ::
@@ -88,6 +100,7 @@ class F100Emu:
     def __init__ (self, ramsize=32768, adsel=1, traceon=False):
         self.CPU = F100CPU(adsel=adsel, memory_read=self.memory_read, memory_write=self.memory_write)
         self.RAM = [0xDEAD]*ramsize
+        self.RAM_writeset = set()
         self.MEMTOP = ramsize-1
         self.traceon = traceon
         self.read_count = 0
@@ -128,9 +141,9 @@ class F100Emu:
         if self.traceon == True:
             print ("STORE 0x%04X 0x%04X" % ( address & 0xFFFF, data & 0xFFFF))
         self.write_count += 1
-
         if 0 <= address <= self.MEMTOP:
             self.RAM[address] = (data & 0xFFFF)
+            self.RAM_writeset.add(address)
         else:
             raise UserWarning("Memory out of range error for address 0x%04X" % address )
 
@@ -157,8 +170,14 @@ if __name__ == "__main__" :
     endianness = "little"
     traceon = False
     listingon = True
+    memdumpon = False
+    memdump_filename = ""
+    memdump_lo = None
+    memdump_hi = None
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:hnt", ["adsel=","endianness=", "filename=","format=","help","nolisting","traceon"])
+        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:m:p:q:hnt", ["adsel=","endianness=", \
+                "filename=","format=","memorydump=","memorystart=", "memoryend=","help",\
+                "nolisting","traceon"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -166,8 +185,15 @@ if __name__ == "__main__" :
     for opt, arg in opts:
         if opt in ( "-f", "--filename" ) :
             filename = arg
+        if opt in ( "-m", "--memorydump" ) :
+            memdump_filename = arg
+            memdumpon = True
         if opt in ( "-a", "--adsel" ) :
-            adsel = int(arg)
+            adsel = int(arg,0)
+        if opt in ( "-p", "--memorystart" ) :
+            memdump_lo = int(arg,0)
+        if opt in ( "-q", "--memoryend" ) :
+            memdump_hi = int(arg,0)
         if opt in ( "-e", "--endianness" ) :
             endianness = arg
         if opt in ( "-g", "--format" ) :
@@ -200,6 +226,17 @@ if __name__ == "__main__" :
             break
         emu.instr_count += 1
     et = time.time()
+
+    if memdumpon:
+        with open(memdump_filename, "w") as f:
+            if memdump_lo != None and memdump_hi != None:
+                for adr in range(memdump_lo, memdump_hi+1):
+                    if adr in emu.RAM_writeset:
+                        f.write("0x%04X : 0x%04X\n" % (adr, emu.RAM[adr]&0xFFFF))
+            else:
+                for adr in sorted(emu.RAM_writeset):
+                    f.write("0x%04X : 0x%04X\n" % (adr, emu.RAM[adr]&0xFFFF))
+
 
     print("# -------------------------------------------------------------------------------------------")
     print("# Program execution Statistics")
