@@ -15,15 +15,7 @@ def sqrt32 (a):
     if a >0:
         count = 15
         while count != 0:
-            m1 = 1
-            loop_ctr = (count << 1)
-            while loop_ctr != 0:
-                m1 = m1 << 1
-                loop_ctr -= 1
-            subtrahend = root * m1
-            m1 = m1 >> 2
-            subtrahend = subtrahend + m1
-
+            subtrahend = root * 2 ** (count * 2 ) + 1 * 2 **((count-1) * 2)
             root = root << 1
             if rem >= subtrahend:
                 rem = rem - subtrahend

@@ -79,6 +79,8 @@ class OpcodeF9(F100_Opcode) :
 
     def execute(self):
         cycle_count = 0
+        self.execstats[self.disassemble(self.CPU.IR)] += 1
+
         (self.CPU.OR, operand_address, cycle_count) = self.get_operand()
 
         result = self.CPU.OR + self.CPU.ACC

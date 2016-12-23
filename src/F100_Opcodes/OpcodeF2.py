@@ -79,6 +79,7 @@ class OpcodeF2(F100_Opcode) :
         IR = self.CPU.IR
         operand = None
         lsp = self.CPU.memory_read(0)
+        self.execstats[self.disassemble(IR)] += 1
 
         if IR.I==0 and IR.N!=0:
             self.addr_mode == ADM_DIRECT

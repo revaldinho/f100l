@@ -300,7 +300,7 @@ class OpcodeF0_Shift(F100_Opcode) :
 
 
     def __init__ (self, CPU=None):
-        super().__init__(opcode_fn = { "SRE":0, "SLE":0, "SLA":0, "SRA":0, "SRL":0, "SLL":0, }, CPU=CPU )
+        super().__init__(opcode_fn = { "SRE":0, "SLE":0, "SLA":0, "SRA":0, "SRL":0, "SLL":0, "SLA.D":0, "SRA.D":0, "SRL.D":0, "SLL.D":0,}, CPU=CPU )
         self.F = 0
 
     def assemble(self, opcode_token, operands, symbol_table, suppress_errors=False):
@@ -402,10 +402,10 @@ class OpcodeF0_Shift(F100_Opcode) :
 
     def execute(self):
         cycle_count = 0
-
         CPU = self.CPU
         CR = self.CPU.CR
         IR = self.CPU.IR
+        self.execstats[self.disassemble(IR)] += 1
 
         if CR.M == 0 :
             # Single length shifts and rotates

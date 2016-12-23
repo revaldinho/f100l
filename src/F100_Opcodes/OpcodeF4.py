@@ -65,6 +65,7 @@ class OpcodeF4(F100_Opcode) :
 
         IR = self.CPU.IR
         CR = self.CPU.CR
+        self.execstats[self.disassemble(IR)] += 1
 
         operand = None
         operand_address = None

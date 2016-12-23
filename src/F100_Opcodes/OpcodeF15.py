@@ -74,6 +74,7 @@ class OpcodeF15(F100_Opcode) :
     def execute(self):
         cycle_count = 0
         IR = self.CPU.IR
+        self.execstats[self.disassemble(IR)] +=1
 
         operand = None
         if ( IR.F != self.F):
@@ -86,12 +87,12 @@ class OpcodeF15(F100_Opcode) :
         elif IR.I==1 and IR.P==0:
             self.CPU.PC = self.CPU.memory_fetch() & 0x7FFF
         elif IR.I==1:
-            pointer_val = self.memory_read(IR.P)
+            pointer_val = self.CPU.memory_read(IR.P)
             if IR.R==1:
                 pointer_val += 1
             self.CPU.PC = self.CPU.memory_read(pointer_val) & 0x7FFF
             if IR.R==3:
                 pointer_val -= 1
-            self.memory_write(IR.P, pointer_val)
+            self.CPU.memory_write(IR.P, pointer_val)
 
         return cycle_count

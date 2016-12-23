@@ -59,6 +59,9 @@ class OpcodeF1(F100_Opcode) :
 
     def execute(self):
         cycle_count = 0
+        self.execstats[self.disassemble(self.CPU.IR)] += 1
+
+
         # Note that the PC has already been incremented during the instruction fetch
         self.CPU.PC = (self.CPU.PC + self.CPU.ACC ) & 0x7FFF
 

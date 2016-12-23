@@ -118,6 +118,8 @@ class OpcodeF7(F100_Opcode) :
     def execute(self):
         cycle_count = 0
         IR = self.CPU.IR
+        self.execstats[self.disassemble(IR)] += 1
+
         # Get the first operand - address or value of counter
         (self.CPU.OR, operand_address, cycle_count) = self.get_operand()
         # fetch the second operand

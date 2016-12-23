@@ -69,6 +69,8 @@ class OpcodeF0_Halt(F100_Opcode) :
 
     def execute (self):
         cycle_count = 0
+        self.execstats[self.disassemble(self.CPU.IR)] += 1
+
         if self.CPU.IR.T >1 :
             raise UserException("External Function operation in F=0 class not yet implemented")
         else:

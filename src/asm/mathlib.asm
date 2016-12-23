@@ -1,3 +1,131 @@
+; Define a Load Operand (LDOR) alias to be the CMP instruction - flags are trashed but acc is preserved
+#define  LDOR  CMP
+
+; ------------------------------------
+; UDIV32
+;
+; Unsigned integer 32 bit division of two numbers
+; returning quotient and remainder.
+; ------------------------------------
+; Entry: USP   -> Denominator (low word)
+;        USP-1 -> Denominator (high word)
+;        USP-2 -> Numerator   (low word)
+;        USP-3 -> Numerator   (high word)
+;
+; Exit:  USP   -> Quotient (low word)
+;        USP-1 -> Quotient (high word)
+;        USP-2 -> Remainder (low word)
+;        USP-3 -> Remainder (high word)
+;
+; Local var space: 9 words
+; ------------------------------------
+; Algorithm
+; ------------------------------------
+;   def div32(N,D):
+;       if N==0 :
+;           return(0,0)
+;       Q = 0
+;       R = 0
+;       for i in range (-31, 1 ):
+;           Q <<= 1
+;           R <<= 1
+;           if bit (N,31) :
+;               R = bitset(R,0)
+;           if R >= D:
+;               R = R - D
+;               Q = bitset(Q,0)
+;           N <<= 1
+;       return (Q,R)
+; ------------------------------------
+
+UDIV32:
+         LDA /USP-
+         STO .UD32_N_LO
+         LDA /USP-
+         STO .UD32_N_HI
+         LDA /USP-
+         STO .UD32_D_LO
+         LDA /USP-
+         STO .UD32_D_HI
+
+         LDA ,0x0000
+         STO .UD32_Q_HI
+         STO .UD32_Q_LO
+         STO .UD32_R_HI
+         STO .UD32_R_LO
+
+         LDA ,-32
+         STO .UD32_LCTR
+         SET MULTI CR
+
+UD32_LOOP:
+         LDOR .UD32_Q_LO
+         LDA .UD32_Q_HI
+         SLA.D 1 A
+         STO .UD32_Q_HI
+         SLA.D 16 A
+         STO .UD32_Q_LO
+
+         LDOR .UD32_R_LO
+         LDA .UD32_R_HI
+         SLA.D 1 A
+         STO .UD32_R_HI
+         SLA.D 16 A
+         STO .UD32_R_LO
+
+         JBC 15 UD32_N_HI UD32_SKIP
+         SET 0 UD32_R_LO
+
+UD32_SKIP:
+         SET CARRY CR
+         LDA .UD32_D_LO
+         CMP .UD32_R_LO
+         LDA .UD32_D_HI
+         CMP .UD32_R_HI
+         JBS SIGN CR UD32_SKIP2        ; JUMP if R < D
+
+         SET CARRY CR
+         LDA .UD32_D_LO
+         SBS .UD32_R_LO
+         LDA .UD32_D_HI
+         SBS .UD32_R_HI
+         SET 0 UD32_Q_LO
+
+UD32_SKIP2:
+         LDOR .UD32_N_LO
+         LDA .UD32_N_HI
+         SLA.D 1 A
+         STO .UD32_N_HI
+         SLA.D 16 A
+         STO .UD32_N_LO
+
+         ICZ .UD32_LCTR UD32_LOOP
+
+UD32_EXIT:
+         LDA .UD32_R_HI
+         STO /USP+
+         LDA .UD32_R_LO
+         STO /USP+
+         LDA .UD32_Q_HI
+         STO /USP+
+         LDA .UD32_Q_LO
+         STO /USP+
+         RTN
+
+UD32_LVAR:
+         .word 0x0000, 0x0000, 0x0000, 0x0000
+         .word 0x0000, 0x0000, 0x0000, 0x0000
+         .word 0x0000
+
+         .equ UD32_Q_LO UD32_LVAR
+         .equ UD32_Q_HI UD32_LVAR + 1
+         .equ UD32_R_LO UD32_LVAR + 2
+         .equ UD32_R_HI UD32_LVAR + 3
+         .equ UD32_N_LO UD32_LVAR + 4
+         .equ UD32_N_HI UD32_LVAR + 5
+         .equ UD32_D_LO UD32_LVAR + 6
+         .equ UD32_D_HI UD32_LVAR + 7
+         .equ UD32_LCTR UD32_LVAR + 8
 
         ;; ------------------------------------------------------
         ;; SQRT32 - Find square root of an integer numbers up to
@@ -38,9 +166,7 @@
         ;;       count -= 1
         ;;
         ;;   return ( root, rem )
-        ;;
-        ;;   for a in (89,102,256,512, 15000, 28000, 32768, 65536, 128456, 1073676289, 1073741824):
-        ;;     print a, sqrt32(a)
+
 SQRT32:
         LDA ,0x0000
         STO .S32_ROOT_LO
@@ -106,8 +232,7 @@ S32_SMC_TARGET:
         LDA /USP-
 
         SET MULTI CR
-        LDA .S32_M1_LO            ; m1 = m1 >> 2
-        SRA.D 16 A
+        LDOR .S32_M1_LO            ; m1 = m1 >> 2
         LDA .S32_M1_HI
         SRA.D 2 A
         STO .S32_M1_HI
@@ -117,8 +242,7 @@ S32_SMC_TARGET:
         ADS .S32_SUB_LO
         LDA .S32_M1_HI
         ADS .S32_SUB_HI
-        LDA .S32_ROOT_LO          ; root = root << 1
-        SRA.D 16 A
+        LDOR .S32_ROOT_LO          ; root = root << 1
         LDA .S32_ROOT_HI
         SLA.D 1 A
         STO .S32_ROOT_HI
@@ -265,16 +389,14 @@ M32_LOOP:
 
 M32_SKIPADD:
 
-        LDA .M32_aa_lo
-        SRA.D 16 A
+        LDOR .M32_aa_lo
         LDA .M32_aa_hi
         SRA.D 1 A
         STO .M32_aa_hi
         SLA.D 16 A
         STO .M32_aa_lo
         ; Now shift the 64bit bb variable
-        LDA .M32_bb_02
-        SRA.D 16 A
+        LDOR .M32_bb_02
         LDA .M32_bb_03
         SLL.D 1 A
         STO .M32_bb_03
@@ -286,8 +408,7 @@ M32_SKIPADD:
         LDA ,0x1
         ADS .M32_bb_02
 M32_SKIPADJ:
-        LDA .M32_bb_00
-        SRA.D 16 A
+        LDOR .M32_bb_00
         LDA .M32_bb_01
         SLL.D 1 A
         STO .M32_bb_01
@@ -361,8 +482,7 @@ M16_SKIPADD:
         CLR MULTI CR
         SRA 1 M16_aa
         SET MULTI CR
-        LDA .M16_bb_lo
-        SRA.D 16 A
+        LDOR .M16_bb_lo
         LDA .M16_bb_hi
         SLL.D 1 A
         STO .M16_bb_hi

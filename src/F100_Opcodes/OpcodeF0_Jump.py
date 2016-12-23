@@ -145,8 +145,10 @@ class OpcodeF0_Jump(F100_Opcode) :
     def execute(self):
 
         cycle_count = 0
-
         IR = self.CPU.IR
+
+        self.execstats[self.disassemble(IR)] += 1
+
         bitmask = 0x01 << IR.B
 
         if IR.R == 3:
@@ -171,7 +173,7 @@ class OpcodeF0_Jump(F100_Opcode) :
                     else:
                         self.CPU.ACC = operand | bitmask
         else: # JBS, JSC
-            if operand & bitmask == 1:
+            if operand & bitmask != 0:
                 self.CPU.PC = W1
                 if IR.J == 3:
                     if IR.R == 3:

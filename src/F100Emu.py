@@ -58,6 +58,8 @@ OPTIONAL SWITCHES ::
 
   -q  --memoryend   <int>        end of memory dump range
 
+  -s  --statistics               print extended statistics summary at end of run
+
   -h --help                      print this help message
 
 EXAMPLES ::
@@ -156,7 +158,7 @@ class F100Emu:
         if ( IR.F not in CPU.opcode_table):
             raise UserWarning("Cannot execute Opcode with function field 0x%X" % IR.F )
         else:
-            IR.name = CPU.opcode_table[IR.F].disassemble()
+            IR.name = CPU.opcode_table[IR.F].disassemble(IR)
 
         print("  %04X : %04X %04X %04X : %04X %04X %d %d %d %d %d %d %d  : %s" % \
         (PC & 0xFFFF,self.RAM[PC] & 0xFFFF ,self.RAM[PC+1] & 0xFFFF, self.RAM[PC+2] & 0xFFFF,\
@@ -174,10 +176,11 @@ if __name__ == "__main__" :
     memdump_filename = ""
     memdump_lo = None
     memdump_hi = None
+    statson = False
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:m:p:q:hnt", ["adsel=","endianness=", \
+        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:m:p:q:hnst", ["adsel=","endianness=", \
                 "filename=","format=","memorydump=","memorystart=", "memoryend=","help",\
-                "nolisting","traceon"])
+                "nolisting","statistics","traceon"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -203,6 +206,8 @@ if __name__ == "__main__" :
                 usage()
         if opt in ("-n", "--nolisting") :
             listingon = False
+        if opt in ("-s", "--statistics") :
+            statson = True
         if opt in ("-t", "--traceon") :
             traceon = True
         elif opt in ("-h", "--help" ) :
@@ -217,6 +222,7 @@ if __name__ == "__main__" :
     print_header()
     st = time.time()
     while True:
+        emu.instr_count += 1
         if listingon:
             emu.print_machine_state()
         try:
@@ -224,7 +230,6 @@ if __name__ == "__main__" :
         except F100HaltException as e:
             print(e)
             break
-        emu.instr_count += 1
     et = time.time()
 
     if memdumpon:
@@ -239,13 +244,23 @@ if __name__ == "__main__" :
 
 
     print("# -------------------------------------------------------------------------------------------")
-    print("# Program execution Statistics")
+    print("# Program Execution Statistics")
     print("# -------------------------------------------------------------------------------------------")
     print("#          Instruction count: %7d" % emu.instr_count)
 #    print("#          Logic cycle count: %7d" % emu.cycle_count)
     print("#      Total Memory accesses: %7d" % (emu.read_count + emu.write_count) )
     print("#               memory reads: %7d" % emu.read_count )
     print("#              memory writes: %7d" % emu.write_count )
+    if statson:
+        print ("# -------------------------------------------------------------------------------------------")
+        print ("# Instruction Class Statistics")
+        print ("# -------------------------------------------------------------------------------------------")
+        print ("# Opcode             Execution")
+        print ("# Class    Mnemonic  Count")
+        print ("# -------+----------+----------------------------------------------------------------------------")
+        for i in emu.CPU.opcode_table:
+            for fn in sorted(emu.CPU.opcode_table[i].opcode_fn.keys()):
+                print("# F =%2d  | %-8s | %12d" % ( i, fn, emu.CPU.opcode_table[i].execstats[fn]))
     print("# -------------------------------------------------------------------------------------------")
     print("# Emulator Performance Statistics")
     print("# -------------------------------------------------------------------------------------------")

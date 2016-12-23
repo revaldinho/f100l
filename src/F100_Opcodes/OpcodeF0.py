@@ -31,8 +31,7 @@ class OpcodeF0(F100_Opcode) :
         super().__init__(self.opcode_fn, CPU=CPU )
         self.F = 0
 
-    def disassemble(self):
-        IR = self.CPU.IR
+    def disassemble(self, IR):
         result = ""
         if IR.T == 1:
             result = self.ohalt.disassemble(IR)
@@ -47,6 +46,8 @@ class OpcodeF0(F100_Opcode) :
     def execute(self):
         # No real function here, just need to determine where to send the exec task
         IR = self.CPU.IR
+        self.execstats[self.disassemble(IR)] += 1
+
         if IR.T == 1:
             execfn = self.ohalt.execute
         elif IR.S == 2:

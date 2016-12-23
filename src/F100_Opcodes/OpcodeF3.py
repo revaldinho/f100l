@@ -72,14 +72,16 @@ class OpcodeF3(F100_Opcode) :
 
         return( self.bitassemble(), warnings)
 
-    def disassemble(self):
-        if self.CPU.IR.I == 0:
+    def disassemble(self, IR):
+        if IR.I == 0:
             return "RTN"
         else:
             return "RTC"
 
     def execute(self):
         cycle_count = 0
+        self.execstats[self.disassemble(self.CPU.IR)] += 1
+
         # Note that the PC has already been incremented during the instruction fetch
         stack_pointer = self.CPU.memory_read(0)
         condition = self.CPU.memory_read(stack_pointer)

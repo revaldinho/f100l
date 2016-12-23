@@ -100,6 +100,7 @@ class OpcodeF0_Bit(F100_Opcode) :
 
         IR = self.CPU.IR
         bitmask = 0x01 << IR.B
+        self.execstats[self.disassemble(IR)] += 1
 
         if IR.J == 3: # CLR
             if IR.R == 3:

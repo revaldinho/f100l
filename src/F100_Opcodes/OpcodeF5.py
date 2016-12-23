@@ -84,6 +84,8 @@ class OpcodeF5(F100_Opcode) :
 
     def execute(self):
         cycle_count = 0
+        self.execstats[self.disassemble(self.CPU.IR)] += 1
+
         (operand, operand_address, cycles) = self.get_operand()
         result = operand + self.CPU.ACC
         if (self.CPU.CR.M==1) :

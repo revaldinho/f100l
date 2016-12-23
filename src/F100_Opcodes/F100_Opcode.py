@@ -79,11 +79,14 @@ class F100_Opcode :
         self.B = None   # Shift Number of bit significance
         self.opcode_regexp = re.compile(r'AND')
         self.code = []
+        self.execstats = dict()
         self.CPU = CPU  # CPU resources for use in emulation
         ## Opcode_fn will be a dictionary of opcode names and F field values
         self.opcode_fn = opcode_fn
         ## Pack the names into a regexp for matching
         self.opcode_regexp = re.compile(r'%s' % '|'.join(self.opcode_fn.keys()))
+        for f in self.opcode_fn.keys():
+            self.execstats[f] = 0
         self.addr_mode = None
 
 
@@ -222,9 +225,10 @@ class F100_Opcode :
         On entry the CPU instruction register is already populated and the PC is pointing
         to the next instruction or the first operand
         '''
+        self.execstats[self.disassemble(self.CPU.IR)] += 1
         pass
 
-    def disassemble(self):
+    def disassemble(self, IR=None):
         return ', '.join(list(self.opcode_fn.keys()))
 
 
