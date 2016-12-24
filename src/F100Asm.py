@@ -274,6 +274,8 @@ class F100Asm():
             for s in self.st.tostring().split('\n'):
                 print( "# %s" % s )
 
+            if error_count > 0 :
+                raise UserWarning("Assembly finished with errors")
         return assembled_words
 
     def process_directive(self, directive, operands ) :
@@ -339,9 +341,12 @@ if __name__ == "__main__":
             text = f.readlines()
         f.close()
         s = time.time()
-        assembled_words = asm.twopass_assemble(text,listingon)
-        if output_filename != "" :
-            write_file(output_filename, output_format, assembled_words, endianness=endianness)
+        try:
+            assembled_words = asm.twopass_assemble(text,listingon)
+            if output_filename != "" :
+                write_file(output_filename, output_format, assembled_words, endianness=endianness)
+        except UserWarning as e:
+            print( e)
         e = time.time()
         print (line_sep)
         print ("# Run time = %1.3f s" % (e-s))

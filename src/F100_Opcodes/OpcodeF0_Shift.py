@@ -429,6 +429,8 @@ class OpcodeF0_Shift(F100_Opcode) :
                 result = sll(operand, IR.B)
                 if IR.J != 2:
                     CR.S = 1 if result & 0x8000 else 0
+                    # FIXME overflow should also be set for multiple place SLA when if any of the bits
+                    # shifted into the MSB are different to the original bit.
                     CR.V = 1 if (result & 0x8000) != (operand & 0x8000) else 0
             elif IR.S == 1 and IR.J == 3:
                 result = rotl(operand, IR.B)
@@ -451,6 +453,8 @@ class OpcodeF0_Shift(F100_Opcode) :
                 (result, result1) = d_sll(CPU.ACC, CPU.OR, shift_dist)
             if IR.J < 2:
                 CR.S = 1 if result & 0x8000 else 0
+                # FIXME overflow should also be set for multiple place SLA when if any of the bits
+                # shifted into the MSB are different to the original bit.
                 CR.V = 1 if (result & 0x8000) != (CPU.ACC & 0x8000) else 0
 
             CPU.ACC = result

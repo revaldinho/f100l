@@ -1,6 +1,6 @@
 #define USE_SELFMODCODE 1           ; comment this to avoid self-modifying code !
 
-;; Initialise Machine Here
+	;; Initialise Machine Here
         .equ  LSP     0x0000        ; Link Stack Pointer
         .equ  USP     0x0001        ; User Stack Pointer
         .equ  DATAPTR 0x0002        ; another pointer

@@ -6,7 +6,7 @@ test_data = []
 result_area = 0x5000
 
 random.seed(0x12345)
-for i in range(0,200):
+for i in range(0,100):
     test_data.append(random.randint(0,0x7FFFFFFF))
 
 def sqrt32 (a):

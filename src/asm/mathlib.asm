@@ -7,10 +7,10 @@
 ; Unsigned integer 32 bit division of two numbers
 ; returning quotient and remainder.
 ; ------------------------------------
-; Entry: USP   -> Denominator (low word)
-;        USP-1 -> Denominator (high word)
-;        USP-2 -> Numerator   (low word)
-;        USP-3 -> Numerator   (high word)
+; Entry: USP   -> Numerator (low word)
+;        USP-1 -> Numerator (high word)
+;        USP-2 -> Denominator   (low word)
+;        USP-3 -> Denominator   (high word)
 ;
 ; Exit:  USP   -> Quotient (low word)
 ;        USP-1 -> Quotient (high word)

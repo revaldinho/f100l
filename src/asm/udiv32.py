@@ -8,13 +8,13 @@ result_area = 0x5000
 
 random.seed(0x12345)
 for i in range(0,200):
-    test_data.append(random.randint(1,0x7FFFFFFF))
+    test_data.append(random.randint(0,0x7FFFFFFF))
 
-test_data[0] = 0x010
-test_data[1] = 0x010
+test_data[0] = 0x009
+test_data[1] = 0x001
 test_data[2] = 0x004
 test_data[3] = 0x002
-test_data[4] = 0x002
+test_data[4] = 0x001
 test_data[5] = 0x004
 
 

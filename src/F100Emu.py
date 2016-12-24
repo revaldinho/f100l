@@ -87,6 +87,7 @@ from hex2bin import Hex2Bin
 import getopt
 import time
 import sys
+import os.path
 
 def usage():
     print( __doc__ )
@@ -214,7 +215,10 @@ if __name__ == "__main__" :
             usage()
     if filename=="" or file_format=="":
         usage()
-
+    elif not os.path.exists(filename):
+        print ("Cannot open file %s" % filename)
+        sys.exit(0)
+        
     emu = F100Emu(adsel=adsel, traceon=traceon)
     emu.load_memory(filename, file_format)
     emu.CPU.reset()
