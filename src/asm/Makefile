@@ -3,7 +3,7 @@
 PYEXE ?= python3
 
 .SUFFIXES: .cpp .hex
-.cpp.hex:; ../F100Asm.py -f $< -o $@ -g hex | tee $*.lst
+.cpp.hex:; ../F100Asm.py -f $< -o $@ -g hex -n |  tee $*.lst
 
 .SUFFIXES: .asm .cpp
 .asm.cpp:; cpp -E $< | grep -v '^#'>  $@

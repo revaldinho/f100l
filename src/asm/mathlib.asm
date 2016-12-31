@@ -1,6 +1,141 @@
 ; Define a Load Operand (LDOR) alias to be the CMP instruction - flags are trashed but acc is preserved
 #define  LDOR  CMP
 
+#ifdef LOCALVARSTACKS
+; ------------------------------------
+; UDIV32
+;
+; Unsigned integer 32 bit division of two numbers
+; returning quotient and remainder.
+; ------------------------------------
+; Entry: USP   -> Numerator (low word)
+;        USP-1 -> Numerator (high word)
+;        USP-2 -> Denominator   (low word)
+;        USP-3 -> Denominator   (high word)
+;
+; Exit:  USP   -> Quotient (low word)
+;        USP-1 -> Quotient (high word)
+;        USP-2 -> Remainder (low word)
+;        USP-3 -> Remainder (high word)
+;
+; Local var space: 9 words
+; ------------------------------------
+; Algorithm
+; ------------------------------------
+;   def div32(N,D):
+;       if N==0 :
+;           return(0,0)
+;       Q = 0
+;       R = 0
+;       for i in range (-31, 1 ):
+;           Q <<= 1
+;           R <<= 1
+;           if bit (N,31) :
+;               R = bitset(R,0)
+;           if R >= D:
+;               R = R - D
+;               Q = bitset(Q,0)
+;           N <<= 1
+;       return (Q,R)
+; ------------------------------------
+
+; Define which of the local variable stacks will be used
+.EQU     UD32_N_LO   LVP0
+.EQU     UD32_N_HI   LVP1
+.EQU     UD32_D_LO   LVP2
+.EQU     UD32_D_HI   LVP3
+.EQU     UD32_Q_LO   LVP4
+.EQU     UD32_Q_HI   LVP5
+.EQU     UD32_R_LO   LVP6
+.EQU     UD32_R_HI   LVP7
+.EQU     UD32_LCTR   LVP8
+
+UDIV32:  ; initialise and claim all local variable space
+         LDA /USP-
+         STO /UD32_N_LO+
+         LDA /USP-
+         STO /UD32_N_HI+
+         LDA /USP-
+         STO /UD32_D_LO+
+         LDA /USP-
+         STO /UD32_D_HI+
+
+         LDA ,0x0000
+         STO /UD32_Q_HI+
+         STO /UD32_Q_LO+
+         STO /UD32_R_HI+
+         STO /UD32_R_LO+
+
+         LDA ,-32
+         STO /UD32_LCTR+
+         SET MULTI CR
+
+UD32_LOOP:
+         LDOR /UD32_Q_LO
+         LDA /UD32_Q_HI
+         SLA.D 1 A
+         STO /UD32_Q_HI
+         SLA.D 16 A
+         STO /UD32_Q_LO
+
+         LDOR /UD32_R_LO
+         LDA /UD32_R_HI
+         SLA.D 1 A
+         STO /UD32_R_HI
+         SLA.D 16 A
+         STO /UD32_R_LO
+         LDA /UD32_N_HI
+         JBC 15 A UD32_SKIP
+         LDA /UD32_R_LO
+         SET 0 A
+         STO /UD32_R_LO
+
+UD32_SKIP:
+         SET CARRY CR
+         LDA /UD32_D_LO
+         CMP /UD32_R_LO
+         LDA /UD32_D_HI
+         CMP /UD32_R_HI
+         JBS SIGN CR UD32_SKIP2        ; JUMP if R < D
+
+         SET CARRY CR
+         LDA /UD32_D_LO
+         SBS /UD32_R_LO
+         LDA /UD32_D_HI
+         SBS /UD32_R_HI
+         LDA /UD32_Q_LO
+         SET 0 A
+         STO /UD32_Q_LO
+
+UD32_SKIP2:
+         LDOR /UD32_N_LO
+         LDA /UD32_N_HI
+         SLA.D 1 A
+         STO /UD32_N_HI
+         SLA.D 16 A
+         STO /UD32_N_LO
+
+         ICZ /UD32_LCTR UD32_LOOP
+
+UD32_EXIT:
+         ; Free up all local variable stacks
+         LDA /UD32_D_LO-
+         LDA /UD32_D_HI-
+         LDA /UD32_N_LO-
+         LDA /UD32_N_HI-
+         LDA /UD32_LCTR-
+         LDA /UD32_R_HI-
+         STO /USP+
+         LDA /UD32_R_LO-
+         STO /USP+
+         LDA /UD32_Q_HI-
+         STO /USP+
+         LDA /UD32_Q_LO-
+         STO /USP+
+         RTN
+#else
+
+
 ; ------------------------------------
 ; UDIV32
 ;
@@ -126,6 +261,8 @@ UD32_LVAR:
          .equ UD32_D_LO UD32_LVAR + 6
          .equ UD32_D_HI UD32_LVAR + 7
          .equ UD32_LCTR UD32_LVAR + 8
+
+#endif
 
         ;; ------------------------------------------------------
         ;; SQRT32 - Find square root of an integer numbers up to
@@ -444,8 +581,11 @@ M32_LVAR:
 
 
 
+#ifdef LOCALVARSTACKS
         ;; ------------------------------------------------------
         ;; MUL16 - multiply two 16b numbers and return 32b result
+        ;;
+        ;; Version uses local variable stacks
         ;;
         ;; Entry:
         ;;   USP   -> Operand A
@@ -456,42 +596,70 @@ M32_LVAR:
         ;;
         ;; Local var. space: 6 words
         ;; ------------------------------------------------------
-MUL16:
+
+        ; Define which of the local variable stacks will be used
+        .EQU     M16_count    LVP0
+        .EQU     M16_bb_lo    LVP1
+        .EQU     M16_bb_hi    LVP2
+        .EQU     M16_res_lo   LVP3
+        .EQU     M16_res_hi   LVP4
+        .EQU     M16_aa       LVP5
+
+MUL16:  ; Claim local stack space
+        LDA ,0x0000
+        STO /LVP0+
+        STO /LVP1+
+        STO /LVP2+
+        STO /LVP3+
+        STO /LVP4+
+        STO /LVP5+
+
         LDA ,-15
-        STO .M16_count
+        STO /M16_count
 
         LDA /USP-
-        STO .M16_bb_lo
+        STO /M16_bb_lo
         LDA /USP-
-        STO .M16_aa
+        STO /M16_aa
         LDA ,0x0000
-        STO .M16_bb_hi
-        STO .M16_res_lo
-        STO .M16_res_hi
+        STO /M16_bb_hi
+        STO /M16_res_lo
+        STO /M16_res_hi
         SET MULTI CR
 
 M16_LOOP:
-        JBC 0 M16_aa M16_SKIPADD
+        LDA /M16_aa
+        JBC 0 A M16_SKIPADD
         CLR CARRY CR
-        LDA .M16_bb_lo
-        ADS .M16_res_lo
-        LDA .M16_bb_hi
-        ADS .M16_res_hi
+        LDA /M16_bb_lo
+        ADS /M16_res_lo
+        LDA /M16_bb_hi
+        ADS /M16_res_hi
 
 M16_SKIPADD:
         CLR MULTI CR
-        SRA 1 M16_aa
+        LDA /M16_aa
+        SRA 1 A
+        STO /M16_aa
         SET MULTI CR
-        LDOR .M16_bb_lo
-        LDA .M16_bb_hi
+        LDOR /M16_bb_lo
+        LDA /M16_bb_hi
         SLL.D 1 A
-        STO .M16_bb_hi
+        STO /M16_bb_hi
         SLL.D 16 A
-        STO .M16_bb_lo
-        ICZ .M16_count M16_LOOP
-        LDA .M16_res_hi
+        STO /M16_bb_lo
+        ICZ /M16_count M16_LOOP
+
+M16_EXIT:
+        ; Surrender local variable space
+        LDA /M16_bb_lo-
+        LDA /M16_bb_hi-
+        LDA /M16_aa-
+        LDA /M16_count-
+
+        LDA /M16_res_hi-
         STO /USP+
-        LDA .M16_res_lo
+        LDA /M16_res_lo-
         STO /USP+
         RTN
 
@@ -505,3 +673,68 @@ M16_LVAR:
         .equ M16_res_lo M16_LVAR+3
         .equ M16_res_hi M16_LVAR+4
         .equ M16_count  M16_LVAR+5
+#else
+        ;; ------------------------------------------------------
+        ;; MUL16 - multiply two 16b numbers and return 32b result
+        ;;
+        ;; Version uses local variables
+        ;;
+        ;; Entry:
+        ;;   USP   -> Operand A
+        ;;   USP-1 -> Operand B
+        ;; Exit:
+        ;;   USP   -> result lo word
+        ;;   USP-1 -> result hi word
+        ;;
+        ;; Local var. space: 6 words
+        ;; ------------------------------------------------------
+MUL16:
+        LDA ,-15
+        STO .M16L_count
+
+        LDA /USP-
+        STO .M16L_bb_lo
+        LDA /USP-
+        STO .M16L_aa
+        LDA ,0x0000
+        STO .M16L_bb_hi
+        STO .M16L_res_lo
+        STO .M16L_res_hi
+        SET MULTI CR
+
+M16L_LOOP:
+        JBC 0 M16L_aa M16L_SKIPADD
+        CLR CARRY CR
+        LDA .M16L_bb_lo
+        ADS .M16L_res_lo
+        LDA .M16L_bb_hi
+        ADS .M16L_res_hi
+
+M16L_SKIPADD:
+        CLR MULTI CR
+        SRA 1 M16L_aa
+        SET MULTI CR
+        LDOR .M16L_bb_lo
+        LDA .M16L_bb_hi
+        SLL.D 1 A
+        STO .M16L_bb_hi
+        SLL.D 16 A
+        STO .M16L_bb_lo
+        ICZ .M16L_count M16L_LOOP
+        LDA .M16L_res_hi
+        STO /USP+
+        LDA .M16L_res_lo
+        STO /USP+
+        RTN
+
+M16L_LVAR:
+        .word 0x0000, 0x0000, 0x0000, 0x0000
+        .word 0x0000, 0x0000
+
+        .equ M16L_aa     M16L_LVAR
+        .equ M16L_bb_lo  M16L_LVAR+1
+        .equ M16L_bb_hi  M16L_LVAR+2
+        .equ M16L_res_lo M16L_LVAR+3
+        .equ M16L_res_hi M16L_LVAR+4
+        .equ M16L_count  M16L_LVAR+5
+#endif
