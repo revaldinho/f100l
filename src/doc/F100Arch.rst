@@ -58,13 +58,11 @@ The function unit itself is a bit-serial unit. All operations are processed one 
 a time, and every instruction requires at least 18 logic cycles in addition to any memory
 accesses.
 
-.. automodule:: ConditionReg
-   :members:
 
-Control Registers
------------------
+Control Unit
+------------
 
-The Control Block has two main registers
+The Control Unit has two main registers
 
   * the 15-bit Program Counter (PC)
   * the 16-bit Instruction Register (IR)
@@ -78,6 +76,10 @@ is loaded with an instruction during the instruction fetch. If the IR is subsequ
 required to hold an address, then any instruction bits which need to be preserved
 are transferred into 'Function Latches' elsewhere in the control block.
 
+
+.. automodule:: ConditionReg
+   :members:
+   
 
 Memory Space
 ------------
