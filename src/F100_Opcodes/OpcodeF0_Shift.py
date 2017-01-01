@@ -116,7 +116,7 @@ In single length operation the data to be shifted can be one of
 For arithmetic shift operations *not* specifying the Condition Register:
 
   * S is set if the MSB of the shifted data is '1', otherwise cleared
-  * V is set if the MSB of the shifted data is different to its original state
+  * V is set if the MSB of the shifted data is permanently or temporarily different to its original state, ie for multiple place shifts the flag is set if any bit passing through the MSB position is different to the original sign even if the shift finishes with the sign bit apparently unchanged.
   * C is preserved
   * Z is meaningless at the end of the instruction
 
@@ -234,7 +234,7 @@ In double length mode, the rotate operations are undefined.
 For arithmetic shift operations *not* specifying the Condition Register:
 
   * S is set if the MSB of the shifted data is '1', otherwise cleared
-  * V is set if the MSB of the shifted data is different to its original state
+  * V is set if the MSB of the shifted data is permanently or temporarily different to its original state, ie for multiple place shifts the flag is set if any bit passing through the MSB position is different to the original sign even if the shift finishes with the sign bit apparently unchanged.
   * C is preserved
   * Z is meaningless at the end of the instruction
 
@@ -266,9 +266,14 @@ def d_srl(a,o,num):
 def d_sll(a,o,num):
     # Double shift left logical of 16b ACC + OR returning
     # two new 16 bit numbers
+    overflow = 0
     operand = (a<<16) | o
-    operand = (operand << num)
-    return (operand>>16 & 0xFFFF, operand & 0xFFFF)
+    source = operand
+    for i in range(0, num):
+        operand = (operand << 1)
+        if (operand & 0x80000000) != (source & 0x80000000):
+            overflow = 1
+    return (operand>>16 & 0xFFFF, operand & 0xFFFF, overflow)
 
 def rotl(a,num):
     # Single 16b rotate left of 16b number by 0-15 places
@@ -292,8 +297,14 @@ def srl( a, num):
 
 def sll( a, num):
     # Single shift left arithmetic of 16b number by 0-15 places
-    operand = a << num
-    return operand  & 0xFFFF
+    # return overflow set if any bit passing through the MSB is different to the original sign bit
+    overflow = 0
+    operand = a
+    for i in range(0, num):
+        operand = operand << 1
+        if (operand & 0x8000) != (a & 0x8000):
+            overflow = 1
+    return (operand  & 0xFFFF, overflow)
 
 
 class OpcodeF0_Shift(F100_Opcode) :
@@ -417,6 +428,7 @@ class OpcodeF0_Shift(F100_Opcode) :
             else:
                 operand = CPU.ACC
 
+            overflow = 0
             if IR.S == 0 and IR.J <2:
                 result = sra(operand, IR.B)
                 CR.S = 1 if result & 0x8000 else 0
@@ -426,12 +438,10 @@ class OpcodeF0_Shift(F100_Opcode) :
             elif IR.S == 0 and IR.J == 3:
                 result = rotr(operand, IR.B)
             elif IR.S == 1 and IR.J != 3:
-                result = sll(operand, IR.B)
+                (result, overflow) = sll(operand, IR.B)
                 if IR.J != 2:
                     CR.S = 1 if result & 0x8000 else 0
-                    # FIXME overflow should also be set for multiple place SLA when if any of the bits
-                    # shifted into the MSB are different to the original bit.
-                    CR.V = 1 if (result & 0x8000) != (operand & 0x8000) else 0
+                    CR.V = overflow
             elif IR.S == 1 and IR.J == 3:
                 result = rotl(operand, IR.B)
 
@@ -445,17 +455,16 @@ class OpcodeF0_Shift(F100_Opcode) :
         else:
             # Double length shifts use LSB of J field to extend shift number
             shift_dist = ( (IR.J << 4) | IR.B )  & 0x1F
+            overflow =  0
             if IR.S == 0 and IR.J <2:
                 (result, result1) = d_sra(CPU.ACC, CPU.OR, shift_dist)
             elif IR.S == 0:
                 (result, result1) = d_srl(CPU.ACC, CPU.OR, shift_dist)
             else:
-                (result, result1) = d_sll(CPU.ACC, CPU.OR, shift_dist)
+                (result, result1, overflow) = d_sll(CPU.ACC, CPU.OR, shift_dist)
             if IR.J < 2:
                 CR.S = 1 if result & 0x8000 else 0
-                # FIXME overflow should also be set for multiple place SLA when if any of the bits
-                # shifted into the MSB are different to the original bit.
-                CR.V = 1 if (result & 0x8000) != (CPU.ACC & 0x8000) else 0
+                CR.V = overflow
 
             CPU.ACC = result
             CPU.OR = result1
