@@ -108,6 +108,7 @@ class F100Emu:
         self.traceon = traceon
         self.read_count = 0
         self.write_count = 0
+        self.modify_write_count = 0
         self.instr_count = 0
 
     def load_memory(self, filename, file_format):
@@ -140,10 +141,12 @@ class F100Emu:
         else:
             raise UserWarning("Memory out of range error for address 0x%04X" % address )
 
-    def memory_write(self, address, data):
+    def memory_write(self, address, data, modify=False):
         if self.traceon == True:
             print ("STORE 0x%04X 0x%04X" % ( address & 0xFFFF, data & 0xFFFF))
         self.write_count += 1
+        if modify:
+            self.modify_write_count += 1
         if 0 <= address <= self.MEMTOP:
             self.RAM[address] = (data & 0xFFFF)
             self.RAM_writeset.add(address)
@@ -218,7 +221,7 @@ if __name__ == "__main__" :
     elif not os.path.exists(filename):
         print ("Cannot open file %s" % filename)
         sys.exit(0)
-        
+
     emu = F100Emu(adsel=adsel, traceon=traceon)
     emu.load_memory(filename, file_format)
     emu.CPU.reset()
