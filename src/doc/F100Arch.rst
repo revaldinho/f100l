@@ -61,6 +61,23 @@ accesses.
 .. automodule:: ConditionReg
    :members:
 
+Control Registers
+-----------------
+
+The Control Block has two main registers
+
+  * the 15-bit Program Counter (PC)
+  * the 16-bit Instruction Register (IR)
+
+The PC holds the address of the next instruction, or operand to be fetched
+from memory. It has a built-in incrementing unit and can be loaded directly from the
+main system bus during jump and call instructions.
+
+The IR serves a dual purpose as it can hold either instructions or addresses. The IR
+is loaded with an instruction during the instruction fetch. If the IR is subsequently
+required to hold an address, then any instruction bits which need to be preserved
+are transferred into 'Function Latches' elsewhere in the control block.
+
 
 Memory Space
 ------------
