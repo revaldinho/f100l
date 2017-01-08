@@ -47,7 +47,22 @@ class F100CPU:
         self.instr_count = 0
         self.reset()
 
+    def interrupt(self, channel=0):
+        channel = channel & 0x3F
+        lsp = self.CPU.memory_read(0)
+        # save next PC (already incremented)
+        self.memory_write(lsp+1, self.CPU.PC)
+        self.memory_write(lsp+2, self.CPU.CR.toint())
+        self.memory_write(0, lsp+2)
+        # disable further interrupts
+        self.CR.I = 1
+        # compute new PC address
+        base_addr = 2048 if self.adsel == 1 else 16384
+        destination = base_addr + 2 * channel
+        self.PC = destination & 0x7FFF
+
     def reset(self):
+        self.CR.reset()
         self.PC = 2048 if self.adsel == 1 else 16384
 
     def memory_fetch(self):
