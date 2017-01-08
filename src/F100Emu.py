@@ -96,7 +96,7 @@ def usage():
 def print_header():
     print(banner)
     print("#                                   Condition Reg.")
-    print("# PC   : Memory         : Acc. OR.  F M C S V Z I  : Instruction ")
+    print("# PC   : Memory         : Acc. OR.  F M C S V Z I  : Instruction")
     print("# -------------------------------------------------------------------------------------------")
 
 class F100Emu:
