@@ -87,7 +87,6 @@ class OpcodeF10(F100_Opcode) :
         result = self.CPU.OR - self.CPU.ACC
         if (self.CPU.CR.M==1) :
             result = result + self.CPU.CR.C - 1
-        self.CPU.ACC = result
 
         self.CPU.CR.C = 0 if (result & 0x010000) > 0 else 1
         self.CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
@@ -96,5 +95,6 @@ class OpcodeF10(F100_Opcode) :
             self.CPU.CR.V = 1
         else:
             self.CPU.CR.V = 0
+        self.CPU.ACC = result
 
         return cycle_count

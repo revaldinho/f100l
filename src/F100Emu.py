@@ -78,7 +78,7 @@ banner =\
 #/_/    /_/\____/\____/     /_____/  /_____/_/ /_/ /_/\__,_/_/\__,_/\__/\____/_/
 #
 #
-# F 1 0 0 - L * E M U L A T O R (c) 2016 Revaldinho & BigEd
+# F 1 0 0 - L * E M U L A T O R (c) 2016, 2017 Revaldinho & BigEd
 # -------------------------------------------------------------------------------------------'''
 
 from F100_Opcodes.F100_Opcode import F100HaltException

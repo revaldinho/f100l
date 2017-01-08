@@ -79,10 +79,7 @@ class OpcodeF15(F100_Opcode) :
         operand = None
         if ( IR.F != self.F):
             raise UserWarning("Cannot execute opcode %04X using opcode class %s" % (opcode, self.__name__) )
-        elif IR.I==0 and IR.N==0:
-            # PC has already been incremented
-            pass
-        elif IR.I==0:
+        if IR.I==0 and IR.N!=0:
             self.CPU.PC = IR.N
         elif IR.I==1 and IR.P==0:
             self.CPU.PC = self.CPU.memory_fetch() & 0x7FFF

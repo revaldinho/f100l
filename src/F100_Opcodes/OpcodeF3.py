@@ -84,13 +84,13 @@ class OpcodeF3(F100_Opcode) :
 
         # Note that the PC has already been incremented during the instruction fetch
         stack_pointer = self.CPU.memory_read(0)
-        condition = self.CPU.memory_read(stack_pointer)
-        self.CPU.PC = self.CPU.memory_read(stack_pointer-1)
-        self.CPU.memory_write(0, stack_pointer-2)
+        self.CPU.PC = self.CPU.memory_read(stack_pointer-1) & 0x7FFF
 
-        if self.I == 0:
+        if self.CPU.IR.I == 0:
             # Restore only bits 0-5 from the stack
+            condition = self.CPU.memory_read(stack_pointer) & 0x3F
             current_cr = self.CPU.CR.toint() & 0x0040
-            self.CPU.CR.fromint( (current_cr | condition) & 0x003F )
+            self.CPU.CR.fromint(current_cr | condition)
+        self.CPU.memory_write(0, stack_pointer-2)
 
         return cycle_count

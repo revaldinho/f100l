@@ -99,6 +99,7 @@ class OpcodeF2(F100_Opcode) :
         self.CPU.memory_write(lsp+1, self.CPU.PC)
         self.CPU.memory_write(lsp+2, self.CPU.CR.toint())
         self.CPU.memory_write(0, lsp+2)
-        self.CPU.PC = operand
+        self.CPU.PC = operand & 0x7FFF
+        self.CPU.CR.M = 0
 
         return cycles

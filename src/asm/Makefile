@@ -3,7 +3,7 @@
 PYEXE ?= python3
 
 .SUFFIXES: .cpp .hex
-.cpp.hex:; ../F100Asm.py -f $< -o $@ -g hex -n |  tee $*.lst
+.cpp.hex:; ../F100Asm.py -f $< -o $@ -g hex |  tee $*.lst
 
 .SUFFIXES: .asm .cpp
 .asm.cpp:; cpp -E $< | grep -v '^#'>  $@
@@ -15,7 +15,7 @@ PYEXE ?= python3
 .py.golden:; python3 $< | tee $*.golden
 
 .SUFFIXES: .hex .rslt
-.hex.rslt:; $(PYEXE) ../F100Emu.py -f $< -g hex -m $*.dump -p 0x5000 -q 0x6000 -n  | tee $*.log ; diff -s $*.dump $*.golden > $@
+.hex.rslt:; $(PYEXE) ../F100Emu.py -f $< -g hex -m $*.dump -p 0x5000 -q 0x6000 >& $*.log ; diff -s $*.dump $*.golden > $@
 
 
 all: test2.hex mul32.hex mul16.hex sqrt.hex udiv32.hex tests

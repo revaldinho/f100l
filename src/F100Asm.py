@@ -95,7 +95,7 @@ header_text = '''
 # /_/    /_/\____/\____/     /_____/  /_/  |_/____/____/\___/_/ /_/ /_/_.___/_/\___/_/
 #
 #
-# F 1 0 0 - L * A S S E M B L E R (c) 2016 Revaldinho & BigEd
+# F 1 0 0 - L * A S S E M B L E R (c) 2016, 2017 Revaldinho & BigEd
 # -------------------------------------------------------------------------------------------
 #
 # LINE:       ADDR: CODE     SOURCE
@@ -181,7 +181,7 @@ class F100Asm():
         warning_count = 0
         lineno = 1
         label_list = dict()
-        
+
         assembled_words = dict()
 
         if pass_number > 0:
