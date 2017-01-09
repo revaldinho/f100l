@@ -160,8 +160,7 @@ int run_emulation(string filename, int adsel) {
     }
     instr_count++;
   }
-  printf ("CPU Halted with halt number 0x%04X\n", breakval);
-  //writeHexFile (filename, emu.mem, 0, 0);
+  printf("CPU Halted with halt number 0x%04X\n", breakval);
   printf("# -------------------------------------------------------------------------------------------\n");
   printf("# Emulator Performance Statistics\n");
   printf("# -------------------------------------------------------------------------------------------\n");

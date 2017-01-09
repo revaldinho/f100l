@@ -18,12 +18,13 @@ PYEXE ?= python3
 .hex.rslt:; $(PYEXE) ../F100Emu.py  -f $< -g hex -m $*.dump -p 0x5000 -q 0x6000 >& $*.log ; diff -s $*.dump $*.golden > $@
 
 
-all: test2.hex mul32.hex mul16.hex sqrt.hex udiv32.hex tests
+all: test2.hex mul32.hex mul16.hex sqrt.hex udiv32.hex test2.hex tests
 
 udiv32.hex: udiv32.asm udiv32.inc mathlib.asm
 mul16.hex: mul16.asm mul16.inc mathlib.asm
 mul32.hex: mul32.asm mul32.inc mathlib.asm
 sqrt.hex: sqrt.asm sqrt.inc mathlib.asm
+test2.hex: test2.asm
 
 tests: mul16.rslt mul32.rslt sqrt.rslt udiv32.rslt
 	cat *rslt

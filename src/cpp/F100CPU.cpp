@@ -223,7 +223,6 @@ public:
         int overflow;
         int sign;
         int i;
-        instr_disassembly="SHIFT";
         if (CC.M == 0) { // Single length shifts and rotates
           if (IR.R == 1) {
             operand = CC.pack();
@@ -234,10 +233,11 @@ public:
             operand = ACC;
           }
           overflow = 0;
+          alu_result = operand & 0xFFFF;
+
           if ((IR.S == 0) && (IR.J <2)) { // SRA
             instr_disassembly="SRA";
             sign = operand & 0x8000;
-            alu_result = operand & 0xFFFF;
             for (i=0; i<IR.B ; i++){
               alu_result = (alu_result >> 1) | sign;
             }
@@ -245,19 +245,17 @@ public:
             CC.V = (alu_result & 0x8000) != (operand & 0x8000) ? 1:0;
           } else if ((IR.S == 0 ) && (IR.J == 2)) { //SRL
             instr_disassembly="SRL";
-            alu_result = operand;
             for (i=0; i<IR.B ; i++){
               alu_result = (alu_result >> 1) & 0x7FFF;
             }
           } else if ((IR.S == 0) & (IR.J == 3)){ // ROTR
             instr_disassembly="SRE";
-            alu_result = operand & 0xFFFF;
             for (i=0; i<IR.B ; i++){
               int wrap = (alu_result & 0x1) << 15;
               alu_result = (alu_result >> 1) | wrap;
             }
-          } else if (( IR.S == 1) && (IR.J != 3)) { // SLL
-            alu_result = operand;
+          } else if (( IR.S == 1) && (IR.J != 3)) { // SLL,SLA
+            instr_disassembly="SLL";
             for (i=0; i<IR.B ; i++){
               alu_result = (alu_result << 1) & 0xFFFF;
               if ((alu_result & 0x8000) != (operand & 0x8000)){
@@ -268,12 +266,9 @@ public:
               instr_disassembly="SLA";
               CC.S = (alu_result & 0x8000) ? 1:0;
               CC.V = overflow;
-            } else {
-              instr_disassembly="SLL";
             }
           } else if ((IR.S == 1) && (IR.J == 3)) { // ROTL
             instr_disassembly="SLE";
-            alu_result = operand & 0xFFFF;
             for (i=0; i<IR.B ; i++){
               int wrap = (alu_result & 0x8000) >> 15;
               alu_result = ((alu_result << 1) & 0xFFFE) | wrap;
@@ -390,6 +385,8 @@ public:
     case 0x9: //ADD
     case 0xA: //SUB
     case 0xB: //CMP
+    case 0xC: //AND
+    case 0xD: //NEQ
       OR=get_operand(&operand_adr);
       if (IR.F==0xA || IR.F==0xB || IR.F==0x6) { // CMP, SUB, SBS
         alu_result = OR - ACC;
@@ -398,35 +395,27 @@ public:
         }
         CC.C=((alu_result & 0x010000)>0)? 0 : 1;
         CC.V=((ACC & 0x8000) != (OR & 0x8000)) && ((alu_result & 0x8000) == (ACC & 0x8000));
-      } else { // ADD
+      } else if (IR.F==0x5 || IR.F==0x9) { // ADD, ADS
         alu_result = OR + ACC;
         if (CC.M==1){
           alu_result = alu_result + CC.C;
         }
         CC.C=((alu_result & 0x010000)>0)? 1 : 0;
         CC.V=((ACC & 0x8000) == (OR & 0x8000)) && ((alu_result & 0x8000) != (ACC & 0x8000));
-      }
-      CC.Z=((alu_result&0xFFFF)==0) ? 1 : 0;
-      CC.S=((alu_result&0x8000)!=0) ? 1 : 0;
-      if (IR.F==0xA || IR.F==0x9){
-        ACC = alu_result;
-      } else if (IR.F==0x5 || IR.F==0x6) {
-        mem_write(operand_adr,alu_result);
-      }
-      break;
-
-    case 0xC: //AND
-    case 0xD: //NEQ
-      OR = get_operand(&operand_adr);
-      if (IR.F==0xD) {
-        alu_result = ACC ^ OR;
-      } else if (IR.F==0xC){
+      } else if (IR.F==0xC) { //AND
         alu_result = ACC & OR;
+        CC.C=1;
+      } else { //NEQ
+        alu_result = ACC ^ OR;
+        CC.C=1;
       }
-      CC.C=1;
       CC.Z=((alu_result&0xFFFF)==0) ? 1 : 0;
       CC.S=((alu_result&0x8000)!=0) ? 1 : 0;
-      ACC=alu_result & 0xFFFF;
+      if (IR.F<0x7) { // ADS, SBS
+        mem_write(operand_adr,alu_result);
+      } else if (IR.F != 0xB ){ // Everything except CMP
+        ACC = alu_result;
+      }
       break;
     case 0xF: //JMP
       get_operand(&operand_adr, 1);
@@ -442,32 +431,23 @@ private:
     unsigned int operand = 0;
     if (IR.I==0 && IR.N==0) { //Immediate addressing
       *operand_adr = PC++;
-      if (noread==0) {
-        operand=mem_read(*operand_adr);
-      }
     } else if (IR.I==0) { //Direct addressing
       *operand_adr=IR.N;
-      if (noread==0) {
-        operand=mem_read(*operand_adr);
-      }
     } else if (IR.I==1 && IR.P==0) {//Immediate Indirect
       *operand_adr=mem_read(PC++);
-      if (noread==0) {
-        operand=mem_read(*operand_adr);
-      }
     } else { //Pointer Indirect
       int pointer_val=mem_read(IR.P);
-      if (IR.R==1) { //Pointer pre-increment
-        pointer_val++;
+      if (nopointerarith==1 || (IR.R & 0x1)==0 ){
+        *operand_adr = pointer_val;
+      } else{
+        pointer_val+= (IR.R==1)?1:0; //Pointer pre-increment
+        *operand_adr = pointer_val;
+        pointer_val-= (IR.R==3)?1:0; //Pointer post-increment
+        mem_write(IR.P, pointer_val);
       }
-      *operand_adr = pointer_val;
-      if (noread==0) {
-        operand=mem_read(*operand_adr);
-      }
-      if (IR.R==3) { //Pointer post-decrement
-        pointer_val--;
-      }
-      mem_write(IR.P, pointer_val);
+    }
+    if (noread==0) {
+      operand=mem_read(*operand_adr);
     }
     return operand;
   }
