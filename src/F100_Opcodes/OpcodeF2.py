@@ -18,7 +18,7 @@ Where LSP is link stack pointer held in memory location 0.
 NOTE: on entry the link stack pointer must always be an odd number.
 
 CAL ,D is a special case where only the link is stored in the link stack and the 'D' operand is
-treated as the next instruction. In this form the assembler discards the provided operand.
+treated as the next instruction. In this form the assembler discards the operand.
 
 **Instruction Encoding**
 
@@ -78,28 +78,20 @@ class OpcodeF2(F100_Opcode) :
         cycles = 0
         IR = self.CPU.IR
         operand = None
+        operand_adr = None
         lsp = self.CPU.memory_read(0)
         self.execstats[self.disassemble(IR)] += 1
 
-        if IR.I==0 and IR.N!=0:
-            self.addr_mode == ADM_DIRECT
-            operand = IR.N
-        elif IR.I==0:
-            self.addr_mode == ADM_IMMEDIATE
-            operand = self.CPU.PC
-        elif IR.I==1 and IR.P==0:
-            self.addr_mode == ADM_IMMEDIATE_INDIRECT
-            operand = self.CPU.memory_fetch()
-        elif IR.I==1:
-            self.addr_mode == ADM_POINTER_INDIRECT
-            pointer_val = IR.P
-            operand = self.CPU.memory_read(pointer_val)
-
+        (operand, operand_address, cycle_count) = self.get_operand(noread=True,nopointerarith=True)
         # save next PC (already incremented)
+        # special case for Immediate addressing, must push the immediate data address on the stack
+        # and then set that to be the PC also.
+        if IR.I==0 and IR.N==0:
+            self.CPU.PC == operand_address & 0x7FFF
         self.CPU.memory_write(lsp+1, self.CPU.PC)
         self.CPU.memory_write(lsp+2, self.CPU.CR.toint())
         self.CPU.memory_write(0, lsp+2)
-        self.CPU.PC = operand & 0x7FFF
+        self.CPU.PC = operand_address & 0x7FFF
         self.CPU.CR.M = 0
 
         return cycles

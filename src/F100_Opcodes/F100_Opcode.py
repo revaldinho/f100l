@@ -183,9 +183,12 @@ class F100_Opcode :
 
 
 
-    def get_operand(self):
+    def get_operand(self, noread=False, nopointerarith=False):
         '''
-        Return operand for use with standard addressing modes in emulation
+        Return operand for use with standard addressing modes in emulation.
+
+        Use noread=True when only computing the EA is required rather than actually
+        fetching the operand, e.g. for stores, cal, jmp
         '''
         cycles = 0
         IR = self.CPU.IR
@@ -196,27 +199,34 @@ class F100_Opcode :
         elif IR.I==0 and IR.N==0:
             self.addr_mode == ADM_IMMEDIATE
             operand_address = self.CPU.PC
-            operand = self.CPU.memory_fetch()
+            if (noread==False):
+                operand = self.CPU.memory_fetch()
+            else:
+                self.CPU.PC+=1
         elif IR.I==0:
             self.addr_mode == ADM_DIRECT
             operand_address = IR.N
-            operand = self.CPU.memory_read(operand_address)
+            if (noread==False):
+                operand = self.CPU.memory_read(operand_address)
         elif IR.I==1 and IR.P==0:
             self.addr_mode == ADM_IMMEDIATE_INDIRECT
             operand_address = self.CPU.memory_fetch()
-            operand = self.CPU.memory_read(operand_address)
+            if (noread==False):
+                operand = self.CPU.memory_read(operand_address)
         elif IR.I==1:
             self.addr_mode == ADM_POINTER_INDIRECT
             pointer_val = self.CPU.memory_read(IR.P)
-            if IR.R==1:
+            if nopointerarith==False and IR.R==1:
                 pointer_val += 1
                 self.addr_mode == ADM_POINTER_INDIRECT_PREINC
             operand_address = pointer_val
-            operand = self.CPU.memory_read(operand_address)
-            if IR.R==3:
+            if (noread==False):
+                operand = self.CPU.memory_read(operand_address)
+            if nopointerarith==False and IR.R==3:
                 self.addr_mode == ADM_POINTER_INDIRECT_POSTDEC
                 pointer_val -= 1
-            self.CPU.memory_write(IR.P, pointer_val)
+            if nopointerarith==False:
+                self.CPU.memory_write(IR.P, pointer_val)
         return (operand, operand_address, cycles)
 
 

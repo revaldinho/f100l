@@ -130,10 +130,6 @@ public:
     PC = (adsel==1) ? 0x0800 : 0x2000 ;
   }
 
-  void interrupt() {
-    // do something when an interrupt occurs
-  }
-
   int single_step(){
     unsigned int operand;
     unsigned int operand_adr;
@@ -152,7 +148,6 @@ public:
       } else if (IR.S==2) { // JUMP CONDITIONAL
         unsigned int bitmask = 0x01 << IR.B;
         unsigned int W, W1;
-
         if (IR.R == 3){
           W = mem_read(PC++);
           operand = mem_read(W);
@@ -167,9 +162,11 @@ public:
         }
 
         if (IR.J == 0 || IR.J == 2){ // JBC, JCS
+          instr_disassembly="JBC";
           if ((operand & bitmask) == 0){
             PC = W1 & 0x7FFF;
             if (IR.J == 2) {
+              instr_disassembly="JCS";
               if (IR.R == 3) {
                 mem_write(W, operand | bitmask);
               } else if (IR.R == 1) {
@@ -181,8 +178,10 @@ public:
           }
         } else { // JBS, JSC
           if ((operand & bitmask) != 0) {
+            instr_disassembly="JBS";
             PC = W1 ;
             if (IR.J == 3) {
+              instr_disassembly="JSC";
               if (IR.R == 3){
                 mem_write(W, operand &  ~bitmask);
               } else if (IR.R == 1) {
@@ -318,7 +317,7 @@ public:
             }
           }
           if (IR.J < 2) {
-            CC.S = (alu_result & 0x8000) ? 1:0;
+            CC.S = (alu_result & 0x80000000) ? 1:0;
             CC.V = overflow;
           }
         ACC = (alu_result >> 16 ) & 0xFFFF;
@@ -332,20 +331,17 @@ public:
       break;
     case 0x2: //CAL
       lsp = mem_read(0);
-      if ((IR.I==0) && (IR.N!=0)){
-        operand = IR.N;
-      } else if (IR.I==0){
-        operand = PC;
-      } else if ((IR.I==1) && (IR.P==0)){
-        operand = mem_read(PC++);
-      } else if (IR.I==1) {
-        operand = mem_read(IR.P);
-      }
+      get_operand(&operand_adr, 1, 1);
       // save next PC (already incremented)
+      // special case for Immediate addressing, must push the immediate data address on the stack
+      // and then set that to be the PC also.
+      if (IR.I==0 && IR.N==0) {
+        PC = operand_adr & 0x7FFF;
+      }
       mem_write(lsp+1, PC);
       mem_write(lsp+2, CC.pack());
       mem_write(0, lsp+2);
-      PC = operand & 0x7FFF;
+      PC = operand_adr & 0x7FFF;
       CC.M = 0;
       break;
     case 0x3: //RTN, RTC
@@ -365,24 +361,7 @@ public:
 
       break;
     case 0x4: //STO
-      if (IR.I==0 && IR.N==0){
-        operand_adr=PC;
-      } else if (IR.I==0) {
-        operand_adr=IR.N;
-      } else if (IR.I==1 && IR.P==0){
-        operand_adr=mem_read(PC++);
-      } else if (IR.I==1) {
-        pointer_val = mem_read(IR.P);
-        if (IR.R==1){
-            pointer_val++;
-            mem_write(IR.P, pointer_val);
-        }
-        operand_adr = pointer_val;
-        if (IR.R==3){
-          pointer_val--;
-          mem_write(IR.P, pointer_val);
-        }
-      }
+      get_operand(&operand_adr, 1);
       mem_write(operand_adr, ACC);
       CC.Z = ((ACC & 0xFFFF) == 0) ? 1 : 0;
       CC.S = ((ACC & 0x8000) != 0) ? 1 : 0;
@@ -442,7 +421,7 @@ public:
       if (IR.F==0xD) {
         alu_result = ACC ^ OR;
       } else if (IR.F==0xC){
-        alu_result = ACC | OR;
+        alu_result = ACC & OR;
       }
       CC.C=1;
       CC.Z=((alu_result&0xFFFF)==0) ? 1 : 0;
@@ -450,47 +429,41 @@ public:
       ACC=alu_result & 0xFFFF;
       break;
     case 0xF: //JMP
-      unsigned int dest;
-      if (IR.I==0 && IR.N!=0) {
-          PC = IR.N;
-      } else if (IR.I==1 && IR.P==0){
-        PC=mem_read(PC++);
-      } else if (IR.I==1) {
-          pointer_val=mem_read(IR.P) & 0x7FFF;
-          if (IR.R==1) {
-              pointer_val++;
-          }
-          PC=mem_read(pointer_val) & 0x7FFF;
-          if (IR.R==3) {
-            pointer_val--;
-          }
-          mem_write(IR.P, pointer_val);
-      }
+      get_operand(&operand_adr, 1);
+      PC = operand_adr;
       break;
     }
     return retval;
   }
 
 private:
-  unsigned int get_operand(unsigned int *operand_adr){
+  unsigned int get_operand(unsigned int *operand_adr, unsigned int noread=0, unsigned int nopointerarith=0){
     unsigned int pointer_val;
-    unsigned int operand;
+    unsigned int operand = 0;
     if (IR.I==0 && IR.N==0) { //Immediate addressing
       *operand_adr = PC++;
-      operand=mem_read(*operand_adr);
+      if (noread==0) {
+        operand=mem_read(*operand_adr);
+      }
     } else if (IR.I==0) { //Direct addressing
       *operand_adr=IR.N;
-      operand=mem_read(*operand_adr);
+      if (noread==0) {
+        operand=mem_read(*operand_adr);
+      }
     } else if (IR.I==1 && IR.P==0) {//Immediate Indirect
       *operand_adr=mem_read(PC++);
-      operand=mem_read(*operand_adr);
+      if (noread==0) {
+        operand=mem_read(*operand_adr);
+      }
     } else { //Pointer Indirect
       int pointer_val=mem_read(IR.P);
       if (IR.R==1) { //Pointer pre-increment
         pointer_val++;
       }
       *operand_adr = pointer_val;
-      operand=mem_read(*operand_adr);
+      if (noread==0) {
+        operand=mem_read(*operand_adr);
+      }
       if (IR.R==3) { //Pointer post-decrement
         pointer_val--;
       }

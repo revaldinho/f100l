@@ -16,7 +16,9 @@ Unconditional jump to the location provided by the operand.
    JMP .W     PC <- W
 
 Note that the JMP,D form causes no branching and instruction proceeds to execute the next word (the
-'D' effectively) as the next instruction. This instruction is effectively a NOP.
+'D' effectively) as the next instruction. This instruction is effectively a NOP. The assembler
+discards the literal provided when using this form so that the next assembled instruction will be
+executed.
 
 **Instruction Encoding**
 
@@ -75,21 +77,6 @@ class OpcodeF15(F100_Opcode) :
         cycle_count = 0
         IR = self.CPU.IR
         self.execstats[self.disassemble(IR)] +=1
-
-        operand = None
-        if ( IR.F != self.F):
-            raise UserWarning("Cannot execute opcode %04X using opcode class %s" % (opcode, self.__name__) )
-        if IR.I==0 and IR.N!=0:
-            self.CPU.PC = IR.N
-        elif IR.I==1 and IR.P==0:
-            self.CPU.PC = self.CPU.memory_fetch() & 0x7FFF
-        elif IR.I==1:
-            pointer_val = self.CPU.memory_read(IR.P)
-            if IR.R==1:
-                pointer_val += 1
-            self.CPU.PC = self.CPU.memory_read(pointer_val) & 0x7FFF
-            if IR.R==3:
-                pointer_val -= 1
-            self.CPU.memory_write(IR.P, pointer_val)
-
+        (operand, operand_address, cycle_count) = self.get_operand(noread=True)
+        self.CPU.PC = operand_address
         return cycle_count

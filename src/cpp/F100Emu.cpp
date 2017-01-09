@@ -140,10 +140,10 @@ void print_machine_state(F100_class emu) {
 }
 
 
-int run_emulation(string filename) {
+int run_emulation(string filename, int adsel) {
   unsigned int instr_count = 0;
   unsigned int breakval = 0;
-  F100_class emu = F100_class::F100_class(1, gtraceon);
+  F100_class emu = F100_class::F100_class(adsel, gtraceon);
 
   read_hex_file (filename, emu.mem, 0 );
 
@@ -180,10 +180,11 @@ int run_emulation(string filename) {
 int main (int argc, char **argv) {
   int index;
   int c;
+  int adsel = 1;
   string filename = string("") ;
 
   opterr = 0;
-  while ((c = getopt (argc, argv, "hntf:m:p:q:")) != -1)
+  while ((c = getopt (argc, argv, "hnta:f:m:p:q:")) != -1)
     switch (c)
       {
       case 'f':
@@ -198,6 +199,9 @@ int main (int argc, char **argv) {
       case 'm':
         gmemdumpon = 1;
         gmemdump = optarg;
+        break;
+      case 'a':
+        adsel = ((int)strtol(optarg,NULL,0) >0)?1:0;
         break;
       case 'p':
         gmemdump_lo = (int)strtol(optarg,NULL,0);
@@ -219,7 +223,7 @@ int main (int argc, char **argv) {
     return false;
   }
 
-  run_emulation(filename);
+  run_emulation(filename, adsel);
 
   return 0;
 }
