@@ -8,10 +8,13 @@ F100Emu: F100CPU.cpp F100Emu.cpp
 
 all : F100Emu tests
 
-crslt: mul16.hex mul32.hex sqrt.hex udiv32.hex
+crslt: F100Emu mul16.hex mul32.hex sqrt.hex udiv32.hex
 
 tests: mul16.crslt mul32.crslt sqrt.crslt udiv32.crslt
 	cat *crslt
 
 clean:
 		rm -rf F100Emu
+		rm -rf *crslt
+		rm -rf *dump
+		

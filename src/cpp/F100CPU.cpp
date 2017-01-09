@@ -177,8 +177,8 @@ public:
             }
           }
         } else { // JBS, JSC
+          instr_disassembly="JBS";
           if ((operand & bitmask) != 0) {
-            instr_disassembly="JBS";
             PC = W1 ;
             if (IR.J == 3) {
               instr_disassembly="JSC";
