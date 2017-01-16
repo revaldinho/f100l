@@ -1,58 +1,4 @@
-
-class CC_class {
-public:
-  unsigned int I:1 ;
-  unsigned int Z:1 ;
-  unsigned int V:1 ;
-  unsigned int S:1 ;
-  unsigned int C:1 ;
-  unsigned int M:1 ;
-  unsigned int F:1 ;
-
-  void unpack(int val) {
-    I = (val >> 0) & 0x01;
-    Z = (val >> 1) & 0x01;
-    V = (val >> 2) & 0x01;
-    S = (val >> 3) & 0x01;
-    C = (val >> 4) & 0x01;
-    M = (val >> 5) & 0x01;
-    F = (val >> 6) & 0x01;
-  }
-  int pack() {
-    return( F<<6 | M <<5 | C<<4 | S<<3 | V<<2 | Z<<1 | I );
-  }
-  void reset() {
-      unpack(0);
-  }
-};
-
-class IR_class {
-public:
-  unsigned int IR:16;
-  unsigned int  F: 4;
-  unsigned int  I: 1;
-  unsigned int  T: 2;
-  unsigned int  R: 2;
-  unsigned int  S: 2;
-  unsigned int  J: 2;
-  unsigned int  B: 4;
-  unsigned int  P: 8;
-  unsigned int  N: 11;
-
-  void unpack(int opcode) {
-    IR = opcode ;
-    F = (opcode>>12)& 0x000F;
-    I = (opcode>>11)& 0x0001;
-    T = (opcode>>10)& 0x0003;
-    R = (opcode>> 8)& 0x0003;
-    S = (opcode>> 6)& 0x0003;
-    J = (opcode>> 4)& 0x0003;
-    B = opcode      & 0x000F;
-    P = opcode      & 0x00FF;
-    N = opcode      & 0x07FF;
-  }
-};
-
+#include "F100CPU.h"
 
 // For Opcodes with a single instruction can pick mnemonics from this array
 static string mnemonics[] = {
@@ -63,25 +9,7 @@ static string mnemonics[] = {
 };
 
 
-class F100_class {
-public:
-  unsigned int mem [MEM_SIZE];
-  unsigned int accessed [MEM_SIZE];
-  unsigned int ACC;
-  unsigned int PC;
-  unsigned int OR;
-  unsigned int adsel;
-  unsigned int traceon;
-  string instr_disassembly;
-  CC_class CC;
-  IR_class IR;
-private:
-  unsigned int lsp;
-  unsigned int condition;
-
-
-public:
-  F100_class(int as, int tron=0) {
+F100_class::F100_class(int as, int tron) {
     adsel = as;
     for (int i=0 ; i< MEM_SIZE ; i++ ) {
       mem[i] = 0x0000;
@@ -94,7 +22,7 @@ public:
     reset();
   }
 
-  int mem_read(int address) {
+int F100_class::mem_read(int address) {
     if (traceon == 1) {
       printf ("READ 0x%04X 0x%04X\n", address & 0xFFFF, mem[address] & 0xFFFF);
     }
@@ -102,7 +30,7 @@ public:
     return mem[address] & 0xFFFF;
   }
 
-  void mem_write(int address, int data) {
+void F100_class::mem_write(int address, int data) {
     if (traceon == 1){
       printf ("STORE 0x%04X 0x%04X\n", address & 0xFFFF, data & 0xFFFF);
     }
@@ -111,7 +39,7 @@ public:
     accessed[address]=1;
   }
 
-  void interrupt(int channel=0) {
+void F100_class::interrupt(int channel) {
     channel = channel & 0x3F;
     lsp = mem_read(0);
     // save next PC (already incremented)
@@ -125,12 +53,12 @@ public:
     PC = destination & 0x7FFF;
   }
 
-  void reset() {
+void F100_class::reset() {
     CC.reset();
     PC = (adsel==1) ? 0x0800 : 0x2000 ;
   }
 
-  int single_step(){
+int F100_class::single_step(){
     unsigned int operand;
     unsigned int operand_adr;
     unsigned int operand2;
@@ -425,8 +353,7 @@ public:
     return retval;
   }
 
-private:
-  unsigned int get_operand(unsigned int *operand_adr, unsigned int noread=0, unsigned int nopointerarith=0){
+int F100_class::get_operand(unsigned int *operand_adr, unsigned int noread, unsigned int nopointerarith){
     unsigned int pointer_val;
     unsigned int operand = 0;
     if (IR.I==0 && IR.N==0) { //Immediate addressing
@@ -452,4 +379,3 @@ private:
     return operand;
   }
 
-};

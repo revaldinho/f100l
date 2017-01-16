@@ -227,6 +227,7 @@ class F100_Opcode :
                 pointer_val -= 1
             if nopointerarith==False:
                 self.CPU.memory_write(IR.P, pointer_val)
+
         return (operand, operand_address, cycles)
 
 

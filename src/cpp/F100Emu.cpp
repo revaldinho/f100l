@@ -33,7 +33,7 @@ using namespace std;
 #define ENDIANNESS 0
 #define MEM_SIZE 32*1024
 
-#include "F100CPU.cpp"
+#include "F100CPU.h"
 
 int glistingon = 1;
 int gtraceon = 0;
