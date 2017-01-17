@@ -1,7 +1,7 @@
 VPATH=.:../asm
 
 .SUFFIXES: .hex .crslt
-.hex.crslt:; ./F100Emu -n -f $< -m $*.dump -p 0x5000 -q 0x6000 >& $*.log ; diff -s $*.dump ../asm/$*.golden > $@
+.hex.crslt:; ./F100Emu -n -f $< -m $*.dump -p 0x5000 -q 0x6000 > $*.log ; diff -s $*.dump ../asm/$*.golden > $@
 
 .SUFFIXES: .cpp .o
 .c.o:; g++ -O $< -o $@

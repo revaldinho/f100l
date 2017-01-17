@@ -64,7 +64,6 @@ int F100_class::single_step(){
     unsigned int operand2;
     unsigned int retval = 0;
     unsigned int alu_result;
-    unsigned int pointer_val;
 
     IR.unpack( mem_read(PC++) );
     instr_disassembly = mnemonics[IR.F];
@@ -211,7 +210,7 @@ int F100_class::single_step(){
             ACC = alu_result;
           }
         } else { // Double length shifts use LSB of J field to extend shift number
-          unsigned int shift_dist;
+          int shift_dist;
 
           shift_dist = ( (IR.J << 4) | IR.B )  & 0x1F;
           overflow =  0;
@@ -354,7 +353,6 @@ int F100_class::single_step(){
   }
 
 int F100_class::get_operand(unsigned int *operand_adr, unsigned int noread, unsigned int nopointerarith){
-    unsigned int pointer_val;
     unsigned int operand = 0;
     if (IR.I==0 && IR.N==0) { //Immediate addressing
       *operand_adr = PC++;

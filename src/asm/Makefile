@@ -15,7 +15,7 @@ PYEXE ?= python3
 .py.golden:; python3 $< | tee $*.golden
 
 .SUFFIXES: .hex .rslt
-.hex.rslt:; $(PYEXE) ../F100Emu.py  -f $< -g hex -m $*.dump -p 0x5000 -q 0x6000 >& $*.log ; diff -s $*.dump $*.golden > $@
+.hex.rslt:; $(PYEXE) ../F100Emu.py  -f $< -g hex -m $*.dump -p 0x5000 -q 0x6000 > $*.log ; diff -s $*.dump $*.golden > $@
 
 
 all: test2.hex mul32.hex mul16.hex sqrt.hex udiv32.hex test2.hex tests

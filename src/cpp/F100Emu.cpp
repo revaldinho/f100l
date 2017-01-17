@@ -22,10 +22,10 @@
  *  ===========================================================================*/
 #include <iostream>
 #include <stdio.h>
-#include <string>
 #include <unistd.h>
 #include <fstream>
 #include <string>
+#include <string.h>
 #include <cstdlib>
 
 using namespace std;
@@ -143,7 +143,7 @@ void print_machine_state(F100_class emu) {
 int run_emulation(string filename, int adsel) {
   unsigned int instr_count = 0;
   unsigned int breakval = 0;
-  F100_class emu = F100_class::F100_class(adsel, gtraceon);
+  F100_class emu = F100_class(adsel, gtraceon);
 
   read_hex_file (filename, emu.mem, 0 );
 
@@ -180,7 +180,8 @@ int main (int argc, char **argv) {
   int index;
   int c;
   int adsel = 1;
-  string filename = string("") ;
+  string filename = "";
+
 
   opterr = 0;
   while ((c = getopt (argc, argv, "hnta:f:m:p:q:")) != -1)
@@ -217,7 +218,7 @@ int main (int argc, char **argv) {
   for (index = optind; index < argc; index++) {
     printf ("Non-option argument %s\n", argv[index]);
   }
-  if (! std::ifstream(filename)){
+  if (! std::ifstream((char *)filename.c_str())){
     std::cout << "Error: File " << filename << " does not exist" << std::endl;
     return false;
   }
