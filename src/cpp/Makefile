@@ -12,9 +12,9 @@ F100Emu: F100CPU.cpp F100Emu.cpp CC_class.cpp IR_class.cpp \
 
 all : F100Emu tests
 
-crslt: F100Emu mul16.hex mul32.hex sqrt.hex udiv32.hex test2.crslt
+crslt: F100Emu mul16.hex mul32.hex sqrt.hex udiv32.hex 
 
-tests: mul16.crslt mul32.crslt sqrt.crslt udiv32.crslt test2.crslt
+tests: mul16.crslt mul32.crslt sqrt.crslt udiv32.crslt 
 	cat *crslt
 
 clean:
