@@ -80,7 +80,7 @@ class OpcodeF2(F100_Opcode) :
         operand = None
         operand_adr = None
         lsp = self.CPU.memory_read(0)
-        self.execstats[self.disassemble(IR)] += 1
+        self.execstats[IR.name] += 1
 
         (operand, operand_address, cycle_count) = self.get_operand(noread=True,nopointerarith=True)
         # save next PC (already incremented)

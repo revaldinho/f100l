@@ -61,11 +61,12 @@ class OpcodeF8(F100_Opcode) :
 
     def execute(self):
         cycle_count = 0
-        self.execstats[self.disassemble(self.CPU.IR)] += 1
+        CPU = self.CPU
+        self.execstats[CPU.IR.name] += 1
 
-        (self.CPU.ACC, operand_address, cycle_count) = self.get_operand()
+        (CPU.ACC, operand_address, cycle_count) = self.get_operand()
 
-        self.CPU.CR.Z = 1 if (self.CPU.ACC & 0xFFFF) == 0 else 0
-        self.CPU.CR.S = 1 if (self.CPU.ACC & 0x8000) != 0 else 0
-        self.CPU.CR.V = 0
+        CPU.CR.Z = 1 if (CPU.ACC & 0xFFFF) == 0 else 0
+        CPU.CR.S = 1 if (CPU.ACC & 0x8000) != 0 else 0
+        CPU.CR.V = 0
         return cycle_count

@@ -63,12 +63,14 @@ class OpcodeF4(F100_Opcode) :
     def execute(self):
         cycle_count = 0
 
+        CPU = self.CPU
         IR = self.CPU.IR
         CR = self.CPU.CR
-        self.execstats[self.disassemble(IR)] += 1
+        
+        self.execstats[IR.name] += 1
         (operand, operand_address, cycle_count) = self.get_operand(noread=True)
-        self.CPU.memory_write(operand_address, self.CPU.ACC)
-        self.CPU.CR.Z = 1 if (self.CPU.ACC & 0xFFFF) == 0 else 0
-        self.CPU.CR.S = 1 if (self.CPU.ACC & 0x8000) != 0 else 0
-        self.CPU.CR.V = 0
+        CPU.memory_write(operand_address, CPU.ACC)
+        CPU.CR.Z = 1 if (CPU.ACC & 0xFFFF) == 0 else 0
+        CPU.CR.S = 1 if (CPU.ACC & 0x8000) != 0 else 0
+        CPU.CR.V = 0
         return cycle_count

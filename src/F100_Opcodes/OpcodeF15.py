@@ -76,7 +76,7 @@ class OpcodeF15(F100_Opcode) :
     def execute(self):
         cycle_count = 0
         IR = self.CPU.IR
-        self.execstats[self.disassemble(IR)] +=1
+        self.execstats[IR.name] +=1
         (operand, operand_address, cycle_count) = self.get_operand(noread=True)
         self.CPU.PC = operand_address
         return cycle_count

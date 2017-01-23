@@ -84,6 +84,8 @@ class OpcodeF0_Jump(F100_Opcode) :
     def __init__ (self, CPU=None):
         super().__init__( opcode_fn = { "JBC":0, "JBS":0, "JCS":0, "JSC":0 }, CPU=CPU )
         self.F = 0
+        self.mnemonics = list( ("JBC","JBS","JCS","JSC") )
+
 
     def assemble(self, opcode_token, operands, symbol_table, suppress_errors=False):
         (addr_mode, first_operand ) = self.get_address_mode(operands[0])
@@ -138,49 +140,49 @@ class OpcodeF0_Jump(F100_Opcode) :
 
 
     def disassemble(self, IR):
-        mnemonics = list( ("JBC","JBS","JCS","JSC") )
-        return mnemonics[IR.J]
+        return self.mnemonics[IR.J]
 
 
     def execute(self):
 
         cycle_count = 0
-        IR = self.CPU.IR
-        IR.name = self.disassemble(self.CPU.IR)
+        CPU = self.CPU
+        IR = CPU.IR
+        IR.name = self.mnemonics[IR.J]
         self.execstats[IR.name] += 1
 
         bitmask = 0x01 << IR.B
 
         if IR.R == 3:
-            W = self.CPU.memory_fetch()
-            operand = self.CPU.memory_read(W)
-            W1 = self.CPU.memory_fetch()
+            W = CPU.memory_fetch()
+            operand = CPU.memory_read(W)
+            W1 = CPU.memory_fetch()
         else:
             if IR.R == 1:
-                operand = self.CPU.CR.toint()
+                operand = CPU.CR.toint()
             else:
-                operand = self.CPU.ACC
-            W1 = self.CPU.memory_fetch()
+                operand = CPU.ACC
+            W1 = CPU.memory_fetch()
 
         if IR.J == 0 or IR.J == 2: # JBC, JCS
             if operand & bitmask == 0:
-                self.CPU.PC = W1
+                CPU.PC = W1
                 if IR.J == 2:
                     if IR.R == 3:
-                        self.CPU.memory_write(W, operand | bitmask)
+                        CPU.memory_write(W, operand | bitmask)
                     elif IR.R == 1:
-                        self.CPU.CR.fromint(operand | bitmask)
+                        CPU.CR.fromint(operand | bitmask)
                     else:
-                        self.CPU.ACC = operand | bitmask
+                        CPU.ACC = operand | bitmask
         else: # JBS, JSC
             if operand & bitmask != 0:
-                self.CPU.PC = W1
+                CPU.PC = W1
                 if IR.J == 3:
                     if IR.R == 3:
-                        self.CPU.memory_write(W, operand &  ~bitmask)
+                        CPU.memory_write(W, operand &  ~bitmask)
                     elif IR.R == 1:
-                        self.CPU.CR.fromint(operand & ~bitmask)
+                        CPU.CR.fromint(operand & ~bitmask)
                     else:
-                        self.CPU.ACC = operand & ~bitmask
+                        CPU.ACC = operand & ~bitmask
 
         return cycle_count
