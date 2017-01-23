@@ -23,16 +23,22 @@ from InstructionReg import InstructionReg
 from ConditionReg import ConditionReg
 
 class F100CPU:
-    def __init__ (self, adsel=1, memory_read=None, memory_write=None):
+    def __init__ (self, adsel=1, ramsize=32768, traceon=False ):
+        
+        self.MEMTOP = ramsize-1
+        self.traceon = traceon
         self.CR = ConditionReg()
         self.IR = InstructionReg()
         self.OR = 0x0000
         self.adsel = adsel
         self.PC = 0x0000
         self.ACC= 0x0000
-        self.memory_write = memory_write
-        self.memory_read = memory_read
+        self.RAM = [0xDEAD]*ramsize
+        self.RAM_writeset = set()
         self.cycle_count = 0
+        self.read_count = 0
+        self.write_count = 0
+        self.modify_write_count = 0        
         self.instr_count = 0
         ## instance all the opcode classes, passing each a reference to the CPU resources
         self.opcode_classes = [ opcode(CPU=self) for opcode in [OpcodeF0,
@@ -43,8 +49,6 @@ class F100CPU:
         self.opcode_table = dict()
         for o in self.opcode_classes:
             self.opcode_table[o.F] = o
-        self.cycle_count = 0
-        self.instr_count = 0
         self.reset()
 
     def interrupt(self, channel=0):
@@ -62,6 +66,12 @@ class F100CPU:
         self.PC = destination & 0x7FFF
 
     def reset(self):
+        self.cycle_count = 0
+        self.instr_count = 0
+        self.read_count = 0
+        self.write_count = 0
+        self.modify_write_count = 0
+        self.RAM_writeset = set()
         self.CR.reset()
         self.PC = 2048 if self.adsel == 1 else 16384
 
@@ -70,6 +80,32 @@ class F100CPU:
         self.PC = ( self.PC + 1 )  & 0x7FFF
         return result
 
+    def memory_read(self, address, nostats=False):
+        if self.traceon == True:
+            print ("READ 0x%04X 0x%04X" % ( address & 0xFFFF, self.RAM[address] & 0xFFFF))
+
+        if nostats== False:
+            self.read_count += 1
+            
+        if 0 <= address <= self.MEMTOP:
+            return self.RAM[address]
+        else:
+            raise UserWarning("Memory out of range error for address 0x%04X" % address )
+
+    def memory_write(self, address, data, modify=False, nostats=False):
+        if self.traceon == True:
+            print ("STORE 0x%04X 0x%04X" % ( address & 0xFFFF, data & 0xFFFF))
+
+        if nostats == False:
+            self.write_count += 1
+            if modify:
+                self.modify_write_count += 1
+        if 0 <= address <= self.MEMTOP:
+            self.RAM[address] = (data & 0xFFFF)
+            self.RAM_writeset.add(address)
+        else:
+            raise UserWarning("Memory out of range error for address 0x%04X" % address )
+
     def single_step(self):
         self.IR.update(self.memory_fetch())
         if ( self.IR.F not in self.opcode_table):
@@ -77,3 +113,5 @@ class F100CPU:
         else:
             self.opcode_table[self.IR.F].execute()
         return
+
+    

@@ -100,15 +100,9 @@ def print_header():
     print("# -------------------------------------------------------------------------------------------")
 
 class F100Emu:
-    def __init__ (self, ramsize=32768, adsel=1, traceon=False):
-        self.CPU = F100CPU(adsel=adsel, memory_read=self.memory_read, memory_write=self.memory_write)
-        self.RAM = [0xDEAD]*ramsize
-        self.RAM_writeset = set()
-        self.MEMTOP = ramsize-1
+    def __init__ (self, adsel=1, traceon=False):
+        self.CPU = F100CPU(adsel=adsel, traceon=traceon)
         self.traceon = traceon
-        self.read_count = 0
-        self.write_count = 0
-        self.modify_write_count = 0
         self.instr_count = 0
 
     def load_memory(self, filename, file_format):
@@ -128,44 +122,24 @@ class F100Emu:
                 i+=1
                 (byte_lo,valid) = h.read_byte(i)
                 i+=1
-            self.RAM[local_addr] = ((byte_hi << 8) | byte_lo ) & 0xFFFF
+            self.CPU.memory_write(local_addr, ((byte_hi << 8) | byte_lo ) & 0xFFFF, nostats=True )
 
 
-    def memory_read(self, address):
-        if self.traceon == True:
-            print ("READ 0x%04X 0x%04X" % ( address & 0xFFFF, self.RAM[address] & 0xFFFF))
-
-        self.read_count += 1
-        if 0 <= address <= self.MEMTOP:
-            return self.RAM[address]
-        else:
-            raise UserWarning("Memory out of range error for address 0x%04X" % address )
-
-    def memory_write(self, address, data, modify=False):
-        if self.traceon == True:
-            print ("STORE 0x%04X 0x%04X" % ( address & 0xFFFF, data & 0xFFFF))
-        self.write_count += 1
-        if modify:
-            self.modify_write_count += 1
-        if 0 <= address <= self.MEMTOP:
-            self.RAM[address] = (data & 0xFFFF)
-            self.RAM_writeset.add(address)
-        else:
-            raise UserWarning("Memory out of range error for address 0x%04X" % address )
 
     def print_machine_state(self):
         CPU = self.CPU
         PC = CPU.PC
         CR = CPU.CR
         IR = CPU.IR
-        IR.update(self.RAM[PC])
+        RAM = CPU.RAM
+        IR.update( self.CPU.memory_read(PC, nostats=True))
         if ( IR.F not in CPU.opcode_table):
             raise UserWarning("Cannot execute Opcode with function field 0x%X" % IR.F )
         else:
             IR.name = CPU.opcode_table[IR.F].disassemble(IR)
 
         print("  %04X : %04X %04X %04X : %04X %04X %d %d %d %d %d %d %d  : %s" % \
-        (PC & 0xFFFF,self.RAM[PC] & 0xFFFF ,self.RAM[PC+1] & 0xFFFF, self.RAM[PC+2] & 0xFFFF,\
+        (PC & 0xFFFF,RAM[PC] & 0xFFFF ,RAM[PC+1] & 0xFFFF, RAM[PC+2] & 0xFFFF,\
          CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.F,CR.M,CR.C,CR.S,CR.V,CR.Z,CR.I, IR.name ))
 
 
@@ -243,11 +217,11 @@ if __name__ == "__main__" :
         with open(memdump_filename, "w") as f:
             if memdump_lo != None and memdump_hi != None:
                 for adr in range(memdump_lo, memdump_hi+1):
-                    if adr in emu.RAM_writeset:
-                        f.write("0x%04X : 0x%04X\n" % (adr, emu.RAM[adr]&0xFFFF))
+                    if adr in emu.CPU.RAM_writeset:
+                        f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.RAM[adr]&0xFFFF))
             else:
-                for adr in sorted(emu.RAM_writeset):
-                    f.write("0x%04X : 0x%04X\n" % (adr, emu.RAM[adr]&0xFFFF))
+                for adr in sorted(emu.CPU.RAM_writeset):
+                    f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.RAM[adr]&0xFFFF))
 
 
     print("# -------------------------------------------------------------------------------------------")
@@ -255,9 +229,9 @@ if __name__ == "__main__" :
     print("# -------------------------------------------------------------------------------------------")
     print("#          Instruction count: %7d" % emu.instr_count)
 #    print("#          Logic cycle count: %7d" % emu.cycle_count)
-    print("#      Total Memory accesses: %7d" % (emu.read_count + emu.write_count) )
-    print("#               memory reads: %7d" % emu.read_count )
-    print("#              memory writes: %7d" % emu.write_count )
+    print("#      Total Memory accesses: %7d" % (emu.CPU.read_count + emu.CPU.write_count) )
+    print("#               memory reads: %7d" % emu.CPU.read_count )
+    print("#              memory writes: %7d" % emu.CPU.write_count )
     if statson:
         print ("# -------------------------------------------------------------------------------------------")
         print ("# Instruction Class Statistics")
