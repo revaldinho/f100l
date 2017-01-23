@@ -32,6 +32,13 @@ ADM_POINTER_INDIRECT = 3
 ADM_POINTER_INDIRECT_PREINC = 4
 ADM_POINTER_INDIRECT_POSTDEC = 5
 
+mnemonic = [ "HALT/BIT/SHIFT/CONDJMP", "SJM", "CAL", "RTN/RTC",
+             "STO","ADS","SBS","ICZ",
+             "LDA","ADD","SUB","CMP",
+             "AND","NEQ","NA","JMP" ] 
+
+
+
 prefix_postfix_re = re.compile( r'([\.\/\,])?((?:.*(?=[+-]$))|(?:.*))([+-])?')
 address_mode_keys = {
     None: ADM_DIRECT,

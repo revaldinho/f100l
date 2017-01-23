@@ -80,7 +80,8 @@ class OpcodeF3(F100_Opcode) :
 
     def execute(self):
         cycle_count = 0
-        self.execstats[self.disassemble(self.CPU.IR)] += 1
+        self.CPU.IR.name = self.disassemble(self.CPU.IR)
+        self.execstats[self.CPU.IR.name] += 1
 
         # Note that the PC has already been incremented during the instruction fetch
         stack_pointer = self.CPU.memory_read(0)

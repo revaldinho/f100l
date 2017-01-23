@@ -33,6 +33,7 @@ Where a don't care (x) bit is presented in the tables, the assembler will consis
 emulator will ignore this field during decoding.
 '''
 
+from F100_Opcodes import F100_Opcode
 import re
 
 class InstructionReg:
@@ -44,7 +45,6 @@ class InstructionReg:
 
     def update(self, new_value):
         self.content = new_value
-        self.name = ""
         self.F = (self.content>>12)& 0x000F
         self.I = (self.content>>11)& 0x0001
         self.T = (self.content>>10)& 0x0003
@@ -54,7 +54,9 @@ class InstructionReg:
         self.B = self.content      & 0x000F
         self.P = self.content      & 0x00FF
         self.N = self.content      & 0x07FF
+        self.name = F100_Opcode.mnemonic[self.F]
 
+    
     def tostring(self):
         list = [ "IR:  0x%04X   " % self.content]
         for m in [attr for attr in dir(self) ]:

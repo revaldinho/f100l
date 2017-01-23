@@ -146,8 +146,8 @@ class OpcodeF0_Jump(F100_Opcode) :
 
         cycle_count = 0
         IR = self.CPU.IR
-
-        self.execstats[self.disassemble(IR)] += 1
+        IR.name = self.disassemble(self.CPU.IR)
+        self.execstats[IR.name] += 1
 
         bitmask = 0x01 << IR.B
 

@@ -416,8 +416,10 @@ class OpcodeF0_Shift(F100_Opcode) :
         CPU = self.CPU
         CR = self.CPU.CR
         IR = self.CPU.IR
-        self.execstats[self.disassemble(IR)] += 1
+        IR.name = self.disassemble(self.CPU.IR)
+        self.execstats[IR.name] += 1
 
+        
         if CR.M == 0 :
             # Single length shifts and rotates
             if IR.R == 1:

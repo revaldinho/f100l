@@ -125,22 +125,17 @@ class F100Emu:
             self.CPU.memory_write(local_addr, ((byte_hi << 8) | byte_lo ) & 0xFFFF, nostats=True )
 
 
-
     def print_machine_state(self):
         CPU = self.CPU
         PC = CPU.PC
         CR = CPU.CR
         IR = CPU.IR
-        RAM = CPU.RAM
-        IR.update( self.CPU.memory_read(PC, nostats=True))
-        if ( IR.F not in CPU.opcode_table):
-            raise UserWarning("Cannot execute Opcode with function field 0x%X" % IR.F )
-        else:
-            IR.name = CPU.opcode_table[IR.F].disassemble(IR)
-
-        print("  %04X : %04X %04X %04X : %04X %04X %d %d %d %d %d %d %d  : %s" % \
-        (PC & 0xFFFF,RAM[PC] & 0xFFFF ,RAM[PC+1] & 0xFFFF, RAM[PC+2] & 0xFFFF,\
-         CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.F,CR.M,CR.C,CR.S,CR.V,CR.Z,CR.I, IR.name ))
+        print("  %04X : %04X %04X %04X : %04X %04X %d %d %d %d %d %d %d  : " % \
+        (PC & 0xFFFF,\
+         CPU.memory_read(PC,nostats=True),\
+         CPU.memory_read(PC+1,nostats=True),\
+         CPU.memory_read(PC+2,nostats=True),\
+         CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.F,CR.M,CR.C,CR.S,CR.V,CR.Z,CR.I ),end='')
 
 
 if __name__ == "__main__" :
@@ -208,8 +203,10 @@ if __name__ == "__main__" :
             emu.print_machine_state()
         try:
             emu.CPU.single_step()
+            if listingon:
+                print( emu.CPU.IR.name)            
         except F100HaltException as e:
-            print(e)
+            print("HALT\n%s" %e)
             break
     et = time.time()
 
@@ -218,10 +215,10 @@ if __name__ == "__main__" :
             if memdump_lo != None and memdump_hi != None:
                 for adr in range(memdump_lo, memdump_hi+1):
                     if adr in emu.CPU.RAM_writeset:
-                        f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.RAM[adr]&0xFFFF))
+                        f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.memory_read(adr,nostats=True)))
             else:
                 for adr in sorted(emu.CPU.RAM_writeset):
-                    f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.RAM[adr]&0xFFFF))
+                    f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.memory_read(adr,nostats=True)))
 
 
     print("# -------------------------------------------------------------------------------------------")

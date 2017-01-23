@@ -24,7 +24,7 @@ from ConditionReg import ConditionReg
 
 class F100CPU:
     def __init__ (self, adsel=1, ramsize=32768, traceon=False ):
-        
+        self.instr_disassembly=""        
         self.MEMTOP = ramsize-1
         self.traceon = traceon
         self.CR = ConditionReg()
@@ -110,8 +110,9 @@ class F100CPU:
         self.IR.update(self.memory_fetch())
         if ( self.IR.F not in self.opcode_table):
             raise UserWarning("Cannot execute Opcode with function field 0x%X" % self.IR.F )
-        else:
+        else:            
             self.opcode_table[self.IR.F].execute()
+            self.instr_disassembly = self.IR.name
         return
 
     
