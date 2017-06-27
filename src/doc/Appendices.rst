@@ -8,6 +8,7 @@ Appendix2_ - F100-L Handset Assembly Language Summary
 
 Appendix3_ - Comparison Table of Contemporary Microprocessors
 
+Appendix4_ - One Page Ferranti F100L Datasheet
 
 .. _Appendix1:
 
@@ -44,3 +45,11 @@ Appendix 3 - Comparison Table of Contemporary Microprocessors
 The following table is reproduced from [15]
 
 .. image:: ./MicroprocessorTable.png
+
+
+Appendix 4 - One Page Ferranti F100-L Datasheet
+-----------------------------------------------
+
+The following datasheet is reproduced from [15]
+
+.. image:: ./F100OnePageData.png

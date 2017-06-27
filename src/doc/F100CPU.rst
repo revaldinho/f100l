@@ -17,13 +17,11 @@ radiation. The 16 bit word size was chosen as the system was seen to be a way of
 downsizing existing applications running using mini-computers and software.
 
 As well as being one of the first of the 16 bit processors the F100-L was
-unusual in that it was designed using a bipolar technology (Common Diffusion
-Isolation, or CDI) when other manufacturers had already turned to planar
+unusual in that it was designed using a bipolar technology when other manufacturers had already turned to planar
 MOS processes to improve component densities. The choice of bipolar
 technology was driven by the radiation hardness requirement and
 eventually it was shown that the F100-L was almost totally latch-up
-resistant even after significant doses of radiation.[11] Fortunately
-then, Ferranti were already technology leaders in the fabrication and application of
+resistant even after significant doses of radiation.[11] Ferranti were already technology leaders in the fabrication and application of
 bipolar design for both linear and logical applications through their
 Common Diffusion Isolation (CDI) process.
 
@@ -104,7 +102,7 @@ shows costs for a selection of microprocessors available in 1978[15]
 |                      |              |  dependent   |             |               |
 +----------------------+--------------+--------------+-------------+---------------+
 
-The F100-L represented very good value for a military spec part, but was less competitive
+The F100-L represented very good value for a military spec part but was less competitive
 with parts from other manufacturers designed and packaged for less rigorous commercial requirements, e.g.
 having an operating range requirement of 0C to +85C rather than -55C to +125C. This
 made the F100-L less attractive for use in the nascent personal computer market created
