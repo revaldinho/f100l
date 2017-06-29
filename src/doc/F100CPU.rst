@@ -127,12 +127,21 @@ The Science Museum has a photograph_ of this system being used in City Universit
 .. _photograph: http://ingenious.org.uk/See/Scienceandtechnology/Physicsoptics/?target=SeeLarge&ObjectID=%7B170D0C25-A24B-658A-A0DD-7D6DCCAE1A20%7D&source=Search&SearchCategoryID=%7BC30DE785-2657-4A36-A5A6-000000042538%7D&viewby=images
 
 Selling into its originally intended military markets the F100-L appears to have had some longevity and
-even spawned a successor with expanded memory addressing abilities in 1984 - the F200-L.[14]
-Almost simultaneously with Ferranti's ill-fated acquisition
-of the US technology company International Signal and Control in 1987, their
-chip business was sold to Plessey for £30M[2]. At that time both F200 and F100, as well
-as the ULA business, were listed as noteworthy assets. Plessey (later merged with GEC to form GPT) were
-still building some number of F200's in 1992, and support chips including the F113 as late as 1995.
+even spawned a successor in 1984 - the F200-L.[14,18] The F200-L was fully software compatible with the
+original F100-L, and supplied in the same 40 pin DIL package. The main logical changes in the F200 were the
+integration of the multiplier unit onto the die or at least into the same package, and an additional address
+bit to bring the directly addressable memory area up to 64K words. This address range could be expanded to 1M words
+when combined with the F220 Memory Management Unit IC introduced at the same time, via a paging scheme combining a
+fixed 32K word lower page and a swappable uppper 32K. [19] Unlike the original F100 series parts, the newer F200 and F220 were both
+available in a commercial 0-70C temperature range as well as the original  -55 to 125C military range. The presumably
+cheaper commercial version doesn't appear to have improved the family's performance in the commercial market.
+
+Not long after the introduction of the F200 chips, Ferranti acquired the American technology company International
+Signal and Control in 1987. Unfortunately for Ferranti the state of ISC had been presented fraudulently and the
+completion of the deal caused Ferranti to collapse owing to the hidden debts of its new subsidiary. Ferranti was
+broken up and their chip business was sold to Plessey for £30M[2]. At that time both F200 and
+F100, as well as the ULA business, were listed as noteworthy assets. Plessey (later merged with GEC to form GPT)
+were still building some number of F200's in 1992, and support chips including the F113 as late as 1995.
 So, although little information is publicly available on Ferranti turn-key systems for military
 applications, these generated sufficient demand to keep the processor and
 support chips in production from the original 1976 launch right up into the mid 1990s.
@@ -181,8 +190,17 @@ The Centre for Computing History (CCH) in Cambridge has a couple of hardware art
 these are held in storage rather than on general display. Of the items they hold, the
 control handset from the F100-L microcomputer system is the most accessible. This unit
 has a complete instruction set summary table printed in the reverse and a transcript of
-that is included in the Appendices here. Other than the handset they also have a board,
-possibly from an F100-L computer system with F112-L and F101-L ICs.
+that is included in the Appendices here.
 
   * http://www.computinghistory.org.uk/det/16974/Box-704-Ferranti-Marconi/
+
+As well as the the handset they also have a board, possibly from an F100-L computer system
+with F112-L and F101-L ICs.
+
   * http://www.computinghistory.org.uk/det/23397/Box-812-Various/
+
+.. image:: F100Board.png
+
+A Higher resolution photo is available here_ .
+
+.. _here: https://revaldinho.smugmug.com/Vintage-Technology/Ferranti-F100-Project/n-VXHdXd

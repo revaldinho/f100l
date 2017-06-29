@@ -46,6 +46,7 @@ The following table is reproduced from [15]
 
 .. image:: ./MicroprocessorTable.png
 
+.. _Appendix4:
 
 Appendix 4 - One Page Ferranti F100-L Datasheet
 -----------------------------------------------

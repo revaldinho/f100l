@@ -82,6 +82,11 @@ References
 [17] "An Advanced Helicopter Engine Control System"
   A.F. Saunders, Journal of the American Society of Mechanical Engineers, 1982
 
+[18] "Catalogue Informatique – Volume E" Ingénieur Général de l'Armement Henri Boucher, pp117-118
+
+  http://www.aconit.org/histoire/iga_boucher/pdf/Vol_E_700-745.pdf
+
+[19] "F220-L Datasheet", Ferranti Computer Systems Ltd, undated
 
 Additional Bibliography
 =======================
