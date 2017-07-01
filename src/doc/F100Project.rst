@@ -60,7 +60,7 @@ itself and some of the associated peripheral chips. These photos are available o
 .. _Visual6502: http://visual6502.org
 .. _Cminusminus: https://github.com/revaldinho/c--
 .. _PiTubeDirect: https://github.com/hoglet67/PiTubeDirect
-.. _website: https://revaldinho.smugmug.com/Vintage-Technology/Integrated-Circuits/Ferranti-F100-and-Related-ICs
+.. _website: https://r3va1dinh0.smugmug.com/Vintage-Technology/Integrated-Circuits/Ferranti-F100-and-Related-ICs
 
 And finally, the F100-L and family chips really should have a wikipedia article, shouldn't it?
 

@@ -17,7 +17,8 @@ rm -rf src/_build
 git branch --set-upstream-to=origin/gh-pages gh-pages
 git push origin gh-pages -f 
 
-
+# return to master branch on exit
+git checkout master
 
 # Checkin all changes (but not newly created files)
 # commit -am "message"

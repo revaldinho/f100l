@@ -1,2 +1,7 @@
 *.pyc
 *~
+*.rslt
+*.dump
+*.log
+*.hex
+*.golden
