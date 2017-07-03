@@ -25,7 +25,7 @@ History, Cambridge, UK: Box704_.
 
 Additional photos in higher resolutions are available from my smugmug photo sharing website_
 
-.. _website: https://r3va1dinh0.smugmug.com/Vintage-Technology/Ferranti-F100-Project/n-VXHdXd
+.. _website: https://revaldinho.smugmug.com/Vintage-Technology/Ferranti-F100-Project/n-VXHdXd
 
 .. _Appendix2:
 
