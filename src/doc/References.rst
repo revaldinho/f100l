@@ -111,6 +111,15 @@ Editorial and Press Releases
 
   https://books.google.co.uk/books?id=BOsKVgqs6LoC&lpg=PA548&ots=9_NdMJDVQS&dq=ferranti%20f100-l&pg=PA548#v=onepage&q=ferranti%20f100-l&f=false
 
+"MoD orders Mascot Kernel for use on F100-L"
+  Computer Weekly, September 7, 1978, p. 7
+
+"F100-L Launched on OEM Basis",
+  Computer Weekly, September 23, 1976, p. 14
+
+"Coral 66 Compiler for F100 now in use",
+  Computer Weekly, November 1977
+
 
 Journal and Conference Papers
 -----------------------------
@@ -124,3 +133,11 @@ Books & Manuals
 
 "The Ferranti F100-L Hardware Data Book",
   Ferranti Ltd., 1977, Bracknell, UK
+
+"The Microprocessor Data Book",
+  S.A. Money, McGraw Hill, 1982, pp. 125-126
+
+  https://archive.org/details/MicroprocessorDataBook
+
+"Modern Microprocessor System Design: Sixteen-Bit and Bit-Slice Architecture"
+  Daniel R. McGlynn, John Wiley & Sons Inc., 1980, p 63
