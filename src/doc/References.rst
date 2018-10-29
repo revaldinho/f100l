@@ -118,8 +118,17 @@ Editorial and Press Releases
   Computer Weekly, September 23, 1976, p. 14
 
 "Coral 66 Compiler for F100 now in use",
-  Computer Weekly, November 1977
+  Computer Weekly, November 17, 1977, p. 7
 
+"£50M Boost for micro industry"
+  Computer Weekly, December 1st, 1977, p. 14
+
+
+"Ferranti F100 Single Eurocard Range".
+  Aircraft Engineering, Vol. 55, Issue 10, October 1983, p. 26
+
+  https://www.emeraldinsight.com/doi/abs/10.1108/eb035911
+ 
 
 Journal and Conference Papers
 -----------------------------
@@ -127,7 +136,16 @@ Journal and Conference Papers
 "Pseudo-emulation facilities for the Ferranti FDS-10 Development System"
   N.F. Grant et al., Software & Microsystems, Vol3, Nos 5 & 6, October/December 1984, pp. 106-110
 
+"Applications of Microprocessors in Air Traffic"
+  D.L. Stoddart, AGARD Air Traffic Management: Civil/Mil Systems and Technology, Feb 1980
 
+  http://www.dtic.mil/dtic/tr/fulltext/u2/a087018.pdf
+
+"Microprocessor Characteristics and Comparative Features"
+  R. G. Burrage,  AGARD Lecture Series No. 113, MICROCOMPUTER APPLICATIONS IN POWER AND PROPULSION SYSTEMS, April 1981, p1-1 - p1-17
+     
+  http://www.dtic.mil/dtic/tr/fulltext/u2/a099267.pdf
+  
 Books & Manuals
 ---------------
 
@@ -141,3 +159,8 @@ Books & Manuals
 
 "Modern Microprocessor System Design: Sixteen-Bit and Bit-Slice Architecture"
   Daniel R. McGlynn, John Wiley & Sons Inc., 1980, p 63
+
+"Illustrating Computers",
+  Colin Day, Donald Alcock, Pan Books Ltd., London, 1982, p. 39-41
+
+
