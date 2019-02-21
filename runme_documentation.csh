@@ -9,6 +9,9 @@ rm -rf _modules _images _sources _static doc genindex.html index.html objects.in
 
 git pull
 git checkout -b gh-pages
+pushd src
+make html
+popd
 cp -r src/_build/html/* .
 cp -r src/_build/html/.nojekyll .
 git add _sources _images _static doc genindex.html index.html objects.inv py-modindex.html search.html searchindex.js .nojekyll

@@ -145,7 +145,18 @@ Journal and Conference Papers
   R. G. Burrage,  AGARD Lecture Series No. 113, MICROCOMPUTER APPLICATIONS IN POWER AND PROPULSION SYSTEMS, April 1981, p1-1 - p1-17
      
   http://www.dtic.mil/dtic/tr/fulltext/u2/a099267.pdf
-  
+
+"The Roving Slave Processor"
+  J. Brignell, R. Comley and R. Young, Microprocessors, Vol. 1, No. 2, December 1976, pp. 79-84
+
+  http://openaccess.city.ac.uk/18587/1/451991_vol_1.pdf
+
+"More bits, more power, more precision"
+  C. Buffam, R. Comley and R. Young, IEE Electron, 12 December 1977, pp. 203-205
+
+  http://openaccess.city.ac.uk/18587/1/451991_vol_1.pdf
+
+     
 Books & Manuals
 ---------------
 
