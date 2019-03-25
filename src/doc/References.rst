@@ -88,6 +88,59 @@ References
 
 [19] "F220-L Datasheet", Ferranti Computer Systems Ltd, undated
 
+
+[20] “Simplifying the Development of Programs for Digital Engine Control”,
+  D. A. Rutherford, Proceedings of the ASME, Volume 1A, March 10, 1980
+
+  http://proceedings.asmedigitalcollection.asme.org/data/conferences/asmep/83974/v01at01a029-80-gt-29.pdf
+
+[21] “A User Programmable General Purpose Microprocessor Control System”,
+  D. E. Mann, Proceedings of the ASME, Volume 1A, March 10, 1980
+
+  http://proceedings.asmedigitalcollection.asme.org/data/conferences/asmep/83974/v01at01a028-80-gt-28.pdf
+     
+[22] "British micro power for engines",
+  New Scientist, 17 May 1979, p. 548
+
+  https://books.google.co.uk/books?id=BOsKVgqs6LoC&lpg=PA548&ots=9_NdMJDVQS&dq=ferranti%20f100-l&pg=PA548#v=onepage&q=ferranti%20f100-l&f=false
+
+[23] "The use of Production Hardware for the Development of Control Laws",
+  I. Learman, N. J. B Young, Proceedings of the ASME, March 27, 1983
+
+  http://proceedings.asmedigitalcollection.asme.org/data/conferences/asmep/83891/v005t13a001-83-gt-6.pdf
+
+[24] IEE Electronics and Power, September 1978, p. 625
+
+[25] Jane's Weapon Systems, 1986/87 [ Sea Eagle Reference  pp. TBC]
+
+[26] Jane's Weapon Systems, 1986/87 [ Ferranti Falcon pp. TBC]
+
+[27] Jane's Naval Weapon Systems, No. 25
+
+[28] "Standard Spacecraft Microcomputer Module"
+  The Radio and Electronic Engineer, Vol 51, No. 5, May 1981, p 208
+
+[29] "The Roving Slave Processor"
+  J. Brignell, R. Comley and R. Young, Microprocessors, Vol. 1, No. 2, December 1976, pp. 79-84
+
+  http://openaccess.city.ac.uk/18587/1/451991_vol_1.pdf
+
+[30] “Applications of Microprocessors in Air Traffic”,
+  D.L. Stoddart, AGARD Air Traffic Management: Civil/Mil Systems and Technology, Feb 1980
+
+  http://www.dtic.mil/dtic/tr/fulltext/u2/a087018.pdf
+
+[31] Jane's Weapon Systems, [ CACS reference pp. TBC]
+
+[32a,b] "Jane's Main Battle Tanks",
+  C. F. Foss, Janes Publishing Co. Ltd., London, 1983, p. 97, p. 105
+
+[33] https://www.globalsecurity.org/military/world/brazil/tamoyo.htm
+
+[35] “Microprocessors Rule The Air”, New Scientist, 5 January 1978, p. 26
+
+  https://books.google.co.uk/books?id=Ayh04jd5YdsC&pg=PA26&dq=Microprocessors+Rule+The+Air&hl=en&sa=X&ved=0ahUKEwjA9_m0vubgAhVMTBUIHUApB0UQ6AEIKjAA
+
 Additional Bibliography
 =======================
 
@@ -105,12 +158,6 @@ Editorial and Press Releases
 
   https://books.google.co.uk/books?id=5rH7T60TWMAC&lpg=PA695&dq=europe%20first%20home%20grown%20microprocessor&pg=PA695#v=onepage&q=europe%20first%20home%20grown%20microprocessor&f=false
 
-
-"British micro power for engines",
-  New Scientist, 17 May 1979, p. 548
-
-  https://books.google.co.uk/books?id=BOsKVgqs6LoC&lpg=PA548&ots=9_NdMJDVQS&dq=ferranti%20f100-l&pg=PA548#v=onepage&q=ferranti%20f100-l&f=false
-
 "MoD orders Mascot Kernel for use on F100-L"
   Computer Weekly, September 7, 1978, p. 7
 
@@ -123,38 +170,41 @@ Editorial and Press Releases
 "£50M Boost for micro industry"
   Computer Weekly, December 1st, 1977, p. 14
 
-
 "Ferranti F100 Single Eurocard Range".
   Aircraft Engineering, Vol. 55, Issue 10, October 1983, p. 26
 
   https://www.emeraldinsight.com/doi/abs/10.1108/eb035911
- 
 
+  
 Journal and Conference Papers
 -----------------------------
 
 "Pseudo-emulation facilities for the Ferranti FDS-10 Development System"
   N.F. Grant et al., Software & Microsystems, Vol3, Nos 5 & 6, October/December 1984, pp. 106-110
 
-"Applications of Microprocessors in Air Traffic"
-  D.L. Stoddart, AGARD Air Traffic Management: Civil/Mil Systems and Technology, Feb 1980
 
-  http://www.dtic.mil/dtic/tr/fulltext/u2/a087018.pdf
+"Characterization of 16 Bit Microprocessors for Space Use"
+  P. May, H. Lamberts, 9th Communications Satellite Systems Conference, 9th, San Diego, CA, March 7-11, 1982, pp 145-149
 
 "Microprocessor Characteristics and Comparative Features"
   R. G. Burrage,  AGARD Lecture Series No. 113, MICROCOMPUTER APPLICATIONS IN POWER AND PROPULSION SYSTEMS, April 1981, p1-1 - p1-17
      
   http://www.dtic.mil/dtic/tr/fulltext/u2/a099267.pdf
 
-"The Roving Slave Processor"
-  J. Brignell, R. Comley and R. Young, Microprocessors, Vol. 1, No. 2, December 1976, pp. 79-84
-
-  http://openaccess.city.ac.uk/18587/1/451991_vol_1.pdf
 
 "More bits, more power, more precision"
   C. Buffam, R. Comley and R. Young, IEE Electron, 12 December 1977, pp. 203-205
 
   http://openaccess.city.ac.uk/18587/1/451991_vol_1.pdf
+
+"The Primary UOSAT Spacecraft Computer"
+  T.G. Jeans, C. P Traynar, The Radio And Electronic Engineer, Vol 52, No. 8/9, pp 285-290, August/September 1982
+
+"The Primary UoSAT-2 Spacecraft Computer"
+  R. M. A. Peel, Journal of the IERE, Vol. 578, No. 5 (Supplement), September/October 1987, pp. S132-S142
+
+"UOSAT - An investigation into cost-effective spacecraft engineering"
+  M. N. Sweeting, The Radio and Electronic Engineer, Vol. 52, No. 8/9, August/September 1982, pp. 363-378
 
      
 Books & Manuals
@@ -174,4 +224,8 @@ Books & Manuals
 "Illustrating Computers",
   Colin Day, Donald Alcock, Pan Books Ltd., London, 1982, p. 39-41
 
+"Coral 66 Language Reference Manual"
+  Micro Focus Ltd, 1982
 
+  https://www.computinghistory.org.uk/downloads/32364
+  

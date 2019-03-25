@@ -214,3 +214,4 @@ second for the jump destination. e.g.
   ::
 
      JBS  0x2 0x4444 0x5555 ; PC <- 0x5555 if (0x4444)[4]==1 else PC+1
+

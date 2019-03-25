@@ -132,7 +132,7 @@ original F100-L, and supplied in the same 40 pin DIL package. The main logical c
 integration of the multiplier unit onto the die or at least into the same package, and an additional address
 bit to bring the directly addressable memory area up to 64K words. This address range could be expanded to 1M words
 when combined with the F220 Memory Management Unit IC introduced at the same time, via a paging scheme combining a
-fixed 32K word lower page and a swappable uppper 32K. [19] Unlike the original F100 series parts, the newer F200 and F220 were both
+fixed 32K word lower page and a swappable upper 32K. [19] The newer F200 and F220 were both immediately
 available in a commercial 0-70C temperature range as well as the original  -55 to 125C military range. The presumably
 cheaper commercial version doesn't appear to have improved the family's performance in the commercial market.
 
@@ -142,27 +142,60 @@ completion of the deal caused Ferranti to collapse owing to the hidden debts of 
 broken up and their chip business was sold to Plessey for £30M[2]. At that time both F200 and
 F100, as well as the ULA business, were listed as noteworthy assets. Plessey (later merged with GEC to form GPT)
 were still building some number of F200's in 1992, and support chips including the F113 as late as 1995.
-So, although little information is publicly available on Ferranti turn-key systems for military
-applications, these generated sufficient demand to keep the processor and
-support chips in production from the original 1976 launch right up into the mid 1990s.
 
 Applications
 ------------
 
-The F100-L was the subject of a number of application studies and trials although
+Although little information is publicly available on Ferranti turn-key systems for military applications, three stand out
+as having generated sufficient demand to keep the processor and support chips in production from the original 1976
+launch right up into the mid 1990s.
+
+1. The BAe Sea Eagle Missile System [25]
+
+   Sea Eagle was an air-launched anti-ship missile originally introduced in 1981 and used in the UK Armed Forces until the late 1990s.
+
+   The F100-L provides the on-board digital flight computer controlling the flight path of the missile until the target is acquired by the radar homing head during the final sea skimming phase of an attack. An upgrade program was abandoned on cost grounds in the mid 1990s so it's possible that the F100-L saw out the entire Sea Eagle lifespan.
+
+2. The Ferranti Falcon Integrated Fire Control System (IFCS) for tanks and AFVs
+
+   "The Ferranti Falcon Fire Control System is a digital system based on the F100-L Microprocessor providing a versatile and cost-effective means of enhancing the combat capability of gun-aimed fighting vehicles. Compact Dimensions, simplicity of operation and low cost enusre the Falcon application is not restricted to main battle tanks."
+
+   -- Janes Weapon Systems, 1985/86 [26]
+
+   The Ferranti Falcon system may originally have been developed for the MBT-80 tank, intended as a British Chieftain replacement, but the MBT-80 project itself was abandoned in 1980[32a]. Whatever its origins, the Ferranti Falcon system itself continued into production and was offered as an option for Chieftain 900 tanks [32b], and was used on the Brazilian MB-3 Tamoyo tanks [33].
+
+   A gun control predictor for smaller calibre Naval cannon, possibly related to the Ferranti Falcon, was also offered and adopted at least by the Brazilian navy.
+
+3. The Naval CACS-1, Computer Assisted Command System, and later CAAIS 450, Computer Aided Action Information System.
+
+   Both of these systems used Ferranti F100-L powered terminals to support multi-processor Ferranti FM1600 and Argus M700 computer systems.
+   
+   "CAAIS 450 is a distributed processing system using the FM1600E computer and Coral 66 software language. It operates at 650 kips and has a memory of 1.2 million words. It is designed to fit a wide range of warships down to fast attack craft size and to interface with a fire-control system. The system also uses new consoles each with its own computer, core, Dragon display drive (using Ferranti F100L microprocessors) and input/output devices. There are two types of display system; two-operator and single-operator, and a typical configuration would be three two-man consoles. These may be supplemented by one two-man or two one-man consoles, the latter being either joined or autonomous.”
+
+   -- Janes Naval Systems, No. 25, [27]
+
+   The CACS-1 system was widely adopted in Royal Navy vessels, including in Type 22 frigates. The CAAIS was also used by the Navy in Hunt Class minesweepers, but also offered for export and used in Brazilian Navy Inhaúma class ships. [27]
+   
+The F100-L was the also subject of a number of application studies and trials although
 it's not clear how many of these resulted in sales of more than sample quantities.
 
-The most reported application was the F100-L's inclusion in the University of Surrey's
+The highest profile application was the F100-L's inclusion in the University of Surrey's
 UoSAT program, where the F100-L was the heart of the secondary computer unit launched
 into space. [9,11]
 
-This section will list briefly a number of other application trials reported in
-the literature including uses
+Other applications and research projects include
 
-* in Helicopter Engine Management control [17]
-* in gas turbine engine control
-* as a standard spacecraft compute module
-* for control of nuclear test equipment
+* Engine management control
+  
+  * Ultra Electronic Controls Ltd. announced an engine management system in 1979[21], and later published technical papers [22,23]
+  * Dowty Group displayed an F100-L digital speed and temperature limiter at the Farnborough Airshow in 1978 [24]
+  * Proceedings of the ASME include another research paper on Helicopter Engine Management control [17]
+    
+* A standard spacecraft compute module was offered by the British Aerospace  Space and Communications Division [28]  
+* several papers have been published on control of nuclear test equipment using the CAMAC protocol
+* medical instrumentation and monitoring [29]
+* application of micro processors in Air Traffic Control [30]
+* an RAE study into airframe stress monitoring using F100-L micro processor for data acquisition and management in flight prior to download for later analysis [34]
 
 Silicon Implementation
 ----------------------
@@ -178,8 +211,8 @@ the main areas of the chip as described in the Architecture section later.
 Preservation
 ------------
 
-Since the F100-L didn't make it into any notable computer systems, there are no significant
-displays of the hardware in any science or technology museums.
+Since the F100-L didn't make it into any notable micro- or mini- computer systems, there are
+no significant displays of the hardware in any science or technology museums.
 
 The Museum of Science and Industry (MOSI) in Manchester has a paperweight memento of a
 single packaged chip encased in perspex with the legend "F100-L the world's most advanced
@@ -194,8 +227,8 @@ that is included in the Appendices here.
 
   * http://www.computinghistory.org.uk/det/16974/Box-704-Ferranti-Marconi/
 
-As well as the the handset they also have a board, possibly from an F100-L computer system
-with F112-L and F101-L ICs.
+As well as the the handset they also have a board, possibly from an Naval CACS or CAAIS F100-L
+computer system with F112-L and F101-L ICs.
 
   * http://www.computinghistory.org.uk/det/23397/Box-812-Various/
 

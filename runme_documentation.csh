@@ -15,7 +15,7 @@ popd
 cp -r src/_build/html/* .
 cp -r src/_build/html/.nojekyll .
 git add _sources _images _static doc genindex.html index.html objects.inv py-modindex.html search.html searchindex.js .nojekyll
-git commit -m "checkin documentation"
+git commit -m "Fix formatting"
 rm -rf src/_build
 git branch --set-upstream-to=origin/gh-pages gh-pages
 git push origin gh-pages -f 
