@@ -26,7 +26,7 @@ References
 
 
 [5] "16-bit Microprocessor for the Hard Environment"
-  R.E. Fox, Microelectronics Reliability, Vol. 19, Issues5-6, pp. 599-610
+  R.E. Fox, Microelectronics Reliability, Vol. 19, Issues5-6, 1979, pp. 599-610
 
   http://www.sciencedirect.com/science/article/pii/0026271479906073
 
