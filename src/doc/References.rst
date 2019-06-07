@@ -111,10 +111,12 @@ References
 
 [24] IEE Electronics and Power, September 1978, p. 625
 
-[25] Jane's Weapon Systems, 1986/87 [ Sea Eagle Reference  pp. TBC]
+[25] Jane's Weapon Systems, 1986/87
+  R. P. Perry (Ed.), Jane's Publishing Company Ltd., London, UK, 1986, pp. 184-185
 
-[26] Jane's Weapon Systems, 1986/87 [ Ferranti Falcon pp. TBC]
-
+[26] Jane's Weapon Systems, 1986/87
+  R. P. Perry (Ed.), Jane's Publishing Company Ltd., London, UK, 1986, p. 345
+     
 [27] Jane's Naval Weapon Systems, No. 25
 
 [28] "Standard Spacecraft Microcomputer Module"
@@ -140,6 +142,10 @@ References
 [35] “Microprocessors Rule The Air”, New Scientist, 5 January 1978, p. 26
 
   https://books.google.co.uk/books?id=Ayh04jd5YdsC&pg=PA26&dq=Microprocessors+Rule+The+Air&hl=en&sa=X&ved=0ahUKEwjA9_m0vubgAhVMTBUIHUApB0UQ6AEIKjAA
+
+  
+[36] Jane's Air-Launched Weapons,
+  R. Hewson (Ed.), Jane's Information Group, IHT Markit, London, UK, 2009, pp. 240-241
 
 Additional Bibliography
 =======================
@@ -206,12 +212,22 @@ Journal and Conference Papers
 "UOSAT - An investigation into cost-effective spacecraft engineering"
   M. N. Sweeting, The Radio and Electronic Engineer, Vol. 52, No. 8/9, August/September 1982, pp. 363-378
 
+"Microprocessors in Air Traffic Control"
+  D. A. Lucas, The Controller, Journal of the International Federation of Air Traffic Controllers Association, Vol. 18., No. 4, 1979, pp. 13-15
+
+  https://issuu.com/ifatca/docs/1979_04
+  
      
 Books & Manuals
 ---------------
 
 "The Ferranti F100-L Hardware Data Book",
   Ferranti Ltd., 1977, Bracknell, UK
+
+  (Replica available in this repository created from OCR'd scans of the original)
+
+  https://github.com/revaldinho/f100l/blob/master/src/FerrantiF100-LHardwareDataBookReplica.pdf
+
 
 "The Microprocessor Data Book",
   S.A. Money, McGraw Hill, 1982, pp. 125-126

@@ -100,5 +100,3 @@ Full size versions of these photographs are available on Smugmug_
 .. figure:: ./F113_Detail_10X_1.5X_GX7_DxO_DxO.jpg
 
 
-
-

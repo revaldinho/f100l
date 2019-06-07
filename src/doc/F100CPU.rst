@@ -73,7 +73,21 @@ Pricing and Commercial History
 ------------------------------
 
 At the launch in 1976 the CPU alone was priced at 57UKP
-in quantities of 100. [1,3] By 1978 prices had reduced somewhat to 39UKP for the processor, with
+in quantities of 100 [1,3], and available in the following speed and operating condition ranges.
+
++---------------------+-----------------------------+-----------------+
+| Operating Condition | Operating Temperature Range | Clock Frequency |
++---------------------+-----------------------------+-----------------+
+| Commercial          |   0C - +70C                 |  8 MHz          |
++---------------------+-----------------------------+-----------------+
+| Industrial          | -25C - +80C                 |  6.5 MHz        |
++---------------------+-----------------------------+-----------------+
+| Military            | -55C - +125C                | 3MHz, 5MHz      |
++---------------------+-----------------------------+-----------------+
+
+Later versions were able to run at up to 20MHz.
+
+By 1978 prices had reduced somewhat to 39UKP for the processor, with
 a support chip set of an F111-L and 2 F112-L's available for an additional 18KUP.[4] The table below
 shows costs for a selection of microprocessors available in 1978[15]
 
@@ -103,8 +117,7 @@ shows costs for a selection of microprocessors available in 1978[15]
 +----------------------+--------------+--------------+-------------+---------------+
 
 The F100-L represented very good value for a military spec part but was less competitive
-with parts from other manufacturers designed and packaged for less rigorous commercial requirements, e.g.
-having an operating range requirement of 0C to +85C rather than -55C to +125C. This
+with parts from other manufacturers designed and packaged for less rigorous commercial requirements. This
 made the F100-L less attractive for use in the nascent personal computer market created
 by the 8 bit processors. Additionally many of these 8 bit processors actually provided 16 bit
 addressing and even some 16 bit (double word) data processing. The Zilog Z80 is a good example
@@ -132,9 +145,8 @@ original F100-L, and supplied in the same 40 pin DIL package. The main logical c
 integration of the multiplier unit onto the die or at least into the same package, and an additional address
 bit to bring the directly addressable memory area up to 64K words. This address range could be expanded to 1M words
 when combined with the F220 Memory Management Unit IC introduced at the same time, via a paging scheme combining a
-fixed 32K word lower page and a swappable upper 32K. [19] The newer F200 and F220 were both immediately
-available in a commercial 0-70C temperature range as well as the original  -55 to 125C military range. The presumably
-cheaper commercial version doesn't appear to have improved the family's performance in the commercial market.
+fixed 32K word lower page and a swappable upper 32K. [19] The newer F200 and F220 were both available in commercial, industrial
+and military grades matching the original family members.
 
 Not long after the introduction of the F200 chips, Ferranti acquired the American technology company International
 Signal and Control in 1987. Unfortunately for Ferranti the state of ISC had been presented fraudulently and the
@@ -152,7 +164,7 @@ launch right up into the mid 1990s.
 
 1. The BAe Sea Eagle Missile System [25]
 
-   Sea Eagle was an air-launched anti-ship missile originally introduced in 1981 and used in the UK Armed Forces until the late 1990s.
+   Sea Eagle was an air-launched anti-ship missile originally introduced in 1981 and used in the UK Armed Forces until the late 1990s, and still in use in the Indian Navy as alte as 2009. [36]
 
    The F100-L provides the on-board digital flight computer controlling the flight path of the missile until the target is acquired by the radar homing head during the final sea skimming phase of an attack. An upgrade program was abandoned on cost grounds in the mid 1990s so it's possible that the F100-L saw out the entire Sea Eagle lifespan.
 
