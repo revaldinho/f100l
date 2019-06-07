@@ -115,7 +115,7 @@ References
   R. P. Perry (Ed.), Jane's Publishing Company Ltd., London, UK, 1986, pp. 184-185
 
 [26] Jane's Weapon Systems, 1986/87
-  R. P. Perry (Ed.), Jane's Publishing Company Ltd., London, UK, 1986, p. 345
+  R. P. Perry (Ed.), Jane's Publishing Company Ltd., London, UK, 1986, p. 302, p. 345
      
 [27] Jane's Naval Weapon Systems, No. 25
 
