@@ -1,6 +1,6 @@
+#/bin/tcsh -f
 
-
-cd ~/Documents/Development/git/f100l
+cd ~/Documents/nas/Development/git/f100l
 
 git checkout master
 git branch -D gh-pages
