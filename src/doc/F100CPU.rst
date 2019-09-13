@@ -57,6 +57,11 @@ family members were added starting with the F113, F114 and ZN1001 in 1978.[16]
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
 | F117-L | Two channel interrupt controller provides full vectored interrupt capability for two external devices connected to an F100-L system.   | DIP24 |
 +--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F118-L | Serial Interface Master Chip - implements a serial bus in which up to 16 F119-L slaves can be connected to a single master. Up to  4   | DIP40 |
+|        | F118-L ICs can be connected to an F100-L to create 4 separate serial busses.                                                           |       |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
+| F119-L | Serial Interface Slave Chip - provides an interface for one or two peripherals onto the F100-L serial bus.                             | DIP28 |
++--------+----------------------------------------------------------------------------------------------------------------------------------------+-------+
 
 The chip sets were designed to allow F100-L systems to be constructed with a
 minimum of glue logic. Like the F100-L the rest of the chipset also needed
@@ -116,7 +121,7 @@ shows costs for a selection of microprocessors available in 1978[15]
 |                      |              |  dependent   |             |               |
 +----------------------+--------------+--------------+-------------+---------------+
 
-The F100-L represented very good value for a military spec part but was less competitive
+The F100-L represented good value for a military spec part but was less competitive
 with parts from other manufacturers designed and packaged for less rigorous commercial requirements. This
 made the F100-L less attractive for use in the nascent personal computer market created
 by the 8 bit processors. Additionally many of these 8 bit processors actually provided 16 bit
