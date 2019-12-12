@@ -8,12 +8,12 @@ Perform a bitwise logical exclusive-OR of the Accumulator and specified operand.
 
 ::
 
-   NEQ N      A <- A & (N)
-   NEQ ,D     A <- A & D
-   NEQ /P     A <- A & (P)
-   NEQ /P+    P <- P + 1 ; A <- A & (P)
-   NEQ /P-    A <- A & (P) ; P <- P - 1
-   NEQ .W     A <- A & (W)
+   NEQ N      A <- A ^ (N)
+   NEQ ,D     A <- A ^ D
+   NEQ /P     A <- A ^ (P)
+   NEQ /P+    P <- P + 1 ; A <- A ^ (P)
+   NEQ /P-    A <- A ^ (P) ; P <- P - 1
+   NEQ .W     A <- A ^ (W)
 
 **Instruction Encoding**
 
