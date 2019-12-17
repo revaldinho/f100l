@@ -87,9 +87,9 @@ class OpcodeF5(F100_Opcode) :
         self.execstats[self.disassemble(self.CPU.IR)] += 1
 
         (self.CPU.OR, operand_address, cycles) = self.get_operand()
-        result = self.CPU.OR + self.CPU.ACC
+        result = (self.CPU.OR + self.CPU.ACC) & 0x1FFFF
         if (self.CPU.CR.M==1) :
-            result = result + self.CPU.CR.C
+            result = (result + self.CPU.CR.C) &0x1FFFF
 
         self.CPU.memory_write(operand_address, result)
 

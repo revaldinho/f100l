@@ -92,9 +92,9 @@ class OpcodeF6(F100_Opcode) :
 
         (CPU.OR, operand_address, cycles) = self.get_operand()
 
-        result = CPU.OR - CPU.ACC
+        result = (CPU.OR - CPU.ACC) & 0x1FFFF
         if (CPU.CR.M==1) :
-            result = result + CPU.CR.C - 1
+            result = (result + CPU.CR.C - 1) & 0x1FFFF
 
         CPU.memory_write(operand_address, result)
 

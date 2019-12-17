@@ -1,3 +1,4 @@
+
 '''
 ICZ - Increment and Jump if Non-Zero
 ====================================
@@ -131,5 +132,6 @@ class OpcodeF7(F100_Opcode) :
             CPU.memory_write(operand_address, result)
         if result != 0:
             CPU.PC = jump_addr
+        CPU.OR = result 
 
         return cycle_count

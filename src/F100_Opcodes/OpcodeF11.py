@@ -94,9 +94,9 @@ class OpcodeF11(F100_Opcode) :
         self.execstats[self.CPU.IR.name] += 1
 
         (CPU.OR, operand_address, cycle_count) = self.get_operand()
-        result = CPU.OR - CPU.ACC
+        result = (CPU.OR - CPU.ACC) & 0xFFFFFF
         if (CPU.CR.M==1) :
-            result = result + CPU.CR.C - 1
+            result = (result + CPU.CR.C - 1) & 0xFFFFFF
 
         CPU.CR.C = 0 if (result & 0x010000) > 0 else 1
         CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0

@@ -429,7 +429,6 @@ class OpcodeF0_Shift(F100_Opcode) :
             else:
                 operand = CPU.ACC
 
-            overflow = 0
             if IR.S == 0 and IR.J <2:
                 result = sra(operand, IR.B)
                 CR.S = 1 if result & 0x8000 else 0
@@ -440,11 +439,12 @@ class OpcodeF0_Shift(F100_Opcode) :
                 result = rotr(operand, IR.B)
             elif IR.S == 1 and IR.J != 3:
                 (result, overflow) = sll(operand, IR.B)
-                if IR.J != 2:
-                    CR.S = 1 if result & 0x8000 else 0
-                    CR.V = overflow
             elif IR.S == 1 and IR.J == 3:
                 result = rotl(operand, IR.B)
+
+            # Always computer S and V even when meaningless
+            CR.S = 1 if result & 0x8000 else 0
+            CR.V = 1 if (result & 0x8000) != (operand & 0x8000) else 0
 
             if IR.R == 1:
                 CR.fromint(result)
@@ -456,16 +456,14 @@ class OpcodeF0_Shift(F100_Opcode) :
         else:
             # Double length shifts use LSB of J field to extend shift number
             shift_dist = ( (IR.J << 4) | IR.B )  & 0x1F
-            overflow =  0
             if IR.S == 0 and IR.J <2:
                 (result, result1) = d_sra(CPU.ACC, CPU.OR, shift_dist)
             elif IR.S == 0:
                 (result, result1) = d_srl(CPU.ACC, CPU.OR, shift_dist)
             else:
                 (result, result1, overflow) = d_sll(CPU.ACC, CPU.OR, shift_dist)
-            if IR.J < 2:
-                CR.S = 1 if result & 0x8000 else 0
-                CR.V = overflow
+            CR.S = 1 if result & 0x8000 else 0
+            CR.V = 1 if (result & 0x8000) != (CPU.ACC & 0x8000) else 0            
 
             CPU.ACC = result
             CPU.OR = result1

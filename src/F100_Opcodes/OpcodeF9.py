@@ -85,16 +85,16 @@ class OpcodeF9(F100_Opcode) :
 
         (CPU.OR, operand_address, cycle_count) = self.get_operand()
 
-        result = CPU.OR + CPU.ACC
+        result = (CPU.OR + CPU.ACC) & 0xFFFFFF
 
         if (CPU.CR.M==1) :
-            result = result + CPU.CR.C
+            result = (result + CPU.CR.C) & 0xFFFFFF
         if ((CPU.ACC & 0x8000) == (CPU.OR & 0x8000)) and ((result & 0x8000) != (CPU.ACC & 0x8000)):
             CPU.CR.V = 1
         else:
             CPU.CR.V = 0
 
-        CPU.ACC = result
+        CPU.ACC = result & 0xFFFF
 
         CPU.CR.C = 1 if (result & 0x010000) > 0 else 0
         CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
