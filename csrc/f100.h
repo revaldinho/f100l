@@ -16,7 +16,7 @@
 #define TRUNC16(m)        (m & 0xFFFF) 
 #define TRUNC15(m)        (m & 0x7FFF) 
 #define INC_ADDR(m,n)     (m = TRUNC15(m+n))
-#define FETCH15(m, o, pc) o=TRUNC15(read_mem(m, pc)); INC_ADDR(pc,1)
+#define FETCH15(m, o, pc) o=TRUNC15(read_mem(pc)); INC_ADDR(pc,1)
 #define HALT(ir)          (ir.F==0 && ir.T==1)
 #define LSP               0
 
@@ -83,6 +83,3 @@ extern cpu_t f100_init();
 extern void  f100_reset(bool adsel);
 extern void  f100_trace(bool header);
 extern int   f100_exec(int max_instr, bool trace_on);
-
-extern uint16_t read_mem( uint16_t mem[], uint16_t addr );
-extern void write_mem( uint16_t mem[], uint16_t addr, uint16_t data );

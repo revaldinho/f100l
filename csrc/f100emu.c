@@ -10,17 +10,6 @@
 #define GRPSZ  8
 #define F100MEMSZ 65536
 
-// Memory access routines (will be external and provided by emulation environment)
-uint16_t read_mem( uint16_t mem[], uint16_t addr )  {
-  uint16_t data = mem[addr];
-  if (false) printf("  MEM READ : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);    
-  return data;
-}
-void write_mem( uint16_t mem[], uint16_t addr, uint16_t data ) {
-  if (false) printf("  MEM WRITE: addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);      
-  mem[addr] = data;
-}
-
 void hex16dump( uint16_t data[], int dlen) {
   int i, j, max;
   char *astr = (char * ) malloc (2*GRPSZ + 1);
