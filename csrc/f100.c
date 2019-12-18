@@ -11,26 +11,19 @@
 #define GRPSZ  8
 #define F100MEMSZ 65536
 
-
 // Global Variables
-bool     verbose = false;
-cpu_t    cpu;
-uint16_t operand_address, target;
-bool     tron;
-
-// Memory access routines (will be external and provided by emulation environment)
-uint16_t read_mem( uint16_t mem[], uint16_t addr )  {
-  uint16_t data = mem[addr];
-  if (false) printf("  MEM READ : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);    
-  return data;
-}
-void write_mem( uint16_t mem[], uint16_t addr, uint16_t data ) {
-  if (false) printf("  MEM WRITE: addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);      
-  mem[addr] = data;
-}
+static bool     verbose = false;
+static bool     tron;
+static cpu_t    cpu;
+static uint16_t operand_address, target;
 
 // CPU Functions
-void decode( uint16_t word) {
+cpu_t f100_init() {  
+  cpu.mem = (uint16_t *) malloc(F100MEMSZ * sizeof(uint16_t));
+  return cpu;
+}
+
+static void decode( uint16_t word) {
   cpu.ir.WORD = word;
   cpu.ir.F = (word>>12) & 0x000F ;
   cpu.ir.I = (word>>11) & 0x0001 ;
@@ -42,22 +35,22 @@ void decode( uint16_t word) {
   cpu.ir.P = word       & 0x00FF ;
   cpu.ir.N = word       & 0x07FF ;
 }
-
-void trace(uint16_t *mem, bool header) {
+ 
+void f100_trace(bool header) {
   if (header) {
     printf("%4s : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");   
   } else {
     char *mnem = mnemonic[cpu.ir.F];
     printf("%04X : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X  %04X   %04X   %04X  : %s\n", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,  \
-           cpu.F, cpu.M, cpu.C, cpu.S, cpu.V, cpu.Z, cpu.I, mem[LSP], mem[TRUNC15(mem[LSP]-2)], mem[TRUNC15(mem[LSP]-1)], mem[TRUNC15(mem[LSP])], mnem);
+           cpu.F, cpu.M, cpu.C, cpu.S, cpu.V, cpu.Z, cpu.I, cpu.mem[LSP], cpu.mem[TRUNC15(cpu.mem[LSP]-2)], cpu.mem[TRUNC15(cpu.mem[LSP]-1)], cpu.mem[TRUNC15(cpu.mem[LSP])], mnem);
   }
 }
 
-void reset(bool adSel ) {
+void f100_reset(bool adSel ) {
   cpu.pc = (adSel) ? 2048 : 16384 ;
 }
 
-int exec(int max_instr, bool trace_on) {
+int f100_exec(int max_instr, bool trace_on) {
   uint32_t result;
   uint16_t stack_pointer;
   uint16_t pointer;
@@ -72,7 +65,7 @@ int exec(int max_instr, bool trace_on) {
     
     // Fetch and decode operand
     decode(read_mem(cpu.mem, cpu.pc));
-    if ( tron ) trace (cpu.mem, false);
+    if ( tron ) f100_trace (false);
     INC_ADDR(cpu.pc,1);
 
     // Fetch additional Operands if required
@@ -103,7 +96,7 @@ int exec(int max_instr, bool trace_on) {
     }                    
     
 
-    // Execute instruction
+    // F100_Execute instruction
     switch ( cpu.ir.F ) {
     case OP_F0:
       if (cpu.ir.T==0 && cpu.ir.S<2) { // Shifts
@@ -260,100 +253,4 @@ int exec(int max_instr, bool trace_on) {
     }
   }
   if (HALT(cpu.ir)) return (int) cpu.ir.WORD; else return 0;  
-}
-
-void hex16dump( uint16_t data[], int dlen) {
-  int i, j, max;
-  char *astr = (char * ) malloc (2*GRPSZ + 1);
-  char *dstr = (char * ) malloc (5*GRPSZ + 1);
-  astr[2*GRPSZ]='\0';
-  dstr[5*GRPSZ]='\0';
-  max = dlen + ((dlen%GRPSZ>0)?dlen + GRPSZ - dlen%GRPSZ: 0);
-  for (i=0; i< max ; i++ ) {
-    j=i%GRPSZ;
-    sprintf( dstr+(j*5), "%04X ", data[i] ) ;  
-      sprintf( astr+(j*2), "%c%c", INTTOPRINT((data[i]>>8)&0xFF),INTTOPRINT(data[i]&0xFF));
-      if (j==GRPSZ-1) printf( "%04X: %s%s%c", i-j, dstr, astr, (i>0)?'\n':'\0');
-  }
-}
-
-void read_hex_file( uint16_t *mem, char *filename, bool big_endian){
-  char buf[BUFSZ];
-  char hstr[BUFSZ+1];
-  int n, hexn=0, i, j ;
-  int first, second;
-  if (big_endian) {
-    first = 256;
-    second = 1;
-  } else {
-    first = 1;
-    second = 256;
-  }
-  
-  FILE *f = fopen( filename, "rt") ;  
-    while( (n=fread( buf, 1, BUFSZ, f))> 0) {
-      for (i=0 ; i<n ; i++) if (ISHEXCH(buf[i])) hstr[hexn++]=buf[i];
-      for (j=0; j<=hexn-4; j+=4) {
-        *mem++=(HEXPAIRTOD(hstr[j],hstr[j+1])*first)+(HEXPAIRTOD(hstr[j+2],hstr[j+3])*second);
-      }
-      // Digits left over must be carried forward to the next line
-      for (i=0; j<hexn; j++) hstr[i++] = hstr[j];
-      hexn = i;
-    }
-    fclose(f);
-}
-
-void read_bin_file( uint16_t *mem, char *filename){
-  char buf[BUFSZ+2];
-  int n, j ; 
-  FILE *f = fopen( filename, "rb") ;  
-    while( (n=fread( buf, 1, BUFSZ-(BUFSZ%2), f))> 0) {
-      for (j=0; j<=n-2; j+=2) *mem++=((buf[j]&0xFF)<<8) + (buf[j+1]&0xFF);
-    }
-    fclose(f);
-}
-
-void usage(){
-  puts("Usage:\n   f100emu -f <filename> [-b][-v][-h]");
-  puts("Options:\n   -f <filename>  program file name");
-  puts("   -b       program file in binary format");
-  puts("   -x       program file in hex format (default)");
-  puts("   -v       verbose mode: turns on more debug messages");
-  puts("   -h       print this summary");
-  exit(0);
-}
-
-
-int main (int argc, char **argv ) {
-  uint16_t *mem;
-  int c;
-  bool binaryNotHex=false;
-  char *filename=NULL;
-  opterr = 0;
-  
-  while ( (c=getopt(argc, argv,"bhvxf:")) != -1 ) {
-    switch(c) {
-    case 'f': filename = optarg; break;
-    case 'v': verbose = true; break;
-    case 'b': binaryNotHex = true; break;
-    case 'x': binaryNotHex = false; break;
-    default : usage(); break;
-    }
-  }    
-  if ( filename==NULL) usage();
-  else if ( access(filename,R_OK) == -1 ) {
-    printf("Error - file %s cannot be opened for reading in read_hex_file\n", filename);
-    exit(1);
-  }
-  
-  cpu.mem = (uint16_t *) malloc(F100MEMSZ * sizeof(uint16_t));
-  if (binaryNotHex) read_bin_file(cpu.mem, filename);
-  else read_hex_file(cpu.mem, filename, false);
-
-  if (verbose) hex16dump(cpu.mem+2048, 64);
-  
-  trace(cpu.mem, true);
-  reset(true);
-  exec (200, verbose);
-  return (0);
 }

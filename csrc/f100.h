@@ -77,3 +77,12 @@ typedef struct {
   bool F;
   instr_t ir;
 } cpu_t;
+
+
+extern cpu_t f100_init();
+extern void  f100_reset(bool adsel);
+extern void  f100_trace(bool header);
+extern int   f100_exec(int max_instr, bool trace_on);
+
+extern uint16_t read_mem( uint16_t mem[], uint16_t addr );
+extern void write_mem( uint16_t mem[], uint16_t addr, uint16_t data );
