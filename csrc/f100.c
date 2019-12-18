@@ -23,6 +23,7 @@
 #define TRUNC16(m)        (m & 0xFFFF) 
 #define TRUNC15(m)        (m & 0x7FFF) 
 #define INC_ADDR(m,n)     (m = TRUNC15(m+n))
+#define FETCH15(m, o, pc) o=TRUNC15(read_mem(m, pc)); INC_ADDR(pc,1)
 #define HALT(ir)          (ir.F==0 && ir.T==1)
 #define LSP               0
 
@@ -147,61 +148,39 @@ int exec(int max_instr, bool trace_on) {
 
   tron = trace_on;
   for ( i=0; i<max_instr ; i++ ) {
-
+    
     // Fetch and decode operand
     decode(read_mem(cpu.mem, cpu.pc));
     if ( tron ) trace (cpu.mem, false);
     INC_ADDR(cpu.pc,1);
 
     // Fetch additional Operands if required
-    if ( cpu.ir.F==OP_F0 && cpu.ir.T==1) {
-      // HALT
-      break;    
-    } else if ( cpu.ir.F==1) {
-      // SJM - ignore all addressing bits
-    } else if ( cpu.ir.F!=0 && cpu.ir.I==0) {
-      if (cpu.ir.N!=0) {
-        // immediate data (single word)
-        operand_address = cpu.ir.N;
-      } else {
-        // immediate data address mode (double word)
-        operand_address = cpu.pc; 
-        INC_ADDR(cpu.pc,1);        
-      }
-      // ICZ can take an additional operand
-      if (cpu.ir.F==OP_ICZ) {
-        operand1_address = TRUNC15(read_mem(cpu.mem, cpu.pc));
-        INC_ADDR(cpu.pc,1);
-      }                    
-    } else if ( cpu.ir.F!=0 && cpu.ir.I==1 && cpu.ir.P!=0) {
-      // Pointer indirect (single word)
+    if ( cpu.ir.F==OP_F0 && cpu.ir.T==1) { // HALT
+      break; 
+    } else if ( cpu.ir.F==1) {  // SJM - ignore all addressing bits
+    } else if ( cpu.ir.F!=0 && cpu.ir.I==0 && cpu.ir.N!=0) { // Direct data (single word)
+      operand_address = cpu.ir.N;
+    } else if ( cpu.ir.F!=0 && cpu.ir.I==0 && cpu.ir.N==0) { // Immediate data (double word)
+      operand_address = cpu.pc; 
+      INC_ADDR(cpu.pc,1);        
+    } else if ( cpu.ir.F!=0 && cpu.ir.I==1 && cpu.ir.P!=0) { // Pointer indirect (single word)
       pointer = TRUNC15(read_mem(cpu.mem, cpu.ir.P));
       if ( cpu.ir.R==1 ) INC_ADDR(pointer,1);
       operand_address = read_mem(cpu.mem, pointer);
       if ( cpu.ir.R==3 ) INC_ADDR(pointer,-1);
       write_mem(cpu.mem, cpu.ir.P, pointer);      
-      if (cpu.ir.F==OP_ICZ) {
-        operand1_address = TRUNC15(read_mem(cpu.mem, cpu.pc));
-        INC_ADDR(cpu.pc,1);
-      }
-    } else if (cpu.ir.F!=0 && cpu.ir.I==1 && cpu.ir.P==0) {
-      // Immediate Indirect address (double word)
-      operand_address = TRUNC15(read_mem(cpu.mem, cpu.pc));
-      INC_ADDR(cpu.pc,1);
-      if (cpu.ir.F==OP_ICZ) {
-        operand1_address = TRUNC15(read_mem(cpu.mem, cpu.pc));
-        INC_ADDR(cpu.pc,1);
-      }        
-    } else if (cpu.ir.F==0 && cpu.ir.T==0 && (cpu.ir.R==3||cpu.ir.S==2)) {
-      // Shifts, bit manipulation and jumps
-      operand_address = TRUNC15(read_mem(cpu.mem, cpu.pc));
-      INC_ADDR(cpu.pc,1);
-      if (cpu.ir.S==2 && cpu.ir.R==3) {
-        // Jumps (triple word) 
-        operand1_address = TRUNC15(read_mem(cpu.mem, cpu.pc));
-        INC_ADDR(cpu.pc,1);
+    } else if (cpu.ir.F!=0 && cpu.ir.I==1 && cpu.ir.P==0) { // Immediate Indirect address (double word)
+      FETCH15(cpu.mem, operand_address, cpu.pc);
+    } else if (cpu.ir.F==0 && cpu.ir.T==0 && (cpu.ir.R==3||cpu.ir.S==2)) { // Shifts, bit manipulation and jumps
+      FETCH15(cpu.mem, operand_address, cpu.pc);
+      if (cpu.ir.S==2 && cpu.ir.R==3) { // Jumps (triple word) 
+        FETCH15(cpu.mem, operand1_address, cpu.pc);
       }
     }
+    if (cpu.ir.F==OP_ICZ) { // ICZ takes an additional operand
+      FETCH15(cpu.mem, operand1_address, cpu.pc);
+    }                    
+    
 
     // Execute instruction
     switch ( cpu.ir.F ) {
