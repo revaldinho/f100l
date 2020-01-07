@@ -91,7 +91,8 @@ int f100_exec(int max_instr, bool trace_on) {
     } else if ( cpu.ir.F!=0 && cpu.ir.I==1 && cpu.ir.P!=0) { // Pointer indirect (single word)
       pointer = TRUNC15(read_mem(cpu.ir.P));
       if ( cpu.ir.R==1 ) INC_ADDR(pointer,1);
-      operand_address = read_mem( pointer);
+      //operand_address = read_mem(pointer);
+      operand_address = pointer;      
       if ( cpu.ir.R==3 ) INC_ADDR(pointer,-1);
       write_mem(cpu.ir.P, pointer);      
     } else if (cpu.ir.F!=0 && cpu.ir.I==1 && cpu.ir.P==0) { // Immediate Indirect address (double word)

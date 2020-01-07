@@ -98,9 +98,10 @@ int main (int argc, char **argv ) {
   f100_cpu = f100_init();
   if (binaryNotHex) read_bin_file(f100_cpu.mem, filename);
   else read_hex_file(f100_cpu.mem, filename, false);
-  if (verbose) hex16dump(f100_cpu.mem+2048, 64);  
+  if (verbose) hex16dump(f100_cpu.mem,0x3000 );      
   f100_trace(true);
   f100_reset(true);
   f100_exec(200, verbose);
+  if (verbose) hex16dump(f100_cpu.mem,0x6000 );    
   return (0);
 }
