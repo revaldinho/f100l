@@ -108,6 +108,6 @@ int main (int argc, char **argv ) {
   f100_trace(true);
   f100_reset(true);
   f100_exec(50000, verbose);
-  if (verbose) hex16dump(f100_cpu.mem,0x6000,"cdump.hexl");
+  if (verbose) hex16dump(f100_cpu.mem,0x8000,"cdump.hexl");
   return (0);
 }

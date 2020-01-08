@@ -25,12 +25,12 @@ cpu_t f100_init() {
 
 static uint16_t read_mem( uint16_t addr )  {
   uint16_t data = cpu.mem[addr];
-  if (false) printf("  MEM READ : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);    
+  if (true) printf("  MEM READ : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);    
   return data;
 }
 
 static void write_mem( uint16_t addr, uint16_t data ) {
-  if (false) printf("  MEM WRITE: addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);      
+  if (true) printf("  MEM WRITE: addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);      
   cpu.mem[addr] = data;
 }
 
@@ -233,8 +233,9 @@ int f100_exec(int max_instr, bool trace_on) {
     case OP_SUB:
     case OP_CMP:    
       cpu.or = read_mem(operand_address);
-      result = cpu.or - cpu.acc;       
-      if (cpu.M || cpu.ir.F==OP_SBS) result += cpu.C-1;
+      result = cpu.or - cpu.acc;
+      // Carry respected only in M=1 mode
+      if (cpu.M && cpu.ir.F==OP_SBS) result += cpu.C-1;
       COMPUTE_BORROW(result) ;
       COMPUTE_OVERFLOW(result, cpu.acc, cpu.or) ;
       COMPUTE_SIGN(result) ;
