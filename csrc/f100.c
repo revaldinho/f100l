@@ -72,8 +72,8 @@ int f100_exec(int max_instr, bool trace_on) {
   int i;
 
   tron = trace_on;
+
   for ( i=0; i<max_instr ; i++ ) {
-    
     // Fetch and decode operand
     decode(read_mem(cpu.pc));
     if ( tron ) f100_trace (false);
@@ -252,7 +252,7 @@ int f100_exec(int max_instr, bool trace_on) {
       COMPUTE_SIGN(result) ;
       COMPUTE_ZERO(result) ; 
       if (cpu.ir.F==OP_ADS) write_mem(operand_address, TRUNC16(result));
-      else if (cpu.ir.F==OP_ADD) cpu.acc=TRUNC16(result);
+      else cpu.acc=TRUNC16(result); // ADD
       break;
     case OP_AND:
     case OP_NEQ:

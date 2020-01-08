@@ -7,23 +7,29 @@
 #include "f100.h"
 
 #define BUFSZ 16
-#define GRPSZ  8
+#define GRPSZ 16
 #define F100MEMSZ 65536
 
-void hex16dump( uint16_t data[], int dlen) {
+void hex16dump( uint16_t data[], int dlen, char *filename) {
+  FILE *f;
   int i, j, max;
   char *astr = (char * ) malloc (2*GRPSZ + 1);
   char *dstr = (char * ) malloc (5*GRPSZ + 1);
   astr[2*GRPSZ]='\0';
   dstr[5*GRPSZ]='\0';
   max = dlen + ((dlen%GRPSZ>0)?dlen + GRPSZ - dlen%GRPSZ: 0);
+
+  if ( filename != NULL ) f = fopen(filename,"w") ;else f=stdout;
+
   for (i=0; i< max ; i++ ) {
     j=i%GRPSZ;
     sprintf( dstr+(j*5), "%04X ", data[i] ) ;  
       sprintf( astr+(j*2), "%c%c", INTTOPRINT((data[i]>>8)&0xFF),INTTOPRINT(data[i]&0xFF));
-      if (j==GRPSZ-1) printf( "%04X: %s%s%c", i-j, dstr, astr, (i>0)?'\n':'\0');
+      if (j==GRPSZ-1) fprintf( f, "%04X: %s%s%c", i-j, dstr, astr, (i>0)?'\n':'\0');
   }
+  if (f != stdout) fclose(f);
 }
+
 
 void read_hex_file( uint16_t *mem, char *filename, bool big_endian){
   char buf[BUFSZ];
@@ -98,10 +104,10 @@ int main (int argc, char **argv ) {
   f100_cpu = f100_init();
   if (binaryNotHex) read_bin_file(f100_cpu.mem, filename);
   else read_hex_file(f100_cpu.mem, filename, false);
-  if (verbose) hex16dump(f100_cpu.mem,0x3000 );      
+  //if (verbose) hex16dump(f100_cpu.mem,0x1000, NULL );
   f100_trace(true);
   f100_reset(true);
-  f100_exec(200, verbose);
-  if (verbose) hex16dump(f100_cpu.mem,0x6000 );    
+  f100_exec(50000, verbose);
+  if (verbose) hex16dump(f100_cpu.mem,0x6000,"cdump.hexl");
   return (0);
 }

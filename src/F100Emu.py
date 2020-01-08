@@ -99,6 +99,33 @@ def print_header():
     print("# PC   : Memory         : Acc. OR.  F M C S V Z I  : Instruction")
     print("# -------------------------------------------------------------------------------------------")
 
+    
+
+def INTTOPRINT(c):
+    if (c>31 and c<128):
+        return c
+    else:
+        return '.'
+
+def hex16dump( data, dlen, filename=None):
+    GRPSZ = 16
+    astr = list()
+    dstr = list()
+
+    max = dlen + ((dlen + GRPSZ - dlen%GRPSZ) if (dlen%GRPSZ>0) else 0)
+    if ( filename != None ) :
+        f = open(filename,"w")
+    else:
+        f =sys.stdout
+    for i in range (0, max):
+        j=i%GRPSZ;
+        dstr.append("%04X" % data[i] ) 
+        astr.append("%c%c" % (INTTOPRINT((data[i]>>8)&0xFF),INTTOPRINT(data[i]&0xFF)))
+        if (j==GRPSZ-1) :
+            f.write( "%04X: %s %s%c" % ( i-j, ' '.join(dstr), ''.join(astr), '\n' if (i>0) else '\0'))
+            astr = list()
+            dstr = list()            
+
 class F100Emu:
     def __init__ (self, adsel=1, traceon=False):
         self.CPU = F100CPU(adsel=adsel, traceon=traceon)
@@ -137,6 +164,8 @@ class F100Emu:
          CPU.memory_read(PC+2,nostats=True),\
          CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.F,CR.M,CR.C,CR.S,CR.V,CR.Z,CR.I ),end='')
 
+
+        
 
 if __name__ == "__main__" :
     filename = ""
@@ -211,14 +240,15 @@ if __name__ == "__main__" :
     et = time.time()
 
     if memdumpon:
-        with open(memdump_filename, "w") as f:
-            if memdump_lo != None and memdump_hi != None:
-                for adr in range(memdump_lo, memdump_hi+1):
-                    if adr in emu.CPU.RAM_writeset:
-                        f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.memory_read(adr,nostats=True)))
-            else:
-                for adr in sorted(emu.CPU.RAM_writeset):
-                    f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.memory_read(adr,nostats=True)))
+        hex16dump( emu.CPU.RAM, 32768, memdump_filename)
+##        with open(memdump_filename, "w") as f:
+##            if memdump_lo != None and memdump_hi != None:
+##                for adr in range(memdump_lo, memdump_hi+1):
+##                    if adr in emu.CPU.RAM_writeset:
+##                        f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.memory_read(adr,nostats=True)))
+##            else:
+##                for adr in sorted(emu.CPU.RAM_writeset):
+##                    f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.memory_read(adr,nostats=True)))
 
 
     print("# -------------------------------------------------------------------------------------------")

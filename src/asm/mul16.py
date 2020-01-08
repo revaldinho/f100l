@@ -5,6 +5,35 @@ import random
 # test data must be pairs of operands
 test_data = []
 result_area = 0x5000
+memory = [0]*0x10000
+
+
+def INTTOPRINT(c):
+    if (c>31 and c<128):
+        return c
+    else:
+        return '.'
+
+def hex16dump( data, dlen, filename=None):
+    GRPSZ = 16
+    astr = list()
+    dstr = list()
+
+    max = dlen + ((dlen + GRPSZ - dlen%GRPSZ) if (dlen%GRPSZ>0) else 0)
+    if ( filename != None ) :
+        f = open(filename,"w")
+    else:
+        f =sys.stdout
+    for i in range (0, max):
+        j=i%GRPSZ;
+        dstr.append("%04X" % data[i] ) 
+        astr.append("%c%c" % (INTTOPRINT((data[i]>>8)&0xFF),INTTOPRINT(data[i]&0xFF)))
+        if (j==GRPSZ-1) :
+            f.write( "%04X: %s %s%c" % ( i-j, ' '.join(dstr), ''.join(astr), '\n' if (i>0) else '\0'))
+            astr = list()
+            dstr = list()            
+
+
 
 random.seed(0x12345)
 for i in range(0,200):
@@ -28,12 +57,14 @@ address = result_area
 for idx in range(0, len(test_data),2):
     a = test_data[idx]
     b = test_data[idx+1]
-    print_hex16(address,a)
+    memory[address]=a & 0xFFFF
     address+=1
-    print_hex16(address,b)
+    memory[address]=b & 0xFFFF
     address+=1
     result = (a * b )
-    print_hex16(address,(result>>16) & 0xFFFF)
+    memory[address]=(result>>16) & 0xFFFF
     address+=1
-    print_hex16(address,result)
+    memory[address]=result & 0xFFFF
     address+=1
+
+hex16dump(memory,32768,"mul16.hexl")    

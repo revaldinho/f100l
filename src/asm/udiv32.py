@@ -5,6 +5,7 @@ import random
 # test data must be pairs of operands
 test_data = []
 result_area = 0x5000
+memory = [0]*0x10000
 
 random.seed(0x12345)
 for i in range(0,200):
@@ -17,6 +18,30 @@ test_data[3] = 0x002
 test_data[4] = 0x001
 test_data[5] = 0x004
 
+def INTTOPRINT(c):
+    if (c>31 and c<128):
+        return c
+    else:
+        return '.'
+
+def hex16dump( data, dlen, filename=None):
+    GRPSZ = 16
+    astr = list()
+    dstr = list()
+
+    max = dlen + ((dlen + GRPSZ - dlen%GRPSZ) if (dlen%GRPSZ>0) else 0)
+    if ( filename != None ) :
+        f = open(filename,"w")
+    else:
+        f =sys.stdout
+    for i in range (0, max):
+        j=i%GRPSZ;
+        dstr.append("%04X" % data[i] ) 
+        astr.append("%c%c" % (INTTOPRINT((data[i]>>8)&0xFF),INTTOPRINT(data[i]&0xFF)))
+        if (j==GRPSZ-1) :
+            f.write( "%04X: %s %s%c" % ( i-j, ' '.join(dstr), ''.join(astr), '\n' if (i>0) else '\0'))
+            astr = list()
+            dstr = list()            
 
 def print_hex16( addr, data):
     print ("0x%04X : 0x%04X" % (addr, data&0xFFFF))
@@ -62,8 +87,9 @@ def udiv32(N,D):
         #print("N: 0x%08X" % N)
     return (Q,R)
 
+
 # write out data for the assembler test code
-with open("udiv32.inc","w") as f:
+with open("udiv32.inc","w") as f:    
   f.write("  .word 0x%04X\n" % (len(test_data)>>1) )
   for a in test_data:
     f.write("  .word 0x%04X, 0x%04X\n" % ( (a>>16)& 0xFFFF, a & 0xFFFF))
@@ -75,14 +101,15 @@ address = result_area
 for idx in range(0, len(test_data),2):
     a = test_data[idx]
     b = test_data[idx+1]
-
-    print_hex32(address,a)
+    memory[address] = a & 0xFFFF
     address+=2
-    print_hex32(address,b)
+    memory[address] = b & 0xFFFF
     address+=2
     # Test the 32 bit multiply Instruction
     (quotient,remainder) = udiv32(b,a)
-    print_hex32(address,remainder)
+    memory[address] = remainder & 0xFFFF
     address+=2
-    print_hex32(address,quotient)
+    memory[address] = quotient & 0xFFFF
     address+=2
+
+hex16dump(memory,32768,"udiv32.hexl")    
