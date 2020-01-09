@@ -95,11 +95,8 @@ def usage():
 
 def print_header():
     print(banner)
-    print("#                                   Condition Reg.")
-    print("# PC   : Memory         : Acc. OR.  F M C S V Z I  : Instruction")
-    print("# -------------------------------------------------------------------------------------------")
-
-    
+    print("# PC  :   OP :  ACC   OR : FMCSVZI :  LSP (LSP-2)(LSP-1)(LSP-0): Instruction")
+    print("# ---------------------------------------------------------------------------")
 
 def INTTOPRINT(c):
     if (c>31 and c<128):
@@ -149,23 +146,9 @@ class F100Emu:
                 i+=1
                 (byte_lo,valid) = h.read_byte(i)
                 i+=1
-            self.CPU.memory_write(local_addr, ((byte_hi << 8) | byte_lo ) & 0xFFFF, nostats=True )
+            self.CPU.memory_write(local_addr, ((byte_hi << 8) | byte_lo ) & 0xFFFF, nostats=True, notrace=True )
 
 
-    def print_machine_state(self):
-        CPU = self.CPU
-        PC = CPU.PC
-        CR = CPU.CR
-        IR = CPU.IR
-        print("  %04X : %04X %04X %04X : %04X %04X %d %d %d %d %d %d %d  : " % \
-        (PC & 0xFFFF,\
-         CPU.memory_read(PC,nostats=True),\
-         CPU.memory_read(PC+1,nostats=True),\
-         CPU.memory_read(PC+2,nostats=True),\
-         CPU.ACC & 0xFFFF ,CPU.OR & 0xFFFF ,CR.F,CR.M,CR.C,CR.S,CR.V,CR.Z,CR.I ),end='')
-
-
-        
 
 if __name__ == "__main__" :
     filename = ""
@@ -228,12 +211,8 @@ if __name__ == "__main__" :
     st = time.time()
     while True:
         emu.instr_count += 1
-        if listingon:
-            emu.print_machine_state()
         try:
             emu.CPU.single_step()
-            if listingon:
-                print( emu.CPU.IR.name)            
         except F100HaltException as e:
             print("HALT\n%s" %e)
             break

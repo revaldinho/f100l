@@ -24,7 +24,6 @@ from ConditionReg import ConditionReg
 
 class F100CPU:
     def __init__ (self, adsel=1, ramsize=32768, traceon=False ):
-        self.instr_disassembly=""        
         self.MEMTOP = ramsize-1
         self.traceon = traceon
         self.CR = ConditionReg()
@@ -38,7 +37,7 @@ class F100CPU:
         self.cycle_count = 0
         self.read_count = 0
         self.write_count = 0
-        self.modify_write_count = 0        
+        self.modify_write_count = 0
         self.instr_count = 0
         ## instance all the opcode classes, passing each a reference to the CPU resources
         self.opcode_classes = [ opcode(CPU=self) for opcode in [OpcodeF0,
@@ -50,6 +49,22 @@ class F100CPU:
         for o in self.opcode_classes:
             self.opcode_table[o.F] = o
         self.reset()
+
+    def print_machine_state(self):
+        PC = self.PC
+        CR = self.CR
+        IR = self.IR
+        LSP = self.memory_read(0,False,True)
+        print("%04X  : %04X : %04X %04X : %d%d%d%d%d%d%d : %04X  %04X   %04X   %04X  : %s" % \
+        ((PC-1) & 0xFFFF,\
+         IR.content, \
+         self.ACC & 0xFFFF ,self.OR & 0xFFFF, \
+         CR.F,CR.M,CR.C,CR.S,CR.V,CR.Z,CR.I,\
+         self.memory_read(0,False,True), \
+         self.memory_read((LSP-2) % 0x7FFF,False,True), \
+         self.memory_read((LSP-1) %0x7FFF,False,True), \
+         self.memory_read((LSP % 0x7FFF),False,True), \
+         self.IR.name) )
 
     def interrupt(self, channel=0):
         channel = channel & 0x3F
@@ -80,39 +95,43 @@ class F100CPU:
         self.PC = ( self.PC + 1 )  & 0x7FFF
         return result
 
-    def memory_read(self, address, nostats=False):
-        if self.traceon == True:
-            print ("READ 0x%04X 0x%04X" % ( address & 0xFFFF, self.RAM[address] & 0xFFFF))
+    def memory_read(self, address, nostats=False, notrace=False):
+        a = address & 0xFFFF
+        data = self.RAM[a] & 0xFFFF
+
+        if self.traceon == True and not notrace:
+            print ("LOAD  : addr=0x%04X (%6d) data=0x%04X (%6d)"%(a, a, data, data));
 
         if nostats== False:
             self.read_count += 1
-            
-        if 0 <= address <= self.MEMTOP:
-            return self.RAM[address]
-        else:
-            raise UserWarning("Memory out of range error for address 0x%04X" % address )
 
-    def memory_write(self, address, data, modify=False, nostats=False):
-        if self.traceon == True:
-            print ("STORE 0x%04X 0x%04X" % ( address & 0xFFFF, data & 0xFFFF))
+        if 0 <= a <= self.MEMTOP:
+            return data
+        else:
+            raise UserWarning("Memory out of range error for address 0x%04X" % a )
+
+    def memory_write(self, address, data, modify=False, nostats=False, notrace=False):
+        a = address & 0xFFFF
+        if self.traceon == True and notrace==False:
+            print ("STORE : addr=0x%04X (%6d) data=0x%04X (%6d)"%(a, a, data, data));
 
         if nostats == False:
             self.write_count += 1
             if modify:
                 self.modify_write_count += 1
-        if 0 <= address <= self.MEMTOP:
-            self.RAM[address] = (data & 0xFFFF)
-            self.RAM_writeset.add(address)
+        if 0 <= a <= self.MEMTOP:
+            self.RAM[a] = (data & 0xFFFF)
+            self.RAM_writeset.add(a)
         else:
-            raise UserWarning("Memory out of range error for address 0x%04X" % address )
+            raise UserWarning("Memory out of range error for address 0x%04X" % a )
 
     def single_step(self):
         self.IR.update(self.memory_fetch())
         if ( self.IR.F not in self.opcode_table):
             raise UserWarning("Cannot execute Opcode with function field 0x%X" % self.IR.F )
-        else:            
+        else:
+            if self.traceon:
+                self.print_machine_state()
             self.opcode_table[self.IR.F].execute()
-            self.instr_disassembly = self.IR.name
-        return
 
-    
+        return

@@ -121,7 +121,6 @@ class OpcodeF7(F100_Opcode) :
         CPU = self.CPU
         IR = CPU.IR
         self.execstats[IR.name] += 1
-
         # Get the first operand - address or value of counter
         (CPU.OR, operand_address, cycle_count) = self.get_operand()
         # fetch the second operand

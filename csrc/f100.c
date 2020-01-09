@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -47,10 +48,10 @@ static void decode( uint16_t word) {
 
 void f100_trace(bool header) {
   if (header) {
-    printf("%4s : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");
+    printf("%4s  : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");
   } else {
     char *mnem = mnemonic[cpu.ir.F];
-    printf("%04X : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X  %04X   %04X   %04X  : %s\n", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,  \
+    printf("%04X  : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X  %04X   %04X   %04X  : %s\n", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,  \
            cpu.F, cpu.M, cpu.C, cpu.S, cpu.V, cpu.Z, cpu.I, cpu.mem[LSP], cpu.mem[TRUNC15(cpu.mem[LSP]-2)], cpu.mem[TRUNC15(cpu.mem[LSP]-1)], cpu.mem[TRUNC15(cpu.mem[LSP])], mnem);
   }
 }
