@@ -15,21 +15,17 @@ void hex16dump( uint16_t data[], int dlen, char *filename) {
   int i, j, max;
   char *astr = (char * ) malloc (2*GRPSZ + 1);
   char *dstr = (char * ) malloc (5*GRPSZ + 1);
-  astr[2*GRPSZ]='\0';
-  dstr[5*GRPSZ]='\0';
+
   max = dlen + ((dlen%GRPSZ>0)?dlen + GRPSZ - dlen%GRPSZ: 0);
-
   if ( filename != NULL ) f = fopen(filename,"w") ;else f=stdout;
-
   for (i=0; i< max ; i++ ) {
     j=i%GRPSZ;
     sprintf( dstr+(j*5), "%04X ", data[i] ) ;  
-      sprintf( astr+(j*2), "%c%c", INTTOPRINT((data[i]>>8)&0xFF),INTTOPRINT(data[i]&0xFF));
-      if (j==GRPSZ-1) fprintf( f, "%04X: %s%s%c", i-j, dstr, astr, (i>0)?'\n':'\0');
+    sprintf( astr+(j*2), "%c%c", INTTOPRINT((data[i]>>8)&0xFF),INTTOPRINT(data[i]&0xFF));
+    if (j==GRPSZ-1) fprintf( f, "%04X: %s%s%c", i-j, dstr, astr, (i>0)?'\n':'\0');
   }
   if (f != stdout) fclose(f);
 }
-
 
 void read_hex_file( uint16_t *mem, char *filename, bool big_endian){
   char buf[BUFSZ];

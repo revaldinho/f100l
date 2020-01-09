@@ -7,8 +7,6 @@
 
 #include "f100.h"
 
-#define BUFSZ 16
-#define GRPSZ  8
 #define F100MEMSZ 65536
 
 // Global Variables
@@ -18,19 +16,19 @@ static cpu_t    cpu;
 static uint16_t operand_address, target;
 
 // CPU Functions
-cpu_t f100_init() {  
+cpu_t f100_init() {
   cpu.mem = (uint16_t *) malloc(F100MEMSZ * sizeof(uint16_t));
   return cpu;
 }
 
 static uint16_t read_mem( uint16_t addr )  {
   uint16_t data = cpu.mem[addr];
-  if (true) printf("  MEM READ : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);    
+  if (true) printf("LOAD  : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
   return data;
 }
 
 static void write_mem( uint16_t addr, uint16_t data ) {
-  if (true) printf("  MEM WRITE: addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);      
+  if (true) printf("STORE : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
   cpu.mem[addr] = data;
 }
 
@@ -46,10 +44,10 @@ static void decode( uint16_t word) {
   cpu.ir.P = word       & 0x00FF ;
   cpu.ir.N = word       & 0x07FF ;
 }
- 
+
 void f100_trace(bool header) {
   if (header) {
-    printf("%4s : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");   
+    printf("%4s : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");
   } else {
     char *mnem = mnemonic[cpu.ir.F];
     printf("%04X : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X  %04X   %04X   %04X  : %s\n", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,  \
@@ -68,7 +66,7 @@ int f100_exec(int max_instr, bool trace_on) {
   uint16_t operand_address;
   uint16_t operand1_address;
   uint16_t operand;
-  
+
   int i;
 
   tron = trace_on;
@@ -81,32 +79,31 @@ int f100_exec(int max_instr, bool trace_on) {
 
     // Fetch additional Operands if required
     if ( cpu.ir.F==OP_F0 && cpu.ir.T==1) { // HALT
-      break; 
+      break;
     } else if ( cpu.ir.F==1) {  // SJM - ignore all addressing bits
     } else if ( cpu.ir.F!=0 && cpu.ir.I==0 && cpu.ir.N!=0) { // Direct data (single word)
       operand_address = cpu.ir.N;
     } else if ( cpu.ir.F!=0 && cpu.ir.I==0 && cpu.ir.N==0) { // Immediate data (double word)
-      operand_address = cpu.pc; 
-      INC_ADDR(cpu.pc,1);        
+      operand_address = cpu.pc;
+      INC_ADDR(cpu.pc,1);
     } else if ( cpu.ir.F!=0 && cpu.ir.I==1 && cpu.ir.P!=0) { // Pointer indirect (single word)
       pointer = TRUNC15(read_mem(cpu.ir.P));
       if ( cpu.ir.R==1 ) INC_ADDR(pointer,1);
-      //operand_address = read_mem(pointer);
-      operand_address = pointer;      
+      operand_address = pointer;
       if ( cpu.ir.R==3 ) INC_ADDR(pointer,-1);
-      write_mem(cpu.ir.P, pointer);      
+      write_mem(cpu.ir.P, pointer);
     } else if (cpu.ir.F!=0 && cpu.ir.I==1 && cpu.ir.P==0) { // Immediate Indirect address (double word)
       FETCH15(cpu.mem, operand_address, cpu.pc);
     } else if (cpu.ir.F==0 && cpu.ir.T==0 && (cpu.ir.R==3||cpu.ir.S==2)) { // Shifts, bit manipulation and jumps
       FETCH15(cpu.mem, operand_address, cpu.pc);
-      if (cpu.ir.S==2 && cpu.ir.R==3) { // Jumps (triple word) 
+      if (cpu.ir.S==2 && cpu.ir.R==3) { // Jumps (triple word)
         FETCH15(cpu.mem, operand1_address, cpu.pc);
       }
     }
     if (cpu.ir.F==OP_ICZ) { // ICZ takes an additional operand
       FETCH15(cpu.mem, operand1_address, cpu.pc);
-    }                    
-    
+    }
+
 
     // F100_Execute instruction
     switch ( cpu.ir.F ) {
@@ -122,8 +119,7 @@ int f100_exec(int max_instr, bool trace_on) {
             if (cpu.ir.S) result = (result<< 1 ) | ((cpu.ir.J==3)?((result>>15)&1):0);
             else result = (result >> 1)  | ((cpu.ir.J<2) ? (result & 0x8000): (cpu.ir.J==3)?(result&1)<<15 : 0);
           }
-          COMPUTE_OVERFLOW(result,operand,operand);
-          COMPUTE_SIGN(result);          
+          COMPUTE_SV(result,operand,operand);
           if (cpu.ir.R==1) {
             // Overwrite flags with the shifted value
             cpu.or = TRUNC16(result);
@@ -143,8 +139,7 @@ int f100_exec(int max_instr, bool trace_on) {
             if (cpu.ir.S) quad_result = quad_result << 1 ;
             else quad_result = (quad_result >> 1)  | ((cpu.ir.J<2)?(quad_result&0x80000000):0);
           }
-          COMPUTE_OVERFLOW((quad_result>>16), cpu.acc, cpu.acc);
-          COMPUTE_SIGN(quad_result>>16); 
+          COMPUTE_SV((quad_result>>16), cpu.acc, cpu.acc);
           cpu.acc = TRUNC16((quad_result>>16));
           cpu.or = TRUNC16(quad_result);
           if (cpu.ir.R==1) {
@@ -152,7 +147,7 @@ int f100_exec(int max_instr, bool trace_on) {
             UNPACK_FLAGS(cpu.or);
           } else if (cpu.ir.R==3) {
             write_mem(operand_address, cpu.or);
-          } 
+          }
         }
       } else if ( cpu.ir.T==0 && cpu.ir.S>1) { //  Bit conditional jumps and Bit manipulation
         uint16_t bmask;
@@ -162,8 +157,8 @@ int f100_exec(int max_instr, bool trace_on) {
           jump_address = operand1_address;
         } else if (cpu.ir.R==1) {
           operand = PACK_FLAGS;
-          jump_address = operand_address;          
-        } else { 
+          jump_address = operand_address;
+        } else {
           operand=cpu.acc;
           jump_address=operand_address;
         }
@@ -186,10 +181,10 @@ int f100_exec(int max_instr, bool trace_on) {
           }
         }
       }
-      break;      
-    case OP_SJM: 
+      break;
+    case OP_SJM:
       INC_ADDR( cpu.pc, cpu.acc ) ;
-      break;      
+      break;
     case OP_CAL:
       // Special case for immed. addr - push imm data addr onto stack and set it to be PC also
       stack_pointer = read_mem( LSP);
@@ -217,53 +212,50 @@ int f100_exec(int max_instr, bool trace_on) {
         flags = PACK_FLAGS;
         new_flags = read_mem( stack_pointer);
         flags = (new_flags & 0x3F) | (flags & 0x60) ;
-        UNPACK_FLAGS(flags);        
+        UNPACK_FLAGS(flags);
       }
       write_mem(LSP, TRUNC15(stack_pointer-2));
       break;
     case OP_LDA:
     case OP_STO:
-      if ( cpu.ir.F==OP_LDA) cpu.acc = read_mem(operand_address); 
+      if ( cpu.ir.F==OP_LDA) cpu.acc = read_mem(operand_address);
       else write_mem(operand_address, cpu.acc);
-      COMPUTE_ZERO(cpu.acc) ;
-      COMPUTE_SIGN(cpu.acc) ; 
+      COMPUTE_SZ(cpu.acc) ;
       CLEAR_OVERFLOW ;
       break;
     case OP_SBS:
     case OP_SUB:
-    case OP_CMP:    
+    case OP_CMP:
+    case OP_ADS:
+    case OP_ADD:
       cpu.or = read_mem(operand_address);
-      result = cpu.or - cpu.acc;
-      // Carry respected only in M=1 mode
-      if (cpu.M && cpu.ir.F==OP_SBS) result += cpu.C-1;
-      COMPUTE_BORROW(result) ;
-      COMPUTE_OVERFLOW(result, cpu.acc, cpu.or) ;
-      COMPUTE_SIGN(result) ;
-      COMPUTE_ZERO(result) ; 
-      if (cpu.ir.F==OP_SBS) write_mem(operand_address, TRUNC16(result));
-      else if (cpu.ir.F==OP_SUB) cpu.acc=TRUNC16(result);
-      break;
-    case OP_ADS: 
-    case OP_ADD: 
-      cpu.or = read_mem(operand_address);
-      result = cpu.acc + cpu.or;
-      if (cpu.M || cpu.ir.F==OP_ADS) result += cpu.C;
-      COMPUTE_CARRY(result) ;
-      COMPUTE_OVERFLOW(result, cpu.acc, cpu.or) ;
-      COMPUTE_SIGN(result) ;
-      COMPUTE_ZERO(result) ; 
-      if (cpu.ir.F==OP_ADS) write_mem(operand_address, TRUNC16(result));
-      else cpu.acc=TRUNC16(result); // ADD
+      if (cpu.ir.F==OP_SBS||cpu.ir.F==OP_SUB||cpu.ir.F==OP_CMP) {
+        result = cpu.or - cpu.acc;
+        if (cpu.M) result += cpu.C-1;
+        COMPUTE_BORROW(result) ;
+      } else {
+        result = cpu.acc + cpu.or;
+        if (cpu.M) result += cpu.C;
+        COMPUTE_CARRY(result) ;
+      }
+      COMPUTE_SVZ(result, cpu.acc, cpu.or) ;
+      if (cpu.ir.F==OP_ADS || cpu.ir.F==OP_SBS) write_mem(operand_address, TRUNC16(result));
+      else if (cpu.ir.F!=OP_CMP) cpu.acc=TRUNC16(result);
       break;
     case OP_AND:
     case OP_NEQ:
       cpu.or = read_mem(operand_address);
-      cpu.acc = (cpu.ir.F==OP_AND)? cpu.acc&cpu.or : cpu.acc^cpu.or;
-      COMPUTE_ZERO(cpu.acc) ;
-      COMPUTE_SIGN(cpu.acc) ;
-      SET_CARRY ;
+      if (cpu.ir.F==OP_AND) {
+        cpu.acc = cpu.acc&cpu.or;
+        SET_CARRY ;
+      } else {
+        cpu.acc = cpu.acc^cpu.or;
+        CLEAR_CARRY;
+      }
+      COMPUTE_SZ(cpu.acc);
+      break;
     default: break;
     }
   }
-  if (HALT(cpu.ir)) return (int) cpu.ir.WORD; else return 0;  
+  if (HALT(cpu.ir)) return (int) cpu.ir.WORD; else return 0;
 }
