@@ -219,8 +219,8 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
       if (cpu.ir.I == 0) {
         uint16_t flags, new_flags;
         flags = PACK_FLAGS;
-        new_flags = read_mem( stack_pointer);
-        flags = (new_flags & 0x3F) | (flags & 0x60) ;
+        new_flags = read_mem(stack_pointer);
+        flags = (new_flags & 0x3F) | (flags & 0xC0) ;
         UNPACK_FLAGS(flags);
       }
       write_mem(LSP, TRUNC15(stack_pointer-2));

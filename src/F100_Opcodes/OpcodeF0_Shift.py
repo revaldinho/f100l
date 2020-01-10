@@ -422,10 +422,10 @@ class OpcodeF0_Shift(F100_Opcode) :
         if CR.M == 0 :
             # Single length shifts and rotates
             if IR.R == 1:
-                operand = CR.toint()
+                operand = CPU.OR = CR.toint()
             elif IR.R == 3:
                 operand_addr = CPU.memory_fetch()
-                operand = CPU.memory_read(operand_addr)
+                operand = CPU.OR = CPU.memory_read(operand_addr)
             else:
                 operand = CPU.ACC
 
@@ -448,8 +448,10 @@ class OpcodeF0_Shift(F100_Opcode) :
 
             if IR.R == 1:
                 CR.fromint(result)
+                CPU.OR = result
             elif IR.R ==3:
                 CPU.memory_write(operand_addr, result)
+                CPU.OR = result                
             else:
                 CPU.ACC = result
 

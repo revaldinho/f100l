@@ -71,14 +71,7 @@ EXAMPLES ::
 banner =\
 '''
 # -------------------------------------------------------------------------------------------
-#    _____________  ____        __       ______                __      __
-#   / ____<  / __ \/ __ \      / /      / ____/___ ___  __  __/ /___ _/ /_____  _____
-#  / /_   / / / / / / / /_____/ /      / __/ / __ `__ \/ / / / / __ `/ __/ __ \/ ___/
-# / __/  / / /_/ / /_/ /_____/ /___   / /___/ / / / / / /_/ / / /_/ / /_/ /_/ / /
-#/_/    /_/\____/\____/     /_____/  /_____/_/ /_/ /_/\__,_/_/\__,_/\__/\____/_/
-#
-#
-# F 1 0 0 - L * E M U L A T O R (c) 2016, 2017 Revaldinho & BigEd
+# F 1 0 0 - L * E M U L A T O R (c) 2016, 2017, 2019 Revaldinho & BigEd
 # -------------------------------------------------------------------------------------------'''
 
 from F100_Opcodes.F100_Opcode import F100HaltException
@@ -116,18 +109,18 @@ def hex16dump( data, dlen, filename=None):
         f =sys.stdout
     for i in range (0, max):
         j=i%GRPSZ;
-        dstr.append("%04X" % data[i] ) 
+        dstr.append("%04X" % data[i] )
         astr.append("%c%c" % (INTTOPRINT((data[i]>>8)&0xFF),INTTOPRINT(data[i]&0xFF)))
         if (j==GRPSZ-1) :
             f.write( "%04X: %s %s%c" % ( i-j, ' '.join(dstr), ''.join(astr), '\n' if (i>0) else '\0'))
             astr = list()
-            dstr = list()            
+            dstr = list()
 
 class F100Emu:
     def __init__ (self, adsel=1, traceon=False, memtraceon=False):
         self.CPU = F100CPU(adsel=adsel, traceon=traceon, memtraceon=memtraceon)
         self.traceon = traceon
-        self.memtraceon = memtraceon        
+        self.memtraceon = memtraceon
         self.instr_count = 0
 
     def load_memory(self, filename, file_format):
@@ -156,7 +149,7 @@ if __name__ == "__main__" :
     file_format = ""
     adsel = 1
     endianness = "little"
-    memtraceon = False    
+    memtraceon = False
     traceon = False
     listingon = True
     memdumpon = False

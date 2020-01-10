@@ -10,6 +10,12 @@
 #define GRPSZ 16
 #define F100MEMSZ 65536
 
+void print_banner() {
+  puts("# -------------------------------------------------------------------------------------------");
+  puts("# F 1 0 0 - L * E M U L A T O R (c) 2016, 2017, 2019 Revaldinho & BigEd");
+  puts("# -------------------------------------------------------------------------------------------");
+}
+
 void hex16dump( uint16_t data[], int dlen, char *filename) {
   FILE *f;
   int i, j, max;
@@ -103,6 +109,7 @@ int main (int argc, char **argv ) {
   f100_cpu = f100_init();
   if (binaryNotHex) read_bin_file(f100_cpu.mem, filename);
   else read_hex_file(f100_cpu.mem, filename, false);
+  print_banner();
   f100_trace(true);
   f100_reset(true);
   f100_exec(50000, trace, memtrace);

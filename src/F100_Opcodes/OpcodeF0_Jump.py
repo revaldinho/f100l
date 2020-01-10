@@ -155,11 +155,11 @@ class OpcodeF0_Jump(F100_Opcode) :
 
         if IR.R == 3:
             W = CPU.memory_fetch()
-            operand = CPU.memory_read(W)
+            operand = CPU.OR = CPU.memory_read(W)
             W1 = CPU.memory_fetch()
         else:
             if IR.R == 1:
-                operand = CPU.CR.toint()
+                operand = CPU.OR = CPU.CR.toint()
             else:
                 operand = CPU.ACC
             W1 = CPU.memory_fetch()
