@@ -11,9 +11,9 @@
 #define F100MEMSZ 65536
 
 void print_banner() {
-  puts("# -------------------------------------------------------------------------------------------");
+  puts("# ---------------------------------------------------------------------------");
   puts("# F 1 0 0 - L * E M U L A T O R (c) 2016, 2017, 2019 Revaldinho & BigEd");
-  puts("# -------------------------------------------------------------------------------------------");
+  puts("# ---------------------------------------------------------------------------");
 }
 
 void hex16dump( uint16_t data[], int dlen, char *filename) {
@@ -112,7 +112,7 @@ int main (int argc, char **argv ) {
   print_banner();
   f100_trace(true);
   f100_reset(true);
-  f100_exec(50000, trace, memtrace);
+  f100_exec(2500000, trace, memtrace);
   if (true) hex16dump(f100_cpu.mem,0x8000,"cdump.hexl");
   return (0);
 }

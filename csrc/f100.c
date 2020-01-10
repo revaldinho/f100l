@@ -49,7 +49,8 @@ static void decode( uint16_t word) {
 
 void f100_trace(bool header) {
   if (header) {
-    printf("%4s  : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");
+    printf("# %2s  : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");
+    puts("# ---------------------------------------------------------------------------");
   } else {
     char *mnem = mnemonic[cpu.ir.F];
     printf("%04X  : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X  %04X   %04X   %04X  : %s\n", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,  \
@@ -119,7 +120,7 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
           if (cpu.ir.R==1 || cpu.ir.R==3) operand = cpu.or;
           else operand = cpu.acc;
           // S=Direction, J=0,1:Arith, 2:Logical, 3:Rotate, B=Num Places
-          if (cpu.ir.S) { 
+          if (cpu.ir.S) {
             result = TRUNC16(operand<<places);
           } else if (cpu.ir.J<2) {
             result = TRUNC16((int16_t)operand>>places);
@@ -145,7 +146,7 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
           } else if ( cpu.ir.J<2 ) {
             // Shift as a signed value to get arithmetic shift
             result =  ((int32_t) result>>places) & 0xFFFFFFFF;
-          } else { 
+          } else {
             result = result>>places;
           }
           COMPUTE_SV(TRUNC16(result>>16), cpu.acc, cpu.acc);
@@ -176,13 +177,14 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
           if ( cpu.ir.J==0 || cpu.ir.J==2) { // Jump on bit clear
             cpu.pc = (!(operand & bmask))? jump_address: cpu.pc;
           } else { // Jump on bit set
-            cpu.pc = ((operand & bmask))? jump_address: cpu.pc;
+            cpu.pc = (operand & bmask)? jump_address: cpu.pc;
           }
         }
         if (cpu.ir.J>1) { // Set or clear bit
-          result = ( cpu.ir.J==2) ? operand | bmask : operand & ~bmask;
+          result = ( cpu.ir.J==2) ? (operand | bmask) : (operand & ~bmask);
           if (cpu.ir.R==3) {
-            write_mem(operand_address, TRUNC16(result));
+            cpu.or = TRUNC16(result);
+            write_mem(operand_address, cpu.or);
           } else if ( cpu.ir.R==1) {
             UNPACK_FLAGS (result);
           } else {
@@ -242,12 +244,13 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
         result = cpu.or - cpu.acc;
         if (cpu.M) result += cpu.C-1;
         COMPUTE_BORROW(result) ;
+        COMPUTE_SVZ_SUB(result, cpu.or, cpu.acc) ;        
       } else {
         result = cpu.acc + cpu.or;
         if (cpu.M) result += cpu.C;
         COMPUTE_CARRY(result) ;
+        COMPUTE_SVZ_ADD(result, cpu.acc, cpu.or) ;                
       }
-      COMPUTE_SVZ(result, cpu.acc, cpu.or) ;
       if (cpu.ir.F==OP_ADS || cpu.ir.F==OP_SBS) write_mem(operand_address, TRUNC16(result));
       else if (cpu.ir.F!=OP_CMP) cpu.acc=TRUNC16(result);
       break;

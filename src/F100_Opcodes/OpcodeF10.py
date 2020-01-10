@@ -92,7 +92,7 @@ class OpcodeF10(F100_Opcode) :
         self.CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
         self.CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
         
-        if ((self.CPU.ACC & 0x8000) == (self.CPU.OR & 0x8000)) and ((result & 0x8000) != (self.CPU.ACC & 0x8000)):
+        if ((self.CPU.ACC & 0x8000) != (self.CPU.OR & 0x8000)) and ((result & 0x8000) != (self.CPU.OR & 0x8000)):
             self.CPU.CR.V = 1
         else:
             self.CPU.CR.V = 0

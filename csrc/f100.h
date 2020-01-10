@@ -6,10 +6,14 @@
 #define COMPUTE_CARRY(r)  cpu.C = (((r&0x10000) !=0)?1:0)
 #define COMPUTE_BORROW(r) cpu.C = (((r&0x10000) !=0)?0:1)
 #define COMPUTE_SIGN(r)   cpu.S = (((r&0x08000) !=0)?1:0)
-#define COMPUTE_OVERFLOW(r,a,b) cpu.V = (((a & 0x8000)==(b & 0x8000)) && (r & 0x8000) != (a & 0x8000))
+#define COMPUTE_OVERFLOW_ADD(r,a,b) cpu.V = (((a & 0x8000)==(b & 0x8000)) && (r & 0x8000) != (a & 0x8000))
+#define COMPUTE_OVERFLOW_SUB(r,a,b) cpu.V = (((a & 0x8000)!=(b & 0x8000)) && (r & 0x8000) != (a & 0x8000))
 #define COMPUTE_SZ(r)        COMPUTE_SIGN(r) ; COMPUTE_ZERO(r)
-#define COMPUTE_SV(r, a, b)  COMPUTE_SIGN(r) ; COMPUTE_OVERFLOW(r,a,b) 
-#define COMPUTE_SVZ(r, a, b) COMPUTE_SV(r,a,b) ; COMPUTE_ZERO(r)
+#define COMPUTE_SV(r, a, b)  COMPUTE_SIGN(r) ; COMPUTE_OVERFLOW_ADD(r,a,b)
+#define COMPUTE_SV_ADD(r, a, b)  COMPUTE_SIGN(r) ; COMPUTE_OVERFLOW_ADD(r,a,b)
+#define COMPUTE_SV_SUB(r, a, b)  COMPUTE_SIGN(r) ; COMPUTE_OVERFLOW_SUB(r,a,b) 
+#define COMPUTE_SVZ_ADD(r, a, b) COMPUTE_SV_ADD(r,a,b) ; COMPUTE_ZERO(r)
+#define COMPUTE_SVZ_SUB(r, a, b) COMPUTE_SV_SUB(r,a,b) ; COMPUTE_ZERO(r)
 
 #define SET_CARRY         cpu.C = 1
 #define CLEAR_CARRY       cpu.C = 0

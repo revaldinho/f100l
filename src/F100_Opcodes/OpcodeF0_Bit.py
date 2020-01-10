@@ -106,8 +106,8 @@ class OpcodeF0_Bit(F100_Opcode) :
         if IR.J == 3: # CLR
             if IR.R == 3:
                 operand = self.CPU.memory_fetch()
-                value = self.CPU.memory_read(operand) & ~bitmask
-                self.CPU.memory_write(operand, value)
+                self.CPU.OR = self.CPU.memory_read(operand) & ~bitmask
+                self.CPU.memory_write(operand, self.CPU.OR)
             elif IR.R == 1:
                 self.CPU.CR.fromint(self.CPU.CR.toint() & ~bitmask)
             else:
@@ -115,8 +115,8 @@ class OpcodeF0_Bit(F100_Opcode) :
         elif IR.J == 2:
             if IR.R == 3:
                 operand = self.CPU.memory_fetch()
-                value = self.CPU.memory_read(operand) | bitmask
-                self.CPU.memory_write(operand, value)
+                self.CPU.OR = self.CPU.memory_read(operand) | bitmask
+                self.CPU.memory_write(operand, self.CPU.OR)
             elif IR.R == 1:
                 self.CPU.CR.fromint(self.CPU.CR.toint() | bitmask)
             else:

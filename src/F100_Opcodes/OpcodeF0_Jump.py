@@ -159,7 +159,7 @@ class OpcodeF0_Jump(F100_Opcode) :
             W1 = CPU.memory_fetch()
         else:
             if IR.R == 1:
-                operand = CPU.OR = CPU.CR.toint()
+                operand = CPU.CR.toint()
             else:
                 operand = CPU.ACC
             W1 = CPU.memory_fetch()
@@ -169,6 +169,7 @@ class OpcodeF0_Jump(F100_Opcode) :
                 CPU.PC = W1
                 if IR.J == 2:
                     if IR.R == 3:
+                        CPU.OR =  operand | bitmask
                         CPU.memory_write(W, operand | bitmask)
                     elif IR.R == 1:
                         CPU.CR.fromint(operand | bitmask)
@@ -179,6 +180,7 @@ class OpcodeF0_Jump(F100_Opcode) :
                 CPU.PC = W1
                 if IR.J == 3:
                     if IR.R == 3:
+                        CPU.OR = operand & ~bitmask
                         CPU.memory_write(W, operand &  ~bitmask)
                     elif IR.R == 1:
                         CPU.CR.fromint(operand & ~bitmask)
