@@ -64,17 +64,19 @@ void read_bin_file( uint16_t *mem, char *filename){
 }
 
 void usage(){
-  puts("Usage:\n   f100emu -f <filename> [-b][-v][-h]");
+  puts("Usage:\n   f100emu -f <filename> [-b][-m][-t][-h]");
   puts("Options:\n   -f <filename>  program file name");
   puts("   -b       program file in binary format");
   puts("   -x       program file in hex format (default)");
-  puts("   -v       verbose mode: turns on more debug messages");
+  puts("   -t       print logic trace");
+  puts("   -m       print memory accesses");  
   puts("   -h       print this summary");
   exit(0);
 }
 
 int main (int argc, char **argv ) {
-  bool     verbose = false;
+  bool     trace = false;
+  bool     memtrace = false;  
   uint16_t *mem;
   cpu_t f100_cpu;
   int c;
@@ -82,10 +84,11 @@ int main (int argc, char **argv ) {
   char *filename=NULL;
   opterr = 0;
   
-  while ( (c=getopt(argc, argv,"bhvxf:")) != -1 ) {
+  while ( (c=getopt(argc, argv,"bhmtxf:")) != -1 ) {
     switch(c) {
     case 'f': filename = optarg; break;
-    case 'v': verbose = true; break;
+    case 'm': memtrace = true; break;
+    case 't': trace = true; break;      
     case 'b': binaryNotHex = true; break;
     case 'x': binaryNotHex = false; break;
     default : usage(); break;
@@ -100,10 +103,9 @@ int main (int argc, char **argv ) {
   f100_cpu = f100_init();
   if (binaryNotHex) read_bin_file(f100_cpu.mem, filename);
   else read_hex_file(f100_cpu.mem, filename, false);
-  //if (verbose) hex16dump(f100_cpu.mem,0x1000, NULL );
   f100_trace(true);
   f100_reset(true);
-  f100_exec(50000, verbose);
-  if (verbose) hex16dump(f100_cpu.mem,0x8000,"cdump.hexl");
+  f100_exec(50000, trace, memtrace);
+  if (true) hex16dump(f100_cpu.mem,0x8000,"cdump.hexl");
   return (0);
 }

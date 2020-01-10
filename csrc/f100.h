@@ -86,4 +86,4 @@ typedef struct {
 extern cpu_t f100_init();
 extern void  f100_reset(bool adsel);
 extern void  f100_trace(bool header);
-extern int   f100_exec(int max_instr, bool trace_on);
+extern int   f100_exec(int max_instr, bool trace_on, bool memtrace_on);

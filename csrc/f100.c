@@ -12,6 +12,7 @@
 
 // Global Variables
 static bool     verbose = false;
+static bool     memtron;
 static bool     tron;
 static cpu_t    cpu;
 static uint16_t operand_address, target;
@@ -24,12 +25,12 @@ cpu_t f100_init() {
 
 static uint16_t read_mem( uint16_t addr )  {
   uint16_t data = cpu.mem[addr];
-  if (true) printf("LOAD  : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
+  if (memtron) printf("LOAD  : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
   return data;
 }
 
 static void write_mem( uint16_t addr, uint16_t data ) {
-  if (true) printf("STORE : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
+  if (memtron) printf("STORE : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
   cpu.mem[addr] = data;
 }
 
@@ -60,7 +61,7 @@ void f100_reset(bool adSel ) {
   cpu.pc = (adSel) ? 2048 : 16384 ;
 }
 
-int f100_exec(int max_instr, bool trace_on) {
+int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
   uint32_t result;
   uint16_t stack_pointer;
   uint16_t pointer;
@@ -70,6 +71,7 @@ int f100_exec(int max_instr, bool trace_on) {
 
   int i;
 
+  memtron = memtrace_on;
   tron = trace_on;
 
   for ( i=0; i<max_instr ; i++ ) {
@@ -105,20 +107,24 @@ int f100_exec(int max_instr, bool trace_on) {
       FETCH15(cpu.mem, operand1_address, cpu.pc);
     }
 
-
     // F100_Execute instruction
     switch ( cpu.ir.F ) {
     case OP_F0:
       if (cpu.ir.T==0 && cpu.ir.S<2) { // Shifts
         int i;
+        if (cpu.ir.R==1) cpu.or = PACK_FLAGS;
+        else if (cpu.ir.R==3) cpu.or = read_mem(operand_address);
         if ( cpu.M==0 ) { // Single Length
-          if (cpu.ir.R==1) operand = (cpu.or = PACK_FLAGS);
-          else if (cpu.ir.R==3) operand = (cpu.or = read_mem(operand_address));
+          uint8_t  places = cpu.ir.B;
+          if (cpu.ir.R==1 || cpu.ir.R==3) operand = cpu.or;
           else operand = cpu.acc;
           // S=Direction, J=0,1:Arith, 2:Logical, 3:Rotate, B=Num Places
-          for (i=0, result=operand; i< cpu.ir.B; i++) {
-            if (cpu.ir.S) result = (result<< 1 ) | ((cpu.ir.J==3)?((result>>15)&1):0);
-            else result = (result >> 1)  | ((cpu.ir.J<2) ? (result & 0x8000): (cpu.ir.J==3)?(result&1)<<15 : 0);
+          if (cpu.ir.S) { 
+            result = TRUNC16(operand<<places);
+          } else if (cpu.ir.J<2) {
+            result = TRUNC16((int16_t)operand>>places);
+          } else {
+            result = TRUNC16(operand>>places);
           }
           COMPUTE_SV(result,operand,operand);
           if (cpu.ir.R==1) {
@@ -130,19 +136,21 @@ int f100_exec(int max_instr, bool trace_on) {
             write_mem(operand_address, cpu.or);
           } else cpu.acc = TRUNC16(result);
         } else { // Double Length
-          uint32_t double_operand;
-          uint64_t quad_result;
-          if (cpu.ir.R==1) cpu.or = PACK_FLAGS;
-          else if (cpu.ir.R==3) cpu.or = read_mem(operand_address);
-          double_operand = (cpu.acc<<16) | cpu.or;
+          uint8_t  places = (((cpu.ir.J&1)<<4) + cpu.ir.B);
+          // Assemble acc+OR into 32bit result register to start shifting
+          result = (cpu.acc<<16) | cpu.or;
           // S=Direction, J=0,1:Arith, 2:Logical, B=Num Places
-          for (i=0, quad_result= (uint64_t) double_operand; i< (((cpu.ir.J&1)<<4) + cpu.ir.B); i++) {
-            if (cpu.ir.S) quad_result = quad_result << 1 ;
-            else quad_result = (quad_result >> 1)  | ((cpu.ir.J<2)?(quad_result&0x80000000):0);
+          if (cpu.ir.S) {
+            result = (result << places) & 0xFFFFFFFF;
+          } else if ( cpu.ir.J<2 ) {
+            // Shift as a signed value to get arithmetic shift
+            result =  ((int32_t) result>>places) & 0xFFFFFFFF;
+          } else { 
+            result = result>>places;
           }
-          COMPUTE_SV((quad_result>>16), cpu.acc, cpu.acc);
-          cpu.acc = TRUNC16((quad_result>>16));
-          cpu.or = TRUNC16(quad_result);
+          COMPUTE_SV(TRUNC16(result>>16), cpu.acc, cpu.acc);
+          cpu.acc = TRUNC16((result>>16));
+          cpu.or = TRUNC16(result);
           if (cpu.ir.R==1) {
             // Overwrite flags with the shifted value, low word (in OR)
             UNPACK_FLAGS(cpu.or);
