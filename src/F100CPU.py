@@ -23,9 +23,10 @@ from InstructionReg import InstructionReg
 from ConditionReg import ConditionReg
 
 class F100CPU:
-    def __init__ (self, adsel=1, ramsize=32768, traceon=False ):
+    def __init__ (self, adsel=1, ramsize=32768, traceon=False, memtraceon=False ):
         self.MEMTOP = ramsize-1
         self.traceon = traceon
+        self.memtraceon = memtraceon        
         self.CR = ConditionReg()
         self.IR = InstructionReg()
         self.OR = 0x0000
@@ -99,7 +100,7 @@ class F100CPU:
         a = address & 0xFFFF
         data = self.RAM[a] & 0xFFFF
 
-        if self.traceon == True and not notrace:
+        if self.memtraceon == True and not notrace:
             print ("LOAD  : addr=0x%04X (%6d) data=0x%04X (%6d)"%(a, a, data, data));
 
         if nostats== False:
@@ -112,7 +113,7 @@ class F100CPU:
 
     def memory_write(self, address, data, modify=False, nostats=False, notrace=False):
         a = address & 0xFFFF
-        if self.traceon == True and notrace==False:
+        if self.memtraceon == True and notrace==False:
             print ("STORE : addr=0x%04X (%6d) data=0x%04X (%6d)"%(a, a, data, data));
 
         if nostats == False:

@@ -124,9 +124,10 @@ def hex16dump( data, dlen, filename=None):
             dstr = list()            
 
 class F100Emu:
-    def __init__ (self, adsel=1, traceon=False):
-        self.CPU = F100CPU(adsel=adsel, traceon=traceon)
+    def __init__ (self, adsel=1, traceon=False, memtraceon=False):
+        self.CPU = F100CPU(adsel=adsel, traceon=traceon, memtraceon=memtraceon)
         self.traceon = traceon
+        self.memtraceon = memtraceon        
         self.instr_count = 0
 
     def load_memory(self, filename, file_format):
@@ -155,6 +156,7 @@ if __name__ == "__main__" :
     file_format = ""
     adsel = 1
     endianness = "little"
+    memtraceon = False    
     traceon = False
     listingon = True
     memdumpon = False
@@ -163,9 +165,9 @@ if __name__ == "__main__" :
     memdump_hi = None
     statson = False
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:m:p:q:hnst", ["adsel=","endianness=", \
+        opts, args = getopt.getopt( sys.argv[1:], "a:e:f:g:d:p:q:hmnst", ["adsel=","endianness=", \
                 "filename=","format=","memorydump=","memorystart=", "memoryend=","help",\
-                "nolisting","statistics","traceon"])
+                "memtraceon","nolisting","statistics","traceon"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -173,7 +175,7 @@ if __name__ == "__main__" :
     for opt, arg in opts:
         if opt in ( "-f", "--filename" ) :
             filename = arg
-        if opt in ( "-m", "--memorydump" ) :
+        if opt in ( "-d", "--memorydump" ) :
             memdump_filename = arg
             memdumpon = True
         if opt in ( "-a", "--adsel" ) :
@@ -195,6 +197,8 @@ if __name__ == "__main__" :
             statson = True
         if opt in ("-t", "--traceon") :
             traceon = True
+        if opt in ("-m", "--memtraceon") :
+            memtraceon = True
         elif opt in ("-h", "--help" ) :
             usage()
     if filename=="" or file_format=="":
@@ -203,7 +207,7 @@ if __name__ == "__main__" :
         print ("Cannot open file %s" % filename)
         sys.exit(0)
 
-    emu = F100Emu(adsel=adsel, traceon=traceon)
+    emu = F100Emu(adsel=adsel, traceon=traceon, memtraceon=memtraceon)
     emu.load_memory(filename, file_format)
     emu.CPU.reset()
 
