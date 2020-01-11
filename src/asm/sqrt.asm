@@ -1,7 +1,7 @@
         .org 0x200
 
 MULT_DATA:                          ; define some data to be used in the arithmetic
-#include "sqrt.inc"
+#include "testdata.inc"
 #include "init.asm"
 
         LDA ,RESULT_AREA-1          ; data pointer will be pre-incremented before use so subtract 1

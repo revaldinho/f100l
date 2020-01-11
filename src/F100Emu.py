@@ -216,15 +216,6 @@ if __name__ == "__main__" :
 
     if memdumpon:
         hex16dump( emu.CPU.RAM, 32768, memdump_filename)
-##        with open(memdump_filename, "w") as f:
-##            if memdump_lo != None and memdump_hi != None:
-##                for adr in range(memdump_lo, memdump_hi+1):
-##                    if adr in emu.CPU.RAM_writeset:
-##                        f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.memory_read(adr,nostats=True)))
-##            else:
-##                for adr in sorted(emu.CPU.RAM_writeset):
-##                    f.write("0x%04X : 0x%04X\n" % (adr, emu.CPU.memory_read(adr,nostats=True)))
-
 
     print("# -------------------------------------------------------------------------------------------")
     print("# Program Execution Statistics")

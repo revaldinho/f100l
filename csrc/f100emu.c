@@ -70,36 +70,41 @@ void read_bin_file( uint16_t *mem, char *filename){
 }
 
 void usage(){
-  puts("Usage:\n   f100emu -f <filename> [-b][-m][-t][-h]");
-  puts("Options:\n   -f <filename>  program file name");
-  puts("   -b       program file in binary format");
-  puts("   -x       program file in hex format (default)");
-  puts("   -t       print logic trace");
-  puts("   -m       print memory accesses");  
-  puts("   -h       print this summary");
+  puts("Usage:\n   f100emu -f <filename> [-x] [-d <filename>] [-b][-m][-t][-h]");
+  puts("Options:\n   -f <filename>              program file name");
+  puts("   -b              program file in binary format");
+  puts("   -x              program file in hex format (default)");
+  puts("   -t              print logic trace");
+  puts("   -d <filename>   make hex dump of memory at end of run");
+  puts("   -m              print memory accesses");  
+  puts("   -h              print this summary");
   exit(0);
 }
 
 int main (int argc, char **argv ) {
   bool     trace = false;
-  bool     memtrace = false;  
+  bool     memtrace = false;
+  bool     memdump = false;
   uint16_t *mem;
   cpu_t f100_cpu;
   int c;
   bool binaryNotHex=false;
   char *filename=NULL;
+  char *memdumpfn=NULL;  
   opterr = 0;
   
-  while ( (c=getopt(argc, argv,"bhmtxf:")) != -1 ) {
+  while ( (c=getopt(argc, argv,"bhmtxf:d:")) != -1 ) {
     switch(c) {
     case 'f': filename = optarg; break;
     case 'm': memtrace = true; break;
-    case 't': trace = true; break;      
+    case 't': trace = true; break;
+    case 'd': memdump = true; memdumpfn = optarg; break; 
     case 'b': binaryNotHex = true; break;
     case 'x': binaryNotHex = false; break;
     default : usage(); break;
     }
-  }    
+  }
+  
   if ( filename==NULL) usage();
   else if ( access(filename,R_OK) == -1 ) {
     printf("Error - file %s cannot be opened for reading in read_hex_file\n", filename);
@@ -113,6 +118,6 @@ int main (int argc, char **argv ) {
   f100_trace(true);
   f100_reset(true);
   f100_exec(2500000, trace, memtrace);
-  if (true) hex16dump(f100_cpu.mem,0x8000,"cdump.hexl");
+  if (memdump) hex16dump(f100_cpu.mem,32768,memdumpfn);
   return (0);
 }

@@ -33,7 +33,7 @@ class F100CPU:
         self.adsel = adsel
         self.PC = 0x0000
         self.ACC= 0x0000
-        self.RAM = [0xDEAD]*ramsize
+        self.RAM = [0x0000]*ramsize
         self.RAM_writeset = set()
         self.cycle_count = 0
         self.read_count = 0
