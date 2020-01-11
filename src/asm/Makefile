@@ -2,12 +2,23 @@
 # e.g. use setenv PYEXE pypy3 to get pypy before calling Make
 PYEXE ?= python3
 
+ALLSRCS    ?= $(wildcard *.asm)
+TESTSRCS   ?= $(shell ls -1 *asm | egrep -v '(mathlib|init)'  )
+PDUMP      ?= $(patsubst %.asm,%.pdump,$(TESTSRCS))
+CDUMP      ?= $(patsubst %.asm,%.cdump,$(TESTSRCS))
+HEX        ?= $(patsubst %.asm,%.hex,$(TESTSRCS))
+
+SRCS=mul32 mul16
+VPATH=../../csrc
 
 .SUFFIXES: .cpp .hex
-.cpp.hex:; ../F100Asm.py -f $< -o $@ -g hex |  tee $*.lst
+.cpp.hex:; /usr/bin/time ${PYEXE} ../F100Asm.py -f $< -o $@ -g hex > $*.lst
 
-.SUFFIXES: .hex .dump
-.hex.dump:; ../F100Emu.py -f $< -g hex -d $*.dump |  tee $*.log
+.SUFFIXES: .hex .pdump	
+.hex.pdump:; /usr/bin/time ${PYEXE} ../F100Emu.py -f $< -g hex -d $*.pdump -n > $*.plog
+
+.SUFFIXES: .hex .cdump
+.hex.cdump:; /usr/bin/time ../../csrc/f100emu -f $< -x -d $*.cdump > $*.clog
 
 .SUFFIXES: .asm .cpp
 .asm.cpp:; cpp -E $< | grep -v '^#'>  $@
@@ -15,16 +26,14 @@ PYEXE ?= python3
 testdata.inc: testgen.py
 	${PYEXE} testgen.py
 
-all: test2.hex mul32.hex mul16.hex sqrt.hex udiv32.hex test2.hex mul16.dump mul32.dump sqrt.dump udiv32.dump
+all: all_hex f100emu all_cdump all_pdump
 
-udiv32.hex: udiv32.asm testdata.inc mathlib.asm
-mul16.hex: mul16.asm   testdata.inc mathlib.asm
-mul32.hex: mul32.asm   testdata.inc mathlib.asm
-sqrt.hex: sqrt.asm     testdata.inc mathlib.asm
-test2.hex: test2.asm
+f100emu: f100emu.c f100.c f100.h
+	(cd ${VPATH} ; make ) 
 
-golden: sqrt.py
-	pypy3 sqrt.py 
+all_cdump: all_hex f100emu ${CDUMP}
+all_pdump: all_hex ${PDUMP} 
+all_hex: testdata.inc init.asm mathlib.asm ${HEX}
 
 clean:
 	rm *hex *lst *~ *cpp *inc *golden *rslt *dump *log

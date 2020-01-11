@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <time.h>
 #include "f100.h"
 
 #define BUFSZ 16
@@ -92,6 +93,8 @@ int main (int argc, char **argv ) {
   char *filename=NULL;
   char *memdumpfn=NULL;  
   opterr = 0;
+
+
   
   while ( (c=getopt(argc, argv,"bhmtxf:d:")) != -1 ) {
     switch(c) {
@@ -117,7 +120,10 @@ int main (int argc, char **argv ) {
   print_banner();
   f100_trace(true);
   f100_reset(true);
-  f100_exec(2500000, trace, memtrace);
+  int time_now_ms = clock() * 1000 / CLOCKS_PER_SEC;    
+  f100_exec(10000000, trace, memtrace);
+  time_now_ms = (clock() * 1000 / CLOCKS_PER_SEC) - time_now_ms;
+  printf ("# Run time                  :       %6.2f s\n", (float)time_now_ms/1000);
   if (memdump) hex16dump(f100_cpu.mem,32768,memdumpfn);
   return (0);
 }
