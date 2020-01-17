@@ -228,45 +228,49 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
       write_mem(LSP, TRUNC15(stack_pointer-2));
       break;
     case OP_LDA:
+      cpu.acc = read_mem(operand_address);
+      COMPUTE_SZ(cpu.acc) ;
+      CLEAR_OVERFLOW ;
+      break;
     case OP_STO:
-      if ( cpu.ir.F==OP_LDA) cpu.acc = read_mem(operand_address);
-      else write_mem(operand_address, cpu.acc);
+      write_mem(operand_address, cpu.acc);
       COMPUTE_SZ(cpu.acc) ;
       CLEAR_OVERFLOW ;
       break;
     case OP_SBS:
     case OP_SUB:
     case OP_CMP:
+      cpu.or = read_mem(operand_address);
+      result = cpu.or - cpu.acc;
+      if (cpu.M) result += cpu.C-1;
+      COMPUTE_BORROW(result) ;
+      COMPUTE_SVZ_SUB(result, cpu.or, cpu.acc) ;        
+      if (cpu.ir.F==OP_SBS) write_mem(operand_address, TRUNC16(result));
+      else if (cpu.ir.F!=OP_CMP) cpu.acc=TRUNC16(result);
+      break;
     case OP_ADS:
     case OP_ADD:
       cpu.or = read_mem(operand_address);
-      if (cpu.ir.F==OP_SBS||cpu.ir.F==OP_SUB||cpu.ir.F==OP_CMP) {
-        result = cpu.or - cpu.acc;
-        if (cpu.M) result += cpu.C-1;
-        COMPUTE_BORROW(result) ;
-        COMPUTE_SVZ_SUB(result, cpu.or, cpu.acc) ;        
-      } else {
-        result = cpu.acc + cpu.or;
-        if (cpu.M) result += cpu.C;
-        COMPUTE_CARRY(result) ;
-        COMPUTE_SVZ_ADD(result, cpu.acc, cpu.or) ;                
-      }
-      if (cpu.ir.F==OP_ADS || cpu.ir.F==OP_SBS) write_mem(operand_address, TRUNC16(result));
-      else if (cpu.ir.F!=OP_CMP) cpu.acc=TRUNC16(result);
+      result = cpu.acc + cpu.or;
+      if (cpu.M) result += cpu.C;
+      COMPUTE_CARRY(result) ;
+      COMPUTE_SVZ_ADD(result, cpu.acc, cpu.or) ;                
+      if (cpu.ir.F==OP_ADS) write_mem(operand_address, TRUNC16(result));
+      else cpu.acc=TRUNC16(result);
       break;
     case OP_AND:
-    case OP_NEQ:
       cpu.or = read_mem(operand_address);
-      if (cpu.ir.F==OP_AND) {
-        cpu.acc = cpu.acc&cpu.or;
-        SET_CARRY ;
-      } else {
-        cpu.acc = cpu.acc^cpu.or;
-        CLEAR_CARRY;
-      }
+      cpu.acc = cpu.acc&cpu.or;
+      SET_CARRY ;
       COMPUTE_SZ(cpu.acc);
       break;
-    default: break;
+    case OP_NEQ:
+      cpu.or = read_mem(operand_address);
+      cpu.acc = cpu.acc^cpu.or;
+      CLEAR_CARRY;
+      COMPUTE_SZ(cpu.acc);
+      break;  
+   default: break;
     }
   }
   if (HALT(cpu.ir)) return (int) cpu.ir.WORD; else return 0;
