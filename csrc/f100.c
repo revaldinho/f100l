@@ -128,14 +128,13 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
             result = TRUNC16(operand>>places);
           }
           COMPUTE_SV(result,operand,operand);
+          cpu.acc = TRUNC16(result);          
           if (cpu.ir.R==1) {
             // Overwrite flags with the shifted value
-            cpu.or = TRUNC16(result);
-            UNPACK_FLAGS(cpu.or);
+            UNPACK_FLAGS(cpu.acc);
           } else if (cpu.ir.R==3) {
-            cpu.or = TRUNC16(result);
-            write_mem(operand_address, cpu.or);
-          } else cpu.acc = TRUNC16(result);
+            write_mem(operand_address, cpu.acc);
+          } 
         } else { // Double Length
           uint8_t  places = (((cpu.ir.J&1)<<4) + cpu.ir.B);
           // Assemble acc+OR into 32bit result register to start shifting

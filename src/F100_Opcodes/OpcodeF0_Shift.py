@@ -448,10 +448,10 @@ class OpcodeF0_Shift(F100_Opcode) :
 
             if IR.R == 1:
                 CR.fromint(result)
-                CPU.OR = result
+                CPU.ACC = result
             elif IR.R ==3:
                 CPU.memory_write(operand_addr, result)
-                CPU.OR = result                
+                CPU.ACC = result                
             else:
                 CPU.ACC = result
 
