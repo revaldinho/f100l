@@ -69,7 +69,7 @@ class OpcodeF13(F100_Opcode) :
         result = self.CPU.ACC ^ self.CPU.OR
         self.CPU.ACC  = result
 
-        self.CPU.CR.C = 1
+        self.CPU.CR.C = 0
         self.CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
         self.CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
         cycle_count += 0
