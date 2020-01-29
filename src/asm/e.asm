@@ -5,8 +5,8 @@
 
 .equ    LSP         	0       ; link stack pointer location
 .equ    USP         	1       ; user stack pointer location
-.equ    LINK_STACK  	0x1601  ; initial value for link stack (must be ODD)
-.equ    USER_STACK  	0x2600  ; initial value for user stack
+.equ    LINK_STACK  	0x7C01  ; initial value for link stack (must be ODD)
+.equ    USER_STACK  	0x7800  ; initial value for user stack
         
 .equ    R0              10      ; register space
 .equ    R1              R0+1 
@@ -26,7 +26,7 @@
 .equ    R15             R0+15
         
 
-.equ  DIGITS  128
+.equ  DIGITS  64
 .equ  COLS    DIGITS+2
 .equ  OSWRADDR 0x7FFF
 
@@ -61,8 +61,8 @@ INIT:   .org 0x800                  ; 0x800 standard start address
         STO     R0
         LDA     ,(REMAIN_ARR-1) ; ptr pre-incremented before use
         STO     R1
-        LDA     ,1
 LOOP:
+        LDA     ,1
         STO     /R1+            ; init values to 1 
         ICZ     R0 LOOP
         LDA     ,0              ; except first which is 0
@@ -176,7 +176,7 @@ UD16_SKIP:
          SBS UD16_R
          SET 0 UD16_Q
 UD16_SKIP2:
-         SLA  1 UD16_N
+         SLA 1 UD16_N
          STO UD16_N
          ICZ UD16_LCTR UD16_LOOP
 UD16_EXIT:

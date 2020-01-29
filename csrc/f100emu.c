@@ -121,7 +121,7 @@ int main (int argc, char **argv ) {
   f100_trace(true);
   f100_reset(true);
   int time_now_ms = clock() * 1000 / CLOCKS_PER_SEC;    
-  f100_exec(10000000, trace, memtrace);
+  f100_exec(0, trace, memtrace);
   time_now_ms = (clock() * 1000 / CLOCKS_PER_SEC) - time_now_ms;
   printf ("# Run time                  :       %6.2f s\n", (float)time_now_ms/1000);
   if (memdump) hex16dump(f100_cpu.mem,32768,memdumpfn);

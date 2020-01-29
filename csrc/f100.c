@@ -75,7 +75,7 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
   memtron = memtrace_on;
   tron = trace_on;
 
-  for ( i=0; i<max_instr ; i++ ) {
+  for ( i=0; (!max_instr)||(i<max_instr) ; i++ ) {
     // Fetch and decode operand
     decode(read_mem(cpu.pc));
     if ( tron ) f100_trace (false);
@@ -206,9 +206,9 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
       CLEAR_MULTI ;
       break;
     case OP_ICZ:
-      cpu.or = 1+read_mem(operand_address);
-      write_mem(operand_address, cpu.or);
-      if (cpu.or!=0) cpu.pc=operand1_address ;
+      cpu.acc = 1+read_mem(operand_address);
+      write_mem(operand_address, cpu.acc);
+      if (cpu.acc!=0) cpu.pc=operand1_address ;
       break;
     case OP_JMP:
       cpu.pc = TRUNC15(operand_address);

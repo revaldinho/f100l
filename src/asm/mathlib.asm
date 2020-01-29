@@ -1,141 +1,6 @@
 ; Define a Load Operand (LDOR) alias to be the CMP instruction - flags are trashed but acc is preserved
 #define  LDOR  CMP
 
-#ifdef LOCALVARSTACKS
-; ------------------------------------
-; UDIV32
-;
-; Unsigned integer 32 bit division of two numbers
-; returning quotient and remainder.
-; ------------------------------------
-; Entry: USP   -> Numerator (low word)
-;        USP-1 -> Numerator (high word)
-;        USP-2 -> Denominator   (low word)
-;        USP-3 -> Denominator   (high word)
-;
-; Exit:  USP   -> Quotient (low word)
-;        USP-1 -> Quotient (high word)
-;        USP-2 -> Remainder (low word)
-;        USP-3 -> Remainder (high word)
-;
-; Local var space: 9 words
-; ------------------------------------
-; Algorithm
-; ------------------------------------
-;   def div32(N,D):
-;       if N==0 :
-;           return(0,0)
-;       Q = 0
-;       R = 0
-;       for i in range (-31, 1 ):
-;           Q <<= 1
-;           R <<= 1
-;           if bit (N,31) :
-;               R = bitset(R,0)
-;           if R >= D:
-;               R = R - D
-;               Q = bitset(Q,0)
-;           N <<= 1
-;       return (Q,R)
-; ------------------------------------
-
-; Define which of the local variable stacks will be used
-.EQU     UD32_N_LO   LVP0
-.EQU     UD32_N_HI   LVP1
-.EQU     UD32_D_LO   LVP2
-.EQU     UD32_D_HI   LVP3
-.EQU     UD32_Q_LO   LVP4
-.EQU     UD32_Q_HI   LVP5
-.EQU     UD32_R_LO   LVP6
-.EQU     UD32_R_HI   LVP7
-.EQU     UD32_LCTR   LVP8
-
-UDIV32:  ; initialise and claim all local variable space
-         LDA /USP-
-         STO /UD32_N_LO+
-         LDA /USP-
-         STO /UD32_N_HI+
-         LDA /USP-
-         STO /UD32_D_LO+
-         LDA /USP-
-         STO /UD32_D_HI+
-
-         LDA ,0x0000
-         STO /UD32_Q_HI+
-         STO /UD32_Q_LO+
-         STO /UD32_R_HI+
-         STO /UD32_R_LO+
-
-         LDA ,-32
-         STO /UD32_LCTR+
-         SET MULTI CR
-
-UD32_LOOP:
-         LDOR /UD32_Q_LO
-         LDA /UD32_Q_HI
-         SLA.D 1 A
-         STO /UD32_Q_HI
-         SLA.D 16 A
-         STO /UD32_Q_LO
-
-         LDOR /UD32_R_LO
-         LDA /UD32_R_HI
-         SLA.D 1 A
-         STO /UD32_R_HI
-         SLA.D 16 A
-         STO /UD32_R_LO
-         LDA /UD32_N_HI
-         JBC 15 A UD32_SKIP
-         LDA /UD32_R_LO
-         SET 0 A
-         STO /UD32_R_LO
-
-UD32_SKIP:
-         SET CARRY CR
-         LDA /UD32_D_LO
-         CMP /UD32_R_LO
-         LDA /UD32_D_HI
-         CMP /UD32_R_HI
-         JBS SIGN CR UD32_SKIP2        ; JUMP if R < D
-
-         SET CARRY CR
-         LDA /UD32_D_LO
-         SBS /UD32_R_LO
-         LDA /UD32_D_HI
-         SBS /UD32_R_HI
-         LDA /UD32_Q_LO
-         SET 0 A
-         STO /UD32_Q_LO
-
-UD32_SKIP2:
-         LDOR /UD32_N_LO
-         LDA /UD32_N_HI
-         SLA.D 1 A
-         STO /UD32_N_HI
-         SLA.D 16 A
-         STO /UD32_N_LO
-
-         ICZ /UD32_LCTR UD32_LOOP
-
-UD32_EXIT:
-         ; Free up all local variable stacks
-         LDA /UD32_D_LO-
-         LDA /UD32_D_HI-
-         LDA /UD32_N_LO-
-         LDA /UD32_N_HI-
-         LDA /UD32_LCTR-
-         LDA /UD32_R_HI-
-         STO /USP+
-         LDA /UD32_R_LO-
-         STO /USP+
-         LDA /UD32_Q_HI-
-         STO /USP+
-         LDA /UD32_Q_LO-
-         STO /USP+
-         RTN
-#else
-
-
 ; ------------------------------------
 ; UDIV32
 ;
@@ -262,8 +127,6 @@ UD32_LVAR:
          .equ UD32_D_HI UD32_LVAR + 7
          .equ UD32_LCTR UD32_LVAR + 8
 
-#endif
-
         ;; ------------------------------------------------------
         ;; SQRT32 - Find square root of an integer numbers up to
         ;;          ~ 2^30
@@ -327,31 +190,18 @@ S32_OUTER:
         LDA .S32_COUNT              ; negate S32_COUNT
         SUB ,0
         SLA 1 A                     ; loop_ctr = (count << 1)
-#ifdef USE_SELFMODCODE
-        ADD .S32_SMC_TEMPLATE       ; add loop_ctr into bitfield of SHIFT instruction from template
-        STO .S32_SMC_TARGET         ; install modified instruction in execution path
-#else
         SUB ,0                      ; negate
         STO .S32_LOOPCTR            ; save in loop counter as neg val for use with ICZ later
-#endif
         SET MULTI CR
         LDA .S32_M1_LO
 S32_INNER:                          ; m1 = m1 << S32_LOOPCTR
         SRA.D 16 A
         LDA .S32_M1_HI
-#ifdef USE_SELFMODCODE
-S32_SMC_TARGET:
-        SLA.D 0 A                   ; self-modifying code location - bitfield (5 lsbs will be modded!)
-#else
         SLA.D 1 A
-#endif
         STO .S32_M1_HI
         SLA.D 16 A
         STO .S32_M1_LO
-#ifdef USE_SELFMODCODE
-#else
         ICZ .S32_LOOPCTR S32_INNER
-#endif
         LDA .S32_M1_HI
         STO /USP+
         LDA .S32_M1_LO
@@ -713,6 +563,7 @@ M16L_LOOP:
 M16L_SKIPADD:
         CLR MULTI CR
         SRA 1 M16L_aa
+        STO M16L_aa
         SET MULTI CR
         LDOR .M16L_bb_lo
         LDA .M16L_bb_hi
