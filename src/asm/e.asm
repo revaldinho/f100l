@@ -26,7 +26,7 @@
 .equ    R15             R0+15
         
 
-.equ  DIGITS  64
+.equ  DIGITS  256
 .equ  COLS    DIGITS+2
 .equ  OSWRADDR 0x7FFF
 

@@ -238,6 +238,6 @@ if __name__ == "__main__" :
     print("# -------------------------------------------------------------------------------------------")
     print("# Emulator Performance Statistics")
     print("# -------------------------------------------------------------------------------------------")
-    print("# Run time                  : %10.2f s" % (et - st))
-    print("# Instructions per second   : %10.2f MIPS" % (emu.instr_count/(1000000 * (et-st))))
+    print("# Run time                  : %10.3f s" % (et - st))
+    print("# Instructions per second   : %10.3f MIPS" % (emu.instr_count/(1000000 * (et-st))))
     print("# -------------------------------------------------------------------------------------------")

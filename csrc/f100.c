@@ -272,5 +272,6 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
    default: break;
     }
   }
-  if (HALT(cpu.ir)) return (int) cpu.ir.WORD; else return 0;
+  if (HALT(cpu.ir)) printf("CPU Halted with halt number 0x%04X\n", cpu.ir.WORD);
+  return (i+1);
 }

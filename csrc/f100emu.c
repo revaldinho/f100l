@@ -93,8 +93,6 @@ int main (int argc, char **argv ) {
   char *filename=NULL;
   char *memdumpfn=NULL;  
   opterr = 0;
-
-
   
   while ( (c=getopt(argc, argv,"bhmtxf:d:")) != -1 ) {
     switch(c) {
@@ -121,9 +119,18 @@ int main (int argc, char **argv ) {
   f100_trace(true);
   f100_reset(true);
   int time_now_ms = clock() * 1000 / CLOCKS_PER_SEC;    
-  f100_exec(0, trace, memtrace);
+  int instr_count = f100_exec(0, trace, memtrace);
   time_now_ms = (clock() * 1000 / CLOCKS_PER_SEC) - time_now_ms;
-  printf ("# Run time                  :       %6.2f s\n", (float)time_now_ms/1000);
+  printf ("# -------------------------------------------------------------------------------------------\n");
+  printf ("# Program Execution Statistics\n");
+  printf ("# -------------------------------------------------------------------------------------------\n");
+  printf ("#          Instruction count: %d\n", instr_count);
+  printf ("# -------------------------------------------------------------------------------------------\n");
+  printf ("# Emulator Performance Statistics\n");
+  printf ("# -------------------------------------------------------------------------------------------\n");
+  printf ("# Run time                  : %10.3f s\n", (float)time_now_ms/1000);
+  printf ("# Instructions per second   : %10.3f MIPS\n", ((float)(instr_count)/(float)(time_now_ms*1000)));  
+  printf ("# -------------------------------------------------------------------------------------------\n");  
   if (memdump) hex16dump(f100_cpu.mem,32768,memdumpfn);
   return (0);
 }
