@@ -193,8 +193,8 @@ S32_OUTER:
         SUB ,0                      ; negate
         STO .S32_LOOPCTR            ; save in loop counter as neg val for use with ICZ later
         SET MULTI CR
-        LDA .S32_M1_LO
 S32_INNER:                          ; m1 = m1 << S32_LOOPCTR
+        LDA .S32_M1_LO        
         SRA.D 16 A
         LDA .S32_M1_HI
         SLA.D 1 A
@@ -563,7 +563,7 @@ M16L_LOOP:
 M16L_SKIPADD:
         CLR MULTI CR
         SRA 1 M16L_aa
-        STO M16L_aa
+        STO .M16L_aa
         SET MULTI CR
         LDOR .M16L_bb_lo
         LDA .M16L_bb_hi
