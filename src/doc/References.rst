@@ -216,6 +216,9 @@ Journal and Conference Papers
   D. A. Lucas, The Controller, Journal of the International Federation of Air Traffic Controllers Association, Vol. 18., No. 4, 1979, pp. 13-15
 
   https://issuu.com/ifatca/docs/1979_04
+
+"A European Bipolar 16-bit Microprocessor"
+  K. Dixon, Microprocessors, Infotech State of the Art Report, Ed. J. Hosier, ISBN 0855393602, 1977, pp. 127-153 
   
      
 Books & Manuals
