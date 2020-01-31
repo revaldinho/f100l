@@ -87,7 +87,7 @@ int main (int argc, char **argv ) {
   bool     memtrace = false;
   bool     memdump = false;
   uint16_t *mem;
-  cpu_t f100_cpu;
+  cpu_t    *f100_cpu;
   int c;
   bool binaryNotHex=false;
   char *filename=NULL;
@@ -113,8 +113,8 @@ int main (int argc, char **argv ) {
   }
  
   f100_cpu = f100_init();
-  if (binaryNotHex) read_bin_file(f100_cpu.mem, filename);
-  else read_hex_file(f100_cpu.mem, filename, false);
+  if (binaryNotHex) read_bin_file(f100_cpu->mem, filename);
+  else read_hex_file(f100_cpu->mem, filename, false);
   print_banner();
   f100_trace(true);
   f100_reset(true);
@@ -124,13 +124,17 @@ int main (int argc, char **argv ) {
   printf ("# -------------------------------------------------------------------------------------------\n");
   printf ("# Program Execution Statistics\n");
   printf ("# -------------------------------------------------------------------------------------------\n");
-  printf ("#          Instruction count: %d\n", instr_count);
+  printf ("#          Instruction Count: %d\n", f100_cpu->stats.instrs);
+  printf ("#      Total Memory Accesses: %d\n", f100_cpu->stats.mwrites + f100_cpu->stats.mreads);  
+  printf ("#              Memory Writes: %d\n", f100_cpu->stats.mwrites);
+  printf ("#               Memory Reads: %d\n", f100_cpu->stats.mreads);
+  
   printf ("# -------------------------------------------------------------------------------------------\n");
   printf ("# Emulator Performance Statistics\n");
   printf ("# -------------------------------------------------------------------------------------------\n");
   printf ("# Run time                  : %10.3f s\n", (float)time_now_ms/1000);
   printf ("# Instructions per second   : %10.3f MIPS\n", ((float)(instr_count)/(float)(time_now_ms*1000)));  
   printf ("# -------------------------------------------------------------------------------------------\n");  
-  if (memdump) hex16dump(f100_cpu.mem,32768,memdumpfn);
+  if (memdump) hex16dump(f100_cpu->mem,32768,memdumpfn);
   return (0);
 }

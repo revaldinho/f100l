@@ -77,6 +77,12 @@ typedef struct {
 } instr_t;
 
 typedef struct {
+  uint32_t instrs;
+  uint32_t mwrites;
+  uint32_t mreads;
+} cpustats_t;
+
+typedef struct {
   uint16_t *mem ;
   uint16_t acc;
   uint16_t or;
@@ -89,10 +95,11 @@ typedef struct {
   bool M;
   bool F;
   instr_t ir;
+  cpustats_t stats;
 } cpu_t;
 
 
-extern cpu_t f100_init();
-extern void  f100_reset(bool adsel);
-extern void  f100_trace(bool header);
-extern int   f100_exec(int max_instr, bool trace_on, bool memtrace_on);
+extern cpu_t    *f100_init();
+extern void     f100_reset(bool adsel);
+extern void     f100_trace(bool header);
+extern int32_t  f100_exec(int max_instr, bool trace_on, bool memtrace_on);

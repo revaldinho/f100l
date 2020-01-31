@@ -18,19 +18,24 @@ static cpu_t    cpu;
 static uint16_t operand_address, target;
 
 // CPU Functions
-cpu_t f100_init() {
+cpu_t *f100_init() {
   cpu.mem = (uint16_t *) malloc(F100MEMSZ * sizeof(uint16_t));
-  return cpu;
+  cpu.stats.mwrites = 0;
+  cpu.stats.mreads = 0;
+  cpu.stats.instrs = 0;
+  return &cpu;
 }
 
 static uint16_t read_mem( uint16_t addr )  {
   uint16_t data = cpu.mem[addr];
   if (memtron) printf("LOAD  : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
+  cpu.stats.mreads++;
   return data;
 }
 
 static void write_mem( uint16_t addr, uint16_t data ) {
   if (memtron) printf("STORE : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
+  cpu.stats.mwrites++;
   cpu.mem[addr] = data;
 }
 
@@ -59,10 +64,13 @@ void f100_trace(bool header) {
 }
 
 void f100_reset(bool adSel ) {
+  cpu.stats.mwrites = 0;
+  cpu.stats.mreads = 0;
+  cpu.stats.instrs = 0;
   cpu.pc = (adSel) ? 2048 : 16384 ;
 }
 
-int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
+int32_t f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
   uint32_t result;
   uint16_t stack_pointer;
   uint16_t pointer;
@@ -70,7 +78,7 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
   uint16_t operand1_address;
   uint16_t operand;
 
-  int i;
+  int32_t i;
 
   memtron = memtrace_on;
   tron = trace_on;
@@ -272,6 +280,7 @@ int f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
    default: break;
     }
   }
+  cpu.stats.instrs += i+1;
   if (HALT(cpu.ir)) printf("CPU Halted with halt number 0x%04X\n", cpu.ir.WORD);
   return (i+1);
 }
