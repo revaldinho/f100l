@@ -51,7 +51,7 @@ import operator as op
 operators = {ast.Add: op.add, ast.BitAnd: op.__and__, ast.BitOr: op.__or__,
              ast.BitXor: op.xor, ast.Div: op.truediv, ast.LShift: op.__lshift__,
              ast.Mult: op.mul, ast.Pow: op.pow, ast.RShift: op.__rshift__,
-             ast.Sub: op.sub, ast.USub: op.neg }
+             ast.Sub: op.sub, ast.USub: op.neg, ast.FloorDiv: op.floordiv  }
 
 class SymbolTable (dict) :
     def __init__ (self, labels=dict()):

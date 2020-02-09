@@ -281,10 +281,11 @@ class F100Asm():
     def process_directive(self, directive, operands ) :
         new_pc = self.pc
         words = []
+
         if directive == ".EQU":
             self.st[operands[0]] = ''.join(operands[1:])
         elif directive == ".ORG":
-            new_pc = self.st.eval_expr(operands[0])
+            new_pc = self.st.eval_expr(''.join(operands[0:]))
         elif directive == ".DATA" or directive == ".WORD":
             ## Need to resplit by commas rather than spaces
             data_words = (''.join(operands).split(','))
