@@ -450,7 +450,6 @@ class OpcodeF0_Shift(F100_Opcode) :
                 CR.fromint(result)
                 CPU.ACC = result
             elif IR.R ==3:
-                CPU.memory_write(operand_addr, result)
                 CPU.ACC = result                
             else:
                 CPU.ACC = result

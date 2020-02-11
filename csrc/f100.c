@@ -140,8 +140,6 @@ int32_t f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
           if (cpu.ir.R==1) {
             // Overwrite flags with the shifted value
             UNPACK_FLAGS(cpu.acc);
-          } else if (cpu.ir.R==3) {
-            write_mem(operand_address, cpu.acc);
           } 
         } else { // Double Length
           uint8_t  places = (((cpu.ir.J&1)<<4) + cpu.ir.B);
@@ -162,9 +160,7 @@ int32_t f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
           if (cpu.ir.R==1) {
             // Overwrite flags with the shifted value, low word (in OR)
             UNPACK_FLAGS(cpu.or);
-          } else if (cpu.ir.R==3) {
-            write_mem(operand_address, cpu.or);
-          }
+          } 
         }
       } else if ( cpu.ir.T==0 && cpu.ir.S>1) { //  Bit conditional jumps and Bit manipulation
         uint16_t bmask;
@@ -253,7 +249,7 @@ int32_t f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
       COMPUTE_BORROW(result) ;
       COMPUTE_SVZ_SUB(result, cpu.or, cpu.acc) ;        
       if (cpu.ir.F==OP_SBS) write_mem(operand_address, TRUNC16(result));
-      else if (cpu.ir.F!=OP_CMP) cpu.acc=TRUNC16(result);
+      if (cpu.ir.F!=OP_CMP) cpu.acc=TRUNC16(result);
       break;
     case OP_ADS:
     case OP_ADD:
@@ -261,9 +257,9 @@ int32_t f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
       result = cpu.acc + cpu.or;
       if (cpu.M) result += cpu.C;
       COMPUTE_CARRY(result) ;
-      COMPUTE_SVZ_ADD(result, cpu.acc, cpu.or) ;                
+      COMPUTE_SVZ_ADD(result, cpu.acc, cpu.or) ;
+      cpu.acc=TRUNC16(result);      
       if (cpu.ir.F==OP_ADS) write_mem(operand_address, TRUNC16(result));
-      else cpu.acc=TRUNC16(result);
       break;
     case OP_AND:
       cpu.or = read_mem(operand_address);

@@ -84,22 +84,25 @@ class OpcodeF5(F100_Opcode) :
 
     def execute(self):
         cycle_count = 0
-        self.execstats[self.disassemble(self.CPU.IR)] += 1
+        CPU = self.CPU
 
-        (self.CPU.OR, operand_address, cycles) = self.get_operand()
-        result = (self.CPU.OR + self.CPU.ACC) & 0x1FFFF
-        if (self.CPU.CR.M==1) :
-            result = (result + self.CPU.CR.C) &0x1FFFF
+        self.execstats[self.disassemble(CPU.IR)] += 1
 
-        self.CPU.memory_write(operand_address, result)
+        (CPU.OR, operand_address, cycles) = self.get_operand()
+        result = (CPU.OR + CPU.ACC) & 0x1FFFF
+        if (CPU.CR.M==1) :
+            result = (result + CPU.CR.C) &0x1FFFF
 
-        if ((self.CPU.ACC & 0x8000) == (self.CPU.OR & 0x8000)) and ((result & 0x8000) != (self.CPU.ACC & 0x8000)):
-            self.CPU.CR.V = 1
+        CPU.ACC = result & 0xFFFF
+        CPU.memory_write(operand_address, result)
+
+        if ((CPU.ACC & 0x8000) == (CPU.OR & 0x8000)) and ((result & 0x8000) != (CPU.ACC & 0x8000)):
+            CPU.CR.V = 1
         else:
-            self.CPU.CR.V = 0
+            CPU.CR.V = 0
 
-        self.CPU.CR.C = 1 if (result & 0x010000) > 0 else 0
-        self.CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
-        self.CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
+        CPU.CR.C = 1 if (result & 0x010000) > 0 else 0
+        CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
+        CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
 
         return cycle_count
