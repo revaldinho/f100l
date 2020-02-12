@@ -97,13 +97,13 @@ class OpcodeF6(F100_Opcode) :
             result = (result + CPU.CR.C - 1) & 0x1FFFF
 
         CPU.memory_write(operand_address, result)
-
-        CPU.CR.C = 0 if (result & 0x010000) > 0 else 1
-        CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
-        CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
         if ((CPU.ACC & 0x8000) != (CPU.OR & 0x8000)) and ((result & 0x8000) != (CPU.OR & 0x8000)):
             CPU.CR.V = 1
         else:
             CPU.CR.V = 0
+        CPU.ACC = result & 0xFFFF
+        CPU.CR.C = 0 if (result & 0x010000) > 0 else 1
+        CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
+        CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
 
         return cycle_count

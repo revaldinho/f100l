@@ -21,7 +21,7 @@ VPATH=../../csrc
 .hex.cdump:; /usr/bin/time ../../csrc/f100emu -f $< -x -d $*.cdump > $*.clog
 
 .SUFFIXES: .asm .cpp
-.asm.cpp:; cpp -E $< | grep -v '^#'>  $@
+.asm.cpp:; cpp -E -C $< | grep -v '^#'>  $@
 
 testdata.inc: testgen.py
 	${PYEXE} testgen.py
