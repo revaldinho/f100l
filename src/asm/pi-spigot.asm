@@ -12,32 +12,39 @@
 .equ    USP             1       ; user stack pointer location
 .equ    LINK_STACK      0x7C01  ; initial value for link stack (must be ODD)
 .equ    USER_STACK      0x7800  ; initial value for user stack
-.equ    R0              10      ; loopctr                               
-.equ    R1              R0+1    ; unused                                 
-.equ    R2              R0+2    ; output pointer                         
-.equ    R3              R0+3    ; c                                      
-.equ    R4              R0+4    ; i (use -i to allow ICZ in inner loop)  
-.equ    R5              R0+5    ; Q                                      
-.equ    R6              R0+6    ; result                                 
-.equ    R7              R0+7    ; pointer to remainders                  
-.equ    R8              R0+8    ; digit number                           
-.equ    R9              R0+9    ; predigit                               
-.equ    R10             R0+10   ; scratch                                
-.equ    R11             R0+11   ; scratch                               
-.equ    R12             R0+12   ; scratch                               
-.equ    R13             R0+13   ; scratch                               
-.equ    R14             R0+14   ; parameter reg                         
-.equ    R15             R0+15   ; parameter reg                         
-                                  
-.equ  DIGITS  16
+.equ    R0              10      ; loopctr
+.equ    R1              R0+1    ; nines
+.equ    R2              R0+2    ; output pointer
+.equ    R3              R0+3    ; c
+.equ    R4              R0+4    ; i (use -i to allow ICZ in inner loop)
+.equ    R5              R0+5    ; Q
+.equ    R6              R0+6    ; result
+.equ    R7              R0+7    ; pointer to remainders
+.equ    R8              R0+8    ; digit number
+.equ    R9              R0+9    ; predigit
+.equ    R10             R0+10   ; scratch
+.equ    R11             R0+11   ; scratch
+.equ    R12             R0+12   ; scratch
+.equ    R13             R0+13   ; scratch
+.equ    R14             R0+14   ; parameter reg
+.equ    R15             R0+15   ; parameter reg
+.equ    CONST0          R0+16   ; constant ZERO
+.equ    CONST1          R0+17   ; constant ONE
+
+
+.equ  DIGITS  512
 .equ  COLS    1+(DIGITS*10//3)
-.equ  OSWRADDR 0x7FFF
 
 INIT:   .org 0x800              ; 0x800 standard start address
         LDA ,LINK_STACK         ; initialize link stack pointer
         STO .LSP
         LDA ,USER_STACK         ; initialize user stack pointer
         STO .USP
+        CLR     MULTI CR
+        LDA ,0                  ; initialize constant registers
+        STO CONST0
+        LDA ,1
+        STO CONST1
 start:
         LDA     ,MYPI-1         ; point to output buffer
         STO     R2
@@ -60,26 +67,27 @@ LOOP:
         ICZ     R0 LOOP
 
         LDA     ,-DIGITS        ; Digit counter from -Digits to 0
-        STO     R8        
-        LDA     ,0              ; C = 0
+        STO     R8
+        LDA     CONST0             ; C = 0
         STO     R3
         STO     R9              ; init outer loop counter
-        
+        STO     R1              ; nines=0
+
 L3:     LDA     ,COLS-1         ; i = COLS-1
-        STO     R4              
+        STO     R4
         ADD     ,REMAINDER      ; setup remainder pointer to end of data
         STO     R7
-        LDA     ,0              ; Q = 0
+        LDA     CONST0            ; Q = 0
         STO     R5
-        
+
 L4:     LDA     /R7             ; Q += R[i]*10
-        SLA     3 A             
+        SLA     3 A
         ADD     /R7
         ADD     /R7
-        ADS     R5             
-        SLA     1 R4            ; denom=(2*i)-1        
+        ADS     R5
+        SLA     1 R4            ; denom=(2*i)-1
         STO     R15
-        LDA     ,1
+        LDA     CONST1
         SBS     R15
         LDA     R5              ; r[i] = q % denom ; q = q//denom
         STO     R14
@@ -88,10 +96,10 @@ L4:     LDA     /R7             ; Q += R[i]*10
         STO     R5              ; Q = quotient
         LDA     R15
         STO     /R7             ; r[i] = remainder
-        LDA     ,1
+        LDA     CONST1
         SBS     R4              ; R4--
-        CMP     ,0              
-        JBS     ZERO CR L5     
+        CMP     CONST0
+        JBS     ZERO CR L5
         LDA     /R7-            ; decrement pointer R7
         LDA     R5              ; Q *= i
         STO     R14
@@ -101,38 +109,55 @@ L4:     LDA     /R7             ; Q += R[i]*10
         LDA     R15
         STO     R5
         JMP     .L4
-        
+
 L5:     LDA     R5              ; result = C+Q//10
         STO     R14
         LDA     ,10
         STO     R15
         CAL     .UDIV16
-        LDA     R14             
+        LDA     R14
         ADD     R3
         STO     R6
         LDA     R15             ; C=Q%10
         STO     R3
-        LDA     R6              ; Check if result=10 (ie overflow)
+
+        LDA     R6              ; check if result=9
+        CMP     ,9
+        JBC     ZERO CR L5A
+        LDA     CONST1              ; decrement 9s if yes (-ve counting)
+        SBS     R1
+        ICZ     R8 L3           ; loop again without printing digits
+
+L5A:    LDA     R6              ; Check if result=10 (ie overflow)
         CMP     ,10
         JBC     ZERO CR L6
-        LDA     ,0              ; if yes, zero result
+        LDA     CONST0            ; if yes, zero result
         STO     R6
-        LDA     ,1              ; and inc predigit
+        LDA     CONST1              ; and inc predigit
         ADS     R9
-        CMP     ,10             ; check if predigit overflowed
-        JBC     ZERO CR L6
-        LDA     ,10             ; should now correct the pre-predigit but settle for 1 digit correction here
-        SBS     R9              ; and zero it
-        
+        CAL     .OSWRDIG        ; print predigit and all nines will be zeros now
+        LDA     R1
+        CMP     CONST0
+        JBS     ZERO CR L7
+L5B:    LDA     CONST0
+        CAL     .OSWRDIG
+        ICZ     R1 L5B
+
 L6:     LDA     R8              ; If this isnt the first digit then print the existing pre-digit
         CMP     ,-DIGITS
         JBS     ZERO CR L7
         LDA     R9
+        CAL     .OSWRDIG        ; print predigit and all nines
+        LDA     R1
+        CMP     CONST0
+        JBS     ZERO CR L7
+L6B:    LDA     ,9
         CAL     .OSWRDIG
-        
+        ICZ     R1 L6B
+
 L7:     LDA     R6              ; predigit <- result
         STO     R9
-        ICZ     R8 L3
+L8:     ICZ     R8 L3
         ;; Print last digit
         LDA     R9
         CAL     .OSWRDIG
@@ -140,9 +165,8 @@ L7:     LDA     R6              ; predigit <- result
 OSWRDIG:
         ;; Entry A=digit to write
         ADD     ,48             ; make ASCII
-OSWRCHR:        
+OSWRCHR:
         STO     /R2+
-        STO     .OSWRADDR       ; write to magic memory (for easy tracing)
         RTN
 ; ------------------------------------
 ; UDIV16
@@ -184,17 +208,9 @@ OSWRCHR:
 .equ UD16_LCTR R11
 
 UDIV16:
-         LDA ,0x0000
+         LDA CONST0
          STO UD16_Q
          STO UD16_R
-         LDA UD16_D            ; check if D>N and zero quotient, return N in remainder if true
-         CMP UD16_N
-         JBC SIGN CR UD16_L1
-         LDA UD16_N
-         STO R15
-         LDA ,0                 ; Q = 0
-         STO R14
-         RTN
 UD16_L1:
          LDA ,-16
          STO UD16_LCTR
@@ -245,7 +261,7 @@ MUL16:
         STO M16L_count
         LDA R15
         STO M16L_aa
-        LDA ,0
+        LDA CONST0
         STO M16L_res
 M16L_LOOP:
         JBC 0 M16L_aa M16L_SKIPADD
@@ -262,6 +278,6 @@ M16L_SKIPADD:
         .ORG 0x1000
 MYPI:                              ; Space for pi digit storage
 
-        .ORG 0x2000
+        .ORG 0x1500
 
 REMAINDER:                         ; Array space for remainder
