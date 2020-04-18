@@ -31,8 +31,7 @@
 .equ    CONST0          R0+16   ; constant ZERO
 .equ    CONST1          R0+17   ; constant ONE
 
-
-.equ  DIGITS  512
+.equ  DIGITS  64        
 .equ  COLS    1+(DIGITS*10//3)
 
 INIT:   .org 0x800              ; 0x800 standard start address
