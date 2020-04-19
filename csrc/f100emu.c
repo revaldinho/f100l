@@ -71,11 +71,12 @@ void read_bin_file( uint16_t *mem, char *filename){
 }
 
 void usage(){
-  puts("Usage:\n   f100emu -f <filename> [-x] [-d <filename>] [-b][-m][-t][-h]");
+  puts("Usage:\n   f100emu -f <filename> [-x] [-d <filename>] [-b][-m][-t][-r][-h]");
   puts("Options:\n   -f <filename>              program file name");
   puts("   -b              program file in binary format");
   puts("   -x              program file in hex format (default)");
   puts("   -t              print logic trace");
+  puts("   -r              print registers (mem 10-26) in logic trace");  
   puts("   -d <filename>   make hex dump of memory at end of run");
   puts("   -m              print memory accesses");  
   puts("   -h              print this summary");
@@ -86,6 +87,7 @@ int main (int argc, char **argv ) {
   bool     trace = false;
   bool     memtrace = false;
   bool     memdump = false;
+  bool     regtrace = false;  
   uint16_t *mem;
   cpu_t    *f100_cpu;
   int c;
@@ -94,10 +96,11 @@ int main (int argc, char **argv ) {
   char *memdumpfn=NULL;  
   opterr = 0;
   
-  while ( (c=getopt(argc, argv,"bhmtxf:d:")) != -1 ) {
+  while ( (c=getopt(argc, argv,"bhmrtxf:d:")) != -1 ) {
     switch(c) {
     case 'f': filename = optarg; break;
     case 'm': memtrace = true; break;
+    case 'r': regtrace = true; break;      
     case 't': trace = true; break;
     case 'd': memdump = true; memdumpfn = optarg; break; 
     case 'b': binaryNotHex = true; break;
@@ -112,14 +115,14 @@ int main (int argc, char **argv ) {
     exit(1);
   }
  
-  f100_cpu = f100_init();
+  f100_cpu = f100_init(trace, memtrace, regtrace);
   if (binaryNotHex) read_bin_file(f100_cpu->mem, filename);
   else read_hex_file(f100_cpu->mem, filename, false);
   print_banner();
   f100_trace(true);
   f100_reset(true);
   int time_now_ms = clock() * 1000 / CLOCKS_PER_SEC;    
-  int instr_count = f100_exec(0, trace, memtrace);
+  int instr_count = f100_exec(0);
   time_now_ms = (clock() * 1000 / CLOCKS_PER_SEC) - time_now_ms;
   printf ("# -------------------------------------------------------------------------------------------\n");
   printf ("# Program Execution Statistics\n");

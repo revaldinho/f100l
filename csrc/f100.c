@@ -14,15 +14,19 @@
 static bool     verbose = false;
 static bool     memtron;
 static bool     tron;
+static bool     regtron;
 static cpu_t    cpu;
-static uint16_t operand_address, target;
 
 // CPU Functions
-cpu_t *f100_init() {
+cpu_t *f100_init( bool trace_on, bool memtrace_on, bool regtrace_on) {
   cpu.mem = (uint16_t *) malloc(F100MEMSZ * sizeof(uint16_t));
   cpu.stats.mwrites = 0;
   cpu.stats.mreads = 0;
   cpu.stats.instrs = 0;
+  memtron = memtrace_on;
+  tron = trace_on;
+  regtron = regtrace_on;
+  
   return &cpu;
 }
 
@@ -54,12 +58,31 @@ static void decode( uint16_t word) {
 
 void f100_trace(bool header) {
   if (header) {
-    printf("# %2s  : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");
-    puts("# ---------------------------------------------------------------------------");
+    if (regtron) {
+      printf("# %2s  : %4s : %4s %4s : %7s %s", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP  USP :");
+      for (int i=0; i<16 ; i++ ) {
+        printf("  r%02d", i);
+      }
+      puts(": Instruction");
+      printf("# ---------------------------------------------------------------------------");
+      puts("------------------------------------------------------------------------");
+    } else { 
+      printf("# %2s  : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");
+      puts("# ---------------------------------------------------------------------------");      
+    }
+
   } else {
     char *mnem = mnemonic[cpu.ir.F];
-    printf("%04X  : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X  %04X   %04X   %04X  : %s\n", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,  \
-           cpu.F, cpu.M, cpu.C, cpu.S, cpu.V, cpu.Z, cpu.I, cpu.mem[LSP], cpu.mem[TRUNC15(cpu.mem[LSP]-2)], cpu.mem[TRUNC15(cpu.mem[LSP]-1)], cpu.mem[TRUNC15(cpu.mem[LSP])], mnem);
+      printf("%04X  : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X %04X :", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,\
+             cpu.F, cpu.M, cpu.C, cpu.S, cpu.V, cpu.Z, cpu.I, cpu.mem[LSP], cpu.mem[1]);    
+    if (regtron) {
+      for ( int i=0;i<16; i++) {
+        printf(" %04X", cpu.mem[i+10]);
+      }
+      printf(": %s\n", mnem);
+    } else {
+      printf(" %04X  %04X   %04X   %04X  : %s\n", cpu.mem[LSP], cpu.mem[TRUNC15(cpu.mem[LSP]-2)], cpu.mem[TRUNC15(cpu.mem[LSP]-1)], cpu.mem[TRUNC15(cpu.mem[LSP])], mnem);
+    }
   }
 }
 
@@ -70,7 +93,7 @@ void f100_reset(bool adSel ) {
   cpu.pc = (adSel) ? 2048 : 16384 ;
 }
 
-int32_t f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
+int32_t f100_exec(int max_instr ){
   uint32_t result;
   uint16_t stack_pointer;
   uint16_t pointer;
@@ -80,8 +103,6 @@ int32_t f100_exec(int max_instr, bool trace_on, bool memtrace_on) {
 
   int32_t i;
 
-  memtron = memtrace_on;
-  tron = trace_on;
 
   for ( i=0; (!max_instr)||(i<max_instr) ; i++ ) {
     // Fetch and decode operand
