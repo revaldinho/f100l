@@ -28,23 +28,23 @@ USAGE:
 
 REQUIRED SWITCHES ::
 
-  -f --filename  <filename>      specify the assembler source file
+  -f --filename  <filename>           specify the assembler source file
 
 
 OPTIONAL SWITCHES ::
 
-  -o --output    <filename>      specify file name for assembled code
+  -o --output    <filename>           specify file name for assembled code
 
-  -g --format    <bin|ihex|hex>  set the file format for the assembled code
-                                 - default is hex
+  -g --format    <bin|ihex|hex|hex16> set the file format for the assembled code
+                                      - default is hex
 
-  -e --endianness <little|big>   set endianness of byte oriented output
-                                 - default is little-endian
+  -e --endianness <little|big>        set endianness of byte oriented output
+                                      - default is little-endian
 
-  -n --nolisting                 suppress the listing to stdout while the
-                                 program runs
+  -n --nolisting                      suppress the listing to stdout while the
+                                      program runs
 
-  -h --help                      print this help message
+  -h --help                           print this help message
 
   If no output filename is provided the assembler just produces the normal
   listing output to stdout.
@@ -110,35 +110,51 @@ def usage():
 
 
 def write_file(output_file, oformat, assembled_words, endianness="little") :
-    addr_lo = 0
-    addr_hi = 0
-
-    # make a 64KByte memory image
-    h = Hex2Bin(64*1024)
-    # fill it from assembled words
-    for k in sorted(assembled_words.keys()):
-        # Need to multiply address by two to convert 16b word address to byte address
-        addr = k * 2
-        words = assembled_words[k]
-        if addr < addr_lo:
-            addr_lo = addr
-        for i in words:
-            byte_lo = i & 0x000000FF
-            byte_hi = (i >> 8) & 0x000000FF
-            if endianness=="little":
-                h.write_byte(addr, byte_lo)
-                addr += 1
-                h.write_byte(addr, byte_hi)
-                addr += 1
-            else:
-                h.write_byte(addr, byte_lo)
-                addr += 1
-                h.write_byte(addr, byte_hi)
-                addr += 1
-        if addr > addr_hi:
-            addr_hi = addr
-
-    result = h.write_file( output_filename, oformat=output_format, first_address=0, number_of_bytes=addr_hi)
+    memdump = [0]*65536        
+    
+    for i in sorted(assembled_words.keys()):
+        k = 0
+        for j in assembled_words[i]:
+            memdump[i+k]=j & 0xFFFF
+            k+=1
+    if ( oformat == "hex16"):
+        with open(output_file,"w" ) as f:
+            for adr in range (0, len(memdump), 16):
+                output_words = []
+                for i in range (0, 16):
+                    output_words.append("%04X" % (memdump[i+adr] & 0xFFFF))
+                f.write("%04X: %s\n" %( adr, ' '.join(output_words)))
+        f.close()
+        result = True
+    else:
+        addr_lo = 0
+        addr_hi = 0
+        
+        # make a 64KByte memory image
+        h = Hex2Bin(64*1024)
+        # fill it from assembled words
+        for k in sorted(assembled_words.keys()):
+            # Need to multiply address by two to convert 16b word address to byte address
+            addr = k * 2
+            words = assembled_words[k]
+            if addr < addr_lo:
+                addr_lo = addr
+            for i in words:
+                byte_lo = i & 0x000000FF
+                byte_hi = (i >> 8) & 0x000000FF
+                if endianness=="little":
+                    h.write_byte(addr, byte_lo)
+                    addr += 1
+                    h.write_byte(addr, byte_hi)
+                    addr += 1
+                else:
+                    h.write_byte(addr, byte_lo)
+                    addr += 1
+                    h.write_byte(addr, byte_hi)
+                    addr += 1
+            if addr > addr_hi:
+                addr_hi = addr    
+        result = h.write_file( output_filename, oformat=output_format, first_address=0, number_of_bytes=addr_hi)
     if result == False:
         raise UserWarning("Error writing to %s " % output_filename)
 
@@ -327,7 +343,7 @@ if __name__ == "__main__":
         if opt in ( "-e", "--endianness" ) :
             endianness = arg
         if opt in ( "-g", "--format" ) :
-            if (arg in ("hex", "bin", "ihex")):
+            if (arg in ("hex", "bin", "ihex", "hex16")):
                 output_format = arg
             else:
                 usage()
