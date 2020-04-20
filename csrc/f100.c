@@ -26,12 +26,12 @@ cpu_t *f100_init( bool trace_on, bool memtrace_on, bool regtrace_on) {
   memtron = memtrace_on;
   tron = trace_on;
   regtron = regtrace_on;
-  
   return &cpu;
 }
 
 static uint16_t read_mem( uint16_t addr )  {
   uint16_t data = cpu.mem[addr];
+  if (addr==0x7EF8) data=0x0040; // Always return status ready for tube register
   if (memtron) printf("LOAD  : addr=0x%04X (%6d) data=0x%04X (%6d)\n", addr, addr, data, data);
   cpu.stats.mreads++;
   return data;
@@ -76,8 +76,8 @@ void f100_trace(bool header) {
       printf("%04X  : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X %04X :", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,\
              cpu.F, cpu.M, cpu.C, cpu.S, cpu.V, cpu.Z, cpu.I, cpu.mem[LSP], cpu.mem[1]);    
     if (regtron) {
-      for ( int i=0;i<16; i++) {
-        printf(" %04X", cpu.mem[i+10]);
+      for ( int i=2;i<(2+16); i++) {
+        printf(" %04X", cpu.mem[i]);
       }
       printf(": %s\n", mnem);
     } else {
