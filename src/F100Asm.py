@@ -122,8 +122,8 @@ def write_file(output_file, oformat, assembled_words, endianness="little") :
             for adr in range (0, len(memdump), 16):
                 output_words = []
                 for i in range (0, 16):
-                    output_words.append("%04X" % (memdump[i+adr] & 0xFFFF))
-                f.write("%04X: %s\n" %( adr, ' '.join(output_words)))
+                    output_words.append("0x%04X" % (memdump[i+adr] & 0xFFFF))
+                f.write("0x%04X: %s,\n" %( adr, ','.join(output_words)))
         f.close()
         result = True
     else:
