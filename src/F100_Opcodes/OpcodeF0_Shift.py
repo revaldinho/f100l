@@ -53,6 +53,7 @@ In single length operation the data to be shifted can be one of
 * the Condition Register (CR), or
 * a memory location (W)
 
+The result for single length shifts is always held in the accumulator.
 
 **Function**
 
@@ -60,16 +61,16 @@ In single length operation the data to be shifted can be one of
 
   SLL  B A      A <- A << B
   SLL  B CR     CR <- CR << B
-  SLL  B W      (W) <- (W) << B
+  SLL  B W      A <- (W) << B
   SLA  B A      A <- A << B
   SLA  B CR     CR <- CR << B
-  SLA  B W      (W) <- (W) << B
+  SLA  B W      A <- (W) << B
   SRL  B A      A <- A >>> B
   SRL  B CR     CR <- CR >>> B
-  SRL  B W      (W) <- (W) >>> B
+  SRL  B W      A <- (W) >>> B
   SRA  B A      A <- A >> B
   SRA  B CR     CR <- CR >> B
-  SRA  B W      (W) <- (W) >> B
+  SRA  B W      A <- (W) >> B
 
 **Instruction Encoding**
 
@@ -137,10 +138,10 @@ Single Length Rotations
 
   SLE  B A      A <- _rotl(A,B)
   SLE  B CR     CR <- _rotl(CR,B)
-  SLE  B W      (W) <- _rotl((W),B)
+  SLE  B W      A <- _rotl((W),B)
   SRE  B A      A <- _rotr(A,B)
   SRE  B CR     CR <- _rotr(CR,B)
-  SRE  B W      (W) <- _rotr((W),B)
+  SRE  B W      A <- _rotr((W),B)
 
 
 **Instruction Encoding**

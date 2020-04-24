@@ -43,10 +43,10 @@ Perform a bitwise logical exclusive-OR of the Accumulator and specified operand.
 +---+---+---+---+---+---+---+
 | F | M | C | S | V | Z | I |
 +---+---+---+---+---+---+---+
-|\--|\--| 1 | * | x | * |\--|
+|\--|\--| 0 | * | x | * |\--|
 +---+---+---+---+---+---+---+
 
-* C is always set to 1
+* C is always reset to 0
 * Z is set if the result is all-zeroes, otherwise cleared
 * S is set if the MSB of the result is a '1', otherwise cleared
 * V is undefined after this operation
