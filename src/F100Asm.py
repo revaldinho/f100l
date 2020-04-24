@@ -241,14 +241,14 @@ class F100Asm():
                             error_count += 1
                             print("Syntax Error on line %d: %s" % (lineno, s))
                 else:
-                    try:
+                    try:                        
                         (line_words, warnings) = self.line_assemble(t, fields[1:], self.st, suppress_errors = True if pass_number < 1 else False)
                     except ValueError as v:
                         if pass_number >0:
                             # Ignore undefined symbols on first pass
                             error_count+= 1
                             print(v)
-                    except (UserWarning, SyntaxError) as e:
+                    except (TypeError, UserWarning, SyntaxError) as e:
                         error_count += 1
                         if pass_number > 0:
                             print("Error on line %d" % lineno)
