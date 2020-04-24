@@ -97,7 +97,6 @@ L4:     LDA     /R7             ; Q += R[i]*10
         STO     /R7             ; r[i] = remainder
         LDA     CONST1
         SBS     R4              ; R4--
-        CMP     CONST0
         JBS     ZERO CR L5
         LDA     /R7-            ; decrement pointer R7
         LDA     R5              ; Q *= i
@@ -136,7 +135,6 @@ L5A:    LDA     R6              ; Check if result=10 (ie overflow)
         ADS     R9
         CAL     .OSWRDIG        ; print predigit and all nines will be zeros now
         LDA     R1
-        CMP     CONST0
         JBS     ZERO CR L7
 L5B:    LDA     CONST0
         CAL     .OSWRDIG
@@ -148,8 +146,7 @@ L6:     LDA     R8              ; If this isnt the first digit then print the ex
         LDA     R9
         CAL     .OSWRDIG        ; print predigit and all nines
         LDA     R1
-        CMP     CONST0
-        JBS     ZERO CR L7
+        JBS     ZERO CR L7      
 L6B:    LDA     ,9
         CAL     .OSWRDIG
         ICZ     R1 L6B
