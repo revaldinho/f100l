@@ -23,6 +23,10 @@
 #define PACK_FLAGS        (((cpu.F<<6)|(cpu.M<<5)|(cpu.C<<4)|(cpu.S<<3)|(cpu.V<<2)|(cpu.Z<<1)|(cpu.I)) & 0x7F)
 #define TRUNC16(m)        (m & 0xFFFF)
 
+#define F100_READ_MEM     read_mem
+#define F100_WRITE_MEM    write_mem
+
+
 #ifdef F200
 // For F200 operation don't trucate the 15th bit of addresses
 #define TRUNC15(m)        (m & 0xFFFF)
