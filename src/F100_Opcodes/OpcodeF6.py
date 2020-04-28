@@ -36,6 +36,10 @@ When M is set, include the carry from a previous operation in the subtraction
 In the immediate mode operation, data 'D' is taken from the location (PC+1), ie the word immediately
 after the opcode, and the the result is returned to that location.
 
+The result of the subtraction passes through the Operand Register as it written to memory.
+
+The accumulator is unchanged by the result of the SBS instruction.
+
 **Instruction Encoding**
 
 +----+-+-+--+-----------------+-+----------------+----------+----------------------+
@@ -101,9 +105,9 @@ class OpcodeF6(F100_Opcode) :
             CPU.CR.V = 1
         else:
             CPU.CR.V = 0
-        CPU.ACC = result & 0xFFFF
         CPU.CR.C = 0 if (result & 0x010000) > 0 else 1
         CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
         CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
-
+        CPU.OR = result
+        
         return cycle_count

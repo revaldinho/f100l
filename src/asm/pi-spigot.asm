@@ -84,7 +84,8 @@ L4:     LDA     /R7             ; Q += R[i]*10
         ADD     /R7
         ADD     /R7
         ADS     R5
-        SLA     1 R4            ; denom=(2*i)-1
+        LDA     R4
+        SLA     1 A            ; denom=(2*i)-1
         STO     R15
         LDA     CONST1
         SBS     R15
@@ -133,6 +134,7 @@ L5A:    LDA     R6              ; Check if result=10 (ie overflow)
         STO     R6
         LDA     CONST1              ; and inc predigit
         ADS     R9
+        LDA     R9
         CAL     .OSWRDIG        ; print predigit and all nines will be zeros now
         LDA     R1
         JBS     ZERO CR L7
@@ -212,9 +214,7 @@ UD16_L1:
          STO UD16_LCTR
 UD16_LOOP:
          SLA 1 UD16_Q
-         STO UD16_Q
          SLA 1 UD16_R
-         STO UD16_R
          JBC 15 UD16_N UD16_SKIP
          SET 0 UD16_R
 UD16_SKIP:
@@ -226,7 +226,6 @@ UD16_SKIP:
          SET 0 UD16_Q
 UD16_SKIP2:
          SLA 1 UD16_N
-         STO UD16_N
          ICZ UD16_LCTR UD16_LOOP
 UD16_EXIT:
          LDA UD16_R
@@ -265,9 +264,7 @@ M16L_LOOP:
         ADS M16L_res
 M16L_SKIPADD:
         SRA 1 M16L_aa
-        STO M16L_aa
         SLL 1 M16L_bb
-        STO M16L_bb
         ICZ M16L_count M16L_LOOP
         RTN
 

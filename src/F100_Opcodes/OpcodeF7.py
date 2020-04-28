@@ -16,6 +16,9 @@ Increment the contents of a counter or address and jump to a specified location 
    ICZ /P- W1  (P) <- (P)+1 ;  P <- P-1; ; if (Z==0) PC <- W1
    ICZ .W  W1  (W) <- (W)+1 ; if (Z==0) PC <- W1
 
+The Operand Register holds the value written back to memory at the end of the instruction, but 
+the contents of the accumulator are preserved.
+
 **Instruction Encoding**
 
 +----+-+-+--+-----------------+-+---------------+-+----------------+-----------+--------------+
@@ -125,12 +128,11 @@ class OpcodeF7(F100_Opcode) :
         (CPU.OR, operand_address, cycle_count) = self.get_operand()
         # fetch the second operand
         jump_addr = CPU.memory_fetch()
-        result = (CPU.OR + 1) & 0xFFFF
+        CPU.OR = result = (CPU.OR + 1) & 0xFFFF
         # only the direct addressing case does not return the result to the operand source location
         if not(IR.I==0 and IR.N==0):
-            CPU.memory_write(operand_address, result)
-        if result != 0:
+            CPU.memory_write(operand_address, CPU.OR)
+        if CPU.OR != 0:
             CPU.PC = jump_addr
 
-        CPU.ACC = result 
         return cycle_count

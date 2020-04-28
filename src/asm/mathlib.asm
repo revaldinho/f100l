@@ -563,7 +563,6 @@ M16L_LOOP:
 M16L_SKIPADD:
         CLR MULTI CR
         SRA 1 M16L_aa
-        STO .M16L_aa
         SET MULTI CR
         LDOR .M16L_bb_lo
         LDA .M16L_bb_hi

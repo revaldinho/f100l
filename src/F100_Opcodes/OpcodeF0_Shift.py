@@ -53,7 +53,10 @@ In single length operation the data to be shifted can be one of
 * the Condition Register (CR), or
 * a memory location (W)
 
-The result for single length shifts is always held in the accumulator.
+All single-length shifting is done through the Operand Register and the result is copied into the 
+required destination at the end of the operation. When a memory location is specified as the source
+that location is updated at the end of the shift via a read-modify-write operation. The Accumulator
+is not modified when shifting the Condition Register or a memory location.
 
 **Function**
 
@@ -61,16 +64,16 @@ The result for single length shifts is always held in the accumulator.
 
   SLL  B A      A <- A << B
   SLL  B CR     CR <- CR << B
-  SLL  B W      A <- (W) << B
+  SLL  B W      (W) <- (W) << B
   SLA  B A      A <- A << B
   SLA  B CR     CR <- CR << B
-  SLA  B W      A <- (W) << B
+  SLA  B W      (W) <- (W) << B
   SRL  B A      A <- A >>> B
   SRL  B CR     CR <- CR >>> B
-  SRL  B W      A <- (W) >>> B
+  SRL  B W      (W) <- (W) >>> B
   SRA  B A      A <- A >> B
   SRA  B CR     CR <- CR >> B
-  SRA  B W      A <- (W) >> B
+  SRA  B W      (W) <- (W) >> B
 
 **Instruction Encoding**
 
@@ -126,11 +129,8 @@ For logical shift operations *not* specifying the Condition Register:
   * C is preserved
   * V, Z and S are meaningless
 
-
-
 Single Length Rotations
 -----------------------
-
 
 **Function**
 
@@ -138,10 +138,10 @@ Single Length Rotations
 
   SLE  B A      A <- _rotl(A,B)
   SLE  B CR     CR <- _rotl(CR,B)
-  SLE  B W      A <- _rotl((W),B)
+  SLE  B W      (W) <- _rotl((W),B)
   SRE  B A      A <- _rotr(A,B)
   SRE  B CR     CR <- _rotr(CR,B)
-  SRE  B W      A <- _rotr((W),B)
+  SRE  B W      (W) <- _rotr((W),B)
 
 
 **Instruction Encoding**
@@ -177,7 +177,6 @@ For operations *not* specifying the Condition register:
 
   * C is preserved
   * S, V and Z are meaningless at the end of the instruction
-
 
 
 Double Length Shifts
@@ -428,7 +427,7 @@ class OpcodeF0_Shift(F100_Opcode) :
                 operand_addr = CPU.memory_fetch()
                 operand = CPU.OR = CPU.memory_read(operand_addr)
             else:
-                operand = CPU.ACC
+                operand = CPU.OR = CPU.ACC
 
             if IR.S == 0 and IR.J <2:
                 result = sra(operand, IR.B)
@@ -447,11 +446,11 @@ class OpcodeF0_Shift(F100_Opcode) :
             CR.S = 1 if result & 0x8000 else 0
             CR.V = 1 if (result & 0x8000) != (operand & 0x8000) else 0
 
+            CPU.OR = result
             if IR.R == 1:
-                CR.fromint(result)
-                CPU.ACC = result
+                CR.fromint(CPU.OR)
             elif IR.R ==3:
-                CPU.ACC = result                
+                CPU.memory_write(operand_addr, CPU.OR)
             else:
                 CPU.ACC = result
 

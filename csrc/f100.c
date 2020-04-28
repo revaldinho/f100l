@@ -66,16 +66,17 @@ void f100_trace(bool header) {
       puts(": Instruction");
       printf("# ---------------------------------------------------------------------------");
       puts("------------------------------------------------------------------------");
-    } else { 
+    } else {
       printf("# %2s  : %4s : %4s %4s : %7s %s\n", "PC", "OP", "ACC", "OR", "FMCSVZI", ":  LSP (LSP-2)(LSP-1)(LSP-0): Instruction");
-      puts("# ---------------------------------------------------------------------------");      
+      puts("# ---------------------------------------------------------------------------");
     }
 
   } else {
     char *mnem = mnemonic[cpu.ir.F];
-      printf("%04X  : %04X : %04X %04X : %x%x%x%d%d%d%d : %04X %04X :", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,\
-             cpu.F, cpu.M, cpu.C, cpu.S, cpu.V, cpu.Z, cpu.I, cpu.mem[LSP], cpu.mem[1]);    
+      printf("%04X  : %04X : %04X %04X : %x%x%x%d%d%d%d :", cpu.pc, cpu.ir.WORD, cpu.acc, cpu.or,\
+             cpu.F, cpu.M, cpu.C, cpu.S, cpu.V, cpu.Z, cpu.I);
     if (regtron) {
+      printf( " %04X %04X :",  cpu.mem[LSP],  cpu.mem[1]);
       for ( int i=2;i<(2+16); i++) {
         printf(" %04X", cpu.mem[i]);
       }
@@ -143,18 +144,18 @@ int32_t f100_exec(int max_instr ){
       if (cpu.ir.T==0 && cpu.ir.S<2) { // Shifts
         uint8_t  places;
         uint32_t mask;
-        
+
         if (cpu.ir.R==1) cpu.or = PACK_FLAGS;
         else if (cpu.ir.R==3) cpu.or = F100_READ_MEM(operand_address);
 
         if ( cpu.M==0 ) { // Single Length
           if (cpu.ir.R==1 || cpu.ir.R==3) operand = cpu.or;
           else operand = cpu.acc;
-          mask = 0x0000FFFF;          
+          mask = 0x0000FFFF;
           places = cpu.ir.B;
           result = TRUNC16(operand);
         } else { // Double length
-          mask = 0xFFFFFFFF;          
+          mask = 0xFFFFFFFF;
           places = (((cpu.ir.J&1)<<4) + cpu.ir.B);
           result = ((cpu.acc<<16) | cpu.or) & mask;
         }
@@ -167,25 +168,34 @@ int32_t f100_exec(int max_instr ){
           }
         } else {
           if ( cpu.ir.J<2 ) {                     // Shift as a signed value to get arithmetic shift
-            result =  ((int32_t) result>>places) & mask;
+            if ( cpu.M==0) {                      // need to respect sign bit in different location for single/double shift
+              result =  TRUNC16((int16_t) result>>places);
+            } else {
+              result =  ((int32_t) result>>places) & mask;
+            }
           } else if ( cpu.ir.J==2 || cpu.M==1) {  // Logical shift, single or double length
             result = (result>>places) & mask;
           } else {                                // Rotate (single length only)
             result = TRUNC16((result >> places) | (result <<(16-places)));
           }
         }
+
         if ( cpu.M== 0) { //Single length
           COMPUTE_SV(result,operand,operand);
-          cpu.acc = TRUNC16(result);
+          cpu.or = TRUNC16(result) ; // Single length shifts always use the OR
+          if (cpu.ir.R==0 || cpu.ir.R==2) {
+            cpu.acc = cpu.or;
+          } else if (cpu.ir.R==1) {
+            // Overwrite flags with the shifted value, low word
+            UNPACK_FLAGS(result);
+          } else if (cpu.ir.R==3) {
+            F100_WRITE_MEM(operand_address, cpu.or);
+          }
         } else { // Double length
           COMPUTE_SV(TRUNC16(result>>16), cpu.acc, cpu.acc);
           cpu.acc = TRUNC16((result>>16));
           cpu.or = TRUNC16(result);
         }
-        if ( cpu.ir.R==1 ) {
-          // Overwrite flags with the shifted value, low word
-          UNPACK_FLAGS(result);
-        }          
       } else if ( cpu.ir.T==0 && cpu.ir.S>1) { //  Bit conditional jumps and Bit manipulation
         uint16_t bmask;
         uint16_t jump_address;
@@ -234,9 +244,9 @@ int32_t f100_exec(int max_instr ){
       CLEAR_MULTI ;
       break;
     case OP_ICZ:
-      cpu.acc = 1+read_mem(operand_address);
-      write_mem(operand_address, cpu.acc);
-      if (cpu.acc!=0) cpu.pc=operand1_address ;
+      cpu.or = 1+read_mem(operand_address);
+      write_mem(operand_address, cpu.or);
+      if (cpu.or!=0) cpu.pc=operand1_address ;
       break;
     case OP_JMP:
       cpu.pc = TRUNC15(operand_address);
@@ -271,9 +281,13 @@ int32_t f100_exec(int max_instr ){
       result = cpu.or - cpu.acc;
       if (cpu.M) result += cpu.C-1;
       COMPUTE_BORROW(result) ;
-      COMPUTE_SVZ_SUB(result, cpu.or, cpu.acc) ;        
-      if (cpu.ir.F==OP_SBS) write_mem(operand_address, TRUNC16(result));
-      if (cpu.ir.F!=OP_CMP) cpu.acc=TRUNC16(result);
+      COMPUTE_SVZ_SUB(result, cpu.or, cpu.acc) ;
+      if (cpu.ir.F==OP_SBS) {
+        cpu.or = TRUNC16(result);
+        write_mem(operand_address, cpu.or);
+      } else if (cpu.ir.F==OP_SUB) {
+        cpu.acc=TRUNC16(result);
+      }
       break;
     case OP_ADS:
     case OP_ADD:
@@ -282,8 +296,12 @@ int32_t f100_exec(int max_instr ){
       if (cpu.M) result += cpu.C;
       COMPUTE_CARRY(result) ;
       COMPUTE_SVZ_ADD(result, cpu.acc, cpu.or) ;
-      cpu.acc=TRUNC16(result);      
-      if (cpu.ir.F==OP_ADS) write_mem(operand_address, TRUNC16(result));
+      if (cpu.ir.F==OP_ADS) {
+        cpu.or = TRUNC16(result);
+        write_mem(operand_address, cpu.or);
+      } else {
+        cpu.acc=TRUNC16(result);
+      }
       break;
     case OP_AND:
       cpu.or = read_mem(operand_address);
@@ -296,7 +314,7 @@ int32_t f100_exec(int max_instr ){
       cpu.acc = cpu.acc^cpu.or;
       CLEAR_CARRY;
       COMPUTE_SZ(cpu.acc);
-      break;  
+      break;
    default: break;
     }
   }

@@ -163,9 +163,7 @@ UDIV16:
          CLR  MULTI CR
 UD16_LOOP:
          SLA 1 UD16_Q
-         STO UD16_Q
          SLA 1 UD16_R
-         STO UD16_R        
          JBC 15 UD16_N UD16_SKIP
          SET 0 UD16_R
 UD16_SKIP:
@@ -177,7 +175,6 @@ UD16_SKIP:
          SET 0 UD16_Q
 UD16_SKIP2:
          SLA 1 UD16_N
-         STO UD16_N
          ICZ UD16_LCTR UD16_LOOP
 UD16_EXIT:
          LDA UD16_R

@@ -36,6 +36,10 @@ When 'M' is set
 In the immediate mode operation, data 'D' is taken from the location (PC+1), ie the word immediately
 after the opcode, and the the result is returned to that location.
 
+The result of the addition passes through the Operand Register as it is written back to memory.
+
+The accumulator is left unchanged by the result of the ADS operation.
+
 **Instruction Encoding**
 
 
@@ -99,10 +103,9 @@ class OpcodeF5(F100_Opcode) :
             CPU.CR.V = 1
         else:
             CPU.CR.V = 0
-        CPU.ACC = result & 0xFFFF
         CPU.CR.C = 1 if (result & 0x010000) > 0 else 0
         CPU.CR.Z = 1 if (result & 0xFFFF) == 0 else 0
         CPU.CR.S = 1 if (result & 0x8000) != 0 else 0
-
-
+        CPU.OR = result
+        
         return cycle_count
