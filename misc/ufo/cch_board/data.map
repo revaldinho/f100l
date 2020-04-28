@@ -1,0 +1,4 @@
+# Exclude the following address ranges from disassembly
+0840,085d
+27c9,284a
+2875,37ff
