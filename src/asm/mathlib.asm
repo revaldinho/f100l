@@ -339,95 +339,82 @@ A32_LVAR:
         ;;   USP-2   -> result 02 word
         ;;   USP-3   -> result 03 (hi) word
         ;;
-        ;; Local var. space: 12 words
         ;; ------------------------------------------------------
+        .equ M32_aa_lo  R8
+        .equ M32_aa_hi  R9
+        .equ M32_bb_00  R10
+        .equ M32_bb_01  R11
+        .equ M32_bb_02  R12
+        .equ M32_bb_03  R13
+        .equ M32_res_00 R14
+        .equ M32_res_01 R15
+        .equ M32_res_02 R16
+        .equ M32_res_03 R17
+        .equ M32_count  R18
+
+
 MUL32:
         LDA ,-31
-        STO .M32_count
+        STO M32_count
 
         LDA /USP-
-        STO .M32_aa_lo
+        STO M32_aa_lo
         LDA /USP-
-        STO .M32_aa_hi
+        STO M32_aa_hi
         LDA /USP-
-        STO .M32_bb_00
+        STO M32_bb_00
         LDA /USP-
-        STO .M32_bb_01
+        STO M32_bb_01
         LDA ,0x0000
-        STO .M32_res_00
-        STO .M32_res_01
-        STO .M32_res_02
-        STO .M32_res_03
-        STO .M32_bb_02
-        STO .M32_bb_03
+        STO M32_res_00
+        STO M32_res_01
+        STO M32_res_02
+        STO M32_res_03
+        STO M32_bb_02
+        STO M32_bb_03
         SET MULTI CR
 
 M32_LOOP:
         JBC 0 M32_aa_lo M32_SKIPADD
         CLR CARRY CR
-        LDA .M32_bb_00
-        ADS .M32_res_00
-        LDA .M32_bb_01
-        ADS .M32_res_01
-        LDA .M32_bb_02
-        ADS .M32_res_02
-        LDA .M32_bb_03
-        ADS .M32_res_03
+        LDA M32_bb_00
+        ADS M32_res_00
+        LDA M32_bb_01
+        ADS M32_res_01
+        LDA M32_bb_02
+        ADS M32_res_02
+        LDA M32_bb_03
+        ADS M32_res_03
 
 M32_SKIPADD:
 
-        LDOR .M32_aa_lo
-        LDA .M32_aa_hi
-        SRA.D 1 A
-        STO .M32_aa_hi
-        SLA.D 16 A
-        STO .M32_aa_lo
+        LDA M32_aa_hi
+        SRA.D 1 M32_aa_lo
+        STO M32_aa_hi
         ; Now shift the 64bit bb variable
-        LDOR .M32_bb_02
-        LDA .M32_bb_03
-        SLL.D 1 A
-        STO .M32_bb_03
-        SLL.D 16 A
-        STO .M32_bb_02
+        LDA M32_bb_03
+        SLL.D 1 M32_bb_02
+        STO M32_bb_03
         ; check the MSB of word 01 and if set need to add 1 into word O2, ie it is shifted into the next word
         JBC 15 M32_bb_01 M32_SKIPADJ
         CLR CARRY CR
         LDA ,0x1
-        ADS .M32_bb_02
+        ADS M32_bb_02
 M32_SKIPADJ:
-        LDOR .M32_bb_00
-        LDA .M32_bb_01
-        SLL.D 1 A
-        STO .M32_bb_01
-        SLL.D 16 A
-        STO .M32_bb_00
-        ICZ .M32_count M32_LOOP
-        LDA .M32_res_03
+        LDA M32_bb_01
+        SLL.D 1 M32_bb_00
+        STO M32_bb_01
+        ICZ M32_count M32_LOOP
+        LDA M32_res_03
         STO /USP+
-        LDA .M32_res_02
+        LDA M32_res_02
         STO /USP+
-        LDA .M32_res_01
+        LDA M32_res_01
         STO /USP+
-        LDA .M32_res_00
+        LDA M32_res_00
         STO /USP+
         RTN
 
-M32_LVAR:
-        .word 0x0000, 0x0000, 0x0000, 0x0000
-        .word 0x0000, 0x0000, 0x0000, 0x0000
-        .word 0x0000, 0x0000, 0x0000, 0x0000
-
-        .equ M32_aa_lo  M32_LVAR
-        .equ M32_aa_hi  M32_LVAR+1
-        .equ M32_bb_00  M32_LVAR+2
-        .equ M32_bb_01  M32_LVAR+3
-        .equ M32_bb_02  M32_LVAR+4
-        .equ M32_bb_03  M32_LVAR+5
-        .equ M32_res_00 M32_LVAR+6
-        .equ M32_res_01 M32_LVAR+7
-        .equ M32_res_02 M32_LVAR+8
-        .equ M32_res_03 M32_LVAR+9
-        .equ M32_count  M32_LVAR+10
 
         ;; ------------------------------------------------------
         ;; MUL16 - multiply two 16b numbers and return 32b result
