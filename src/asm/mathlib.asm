@@ -1,6 +1,3 @@
-; Define a Load Operand (LDOR) alias to be the CMP instruction - flags are trashed but acc is preserved
-#define  LDOR  CMP
-
 ; ------------------------------------
 ; UDIV32
 ;
@@ -38,94 +35,81 @@
 ;       return (Q,R)
 ; ------------------------------------
 
+         .equ UD32_Q_LO R10
+         .equ UD32_Q_HI R11
+         .equ UD32_R_LO R12
+         .equ UD32_R_HI R13
+         .equ UD32_N_LO R14
+         .equ UD32_N_HI R15
+         .equ UD32_D_LO R16
+         .equ UD32_D_HI R17
+         .equ UD32_LCTR R18
+
 UDIV32:
          LDA /USP-
-         STO .UD32_N_LO
+         STO UD32_N_LO
          LDA /USP-
-         STO .UD32_N_HI
+         STO UD32_N_HI
          LDA /USP-
-         STO .UD32_D_LO
+         STO UD32_D_LO
          LDA /USP-
-         STO .UD32_D_HI
+         STO UD32_D_HI
 
          LDA ,0x0000
-         STO .UD32_Q_HI
-         STO .UD32_Q_LO
-         STO .UD32_R_HI
-         STO .UD32_R_LO
+         STO UD32_Q_HI
+         STO UD32_Q_LO
+         STO UD32_R_HI
+         STO UD32_R_LO
 
          LDA ,-32
-         STO .UD32_LCTR
+         STO UD32_LCTR
          SET MULTI CR
 
 UD32_LOOP:
-         LDOR .UD32_Q_LO
-         LDA .UD32_Q_HI
-         SLA.D 1 A
-         STO .UD32_Q_HI
-         SLA.D 16 A
-         STO .UD32_Q_LO
+         LDA UD32_Q_HI
+         SLA.D 1 UD32_Q_LO
+         STO UD32_Q_HI
 
-         LDOR .UD32_R_LO
-         LDA .UD32_R_HI
-         SLA.D 1 A
-         STO .UD32_R_HI
-         SLA.D 16 A
-         STO .UD32_R_LO
+         LDA UD32_R_HI
+         SLA.D 1 UD32_R_LO
+         STO UD32_R_HI
 
          JBC 15 UD32_N_HI UD32_SKIP
          SET 0 UD32_R_LO
 
 UD32_SKIP:
          SET CARRY CR
-         LDA .UD32_D_LO
-         CMP .UD32_R_LO
-         LDA .UD32_D_HI
-         CMP .UD32_R_HI
+         LDA UD32_D_LO
+         CMP UD32_R_LO
+         LDA UD32_D_HI
+         CMP UD32_R_HI
          JBS SIGN CR UD32_SKIP2        ; JUMP if R < D
 
          SET CARRY CR
-         LDA .UD32_D_LO
-         SBS .UD32_R_LO
-         LDA .UD32_D_HI
-         SBS .UD32_R_HI
+         LDA UD32_D_LO
+         SBS UD32_R_LO
+         LDA UD32_D_HI
+         SBS UD32_R_HI
          SET 0 UD32_Q_LO
 
 UD32_SKIP2:
-         LDOR .UD32_N_LO
-         LDA .UD32_N_HI
-         SLA.D 1 A
-         STO .UD32_N_HI
-         SLA.D 16 A
-         STO .UD32_N_LO
+         LDA UD32_N_HI
+         SLA.D 1 UD32_N_LO
+         STO UD32_N_HI
 
-         ICZ .UD32_LCTR UD32_LOOP
+         ICZ UD32_LCTR UD32_LOOP
 
 UD32_EXIT:
-         LDA .UD32_R_HI
+         LDA UD32_R_HI
          STO /USP+
-         LDA .UD32_R_LO
+         LDA UD32_R_LO
          STO /USP+
-         LDA .UD32_Q_HI
+         LDA UD32_Q_HI
          STO /USP+
-         LDA .UD32_Q_LO
+         LDA UD32_Q_LO
          STO /USP+
          RTN
 
-UD32_LVAR:
-         .word 0x0000, 0x0000, 0x0000, 0x0000
-         .word 0x0000, 0x0000, 0x0000, 0x0000
-         .word 0x0000
-
-         .equ UD32_Q_LO UD32_LVAR
-         .equ UD32_Q_HI UD32_LVAR + 1
-         .equ UD32_R_LO UD32_LVAR + 2
-         .equ UD32_R_HI UD32_LVAR + 3
-         .equ UD32_N_LO UD32_LVAR + 4
-         .equ UD32_N_HI UD32_LVAR + 5
-         .equ UD32_D_LO UD32_LVAR + 6
-         .equ UD32_D_HI UD32_LVAR + 7
-         .equ UD32_LCTR UD32_LVAR + 8
 
         ;; ------------------------------------------------------
         ;; SQRT32 - Find square root of an integer numbers up to
@@ -167,127 +151,107 @@ UD32_LVAR:
         ;;
         ;;   return ( root, rem )
 
+        .equ S32_ROOT_LO   R0
+        .equ S32_ROOT_HI   R1
+        .equ S32_REM_LO    R2
+        .equ S32_REM_HI    R3
+        .equ S32_SUB_LO    R4
+        .equ S32_SUB_HI    R5
+        .equ S32_COUNT     R6
+        .equ S32_LOOPCTR   R7
+        .equ S32_M1_LO     R8
+        .equ S32_M1_HI     R9
+
+
 SQRT32:
         LDA ,0x0000
-        STO .S32_ROOT_LO
-        STO .S32_ROOT_HI
+        STO S32_ROOT_LO
+        STO S32_ROOT_HI
         LDA /USP-
-        STO .S32_REM_LO
+        STO S32_REM_LO
         LDA /USP-
-        STO .S32_REM_HI
+        STO S32_REM_HI
         JBS ZERO CR S32_EXIT
         JBS SIGN CR S32_EXIT
 
         LDA ,-15
 
-        STO .S32_COUNT
+        STO S32_COUNT
 S32_OUTER:
         CLR MULTI CR
         LDA ,0x01
-        STO .S32_M1_LO
+        STO S32_M1_LO
         LDA ,0x0000
-        STO .S32_M1_HI
-        LDA .S32_COUNT              ; negate S32_COUNT
+        STO S32_M1_HI
+        LDA S32_COUNT              ; negate S32_COUNT
         SUB ,0
         SLA 1 A                     ; loop_ctr = (count << 1)
         SUB ,0                      ; negate
-        STO .S32_LOOPCTR            ; save in loop counter as neg val for use with ICZ later
+        STO S32_LOOPCTR            ; save in loop counter as neg val for use with ICZ later
         SET MULTI CR
 S32_INNER:                          ; m1 = m1 << S32_LOOPCTR
-        LDA .S32_M1_LO        
-        SRA.D 16 A
-        LDA .S32_M1_HI
-        SLA.D 1 A
-        STO .S32_M1_HI
-        SLA.D 16 A
-        STO .S32_M1_LO
-        ICZ .S32_LOOPCTR S32_INNER
-        LDA .S32_M1_HI
+        LDA S32_M1_HI
+        SLA.D 1 S32_M1_LO
+        STO S32_M1_HI
+        ICZ S32_LOOPCTR S32_INNER
+        LDA S32_M1_HI
         STO /USP+
-        LDA .S32_M1_LO
+        LDA S32_M1_LO
         STO /USP+
-        LDA .S32_ROOT_HI
+        LDA S32_ROOT_HI
         STO /USP+
-        LDA .S32_ROOT_LO
+        LDA S32_ROOT_LO
         STO /USP+
         CAL .MUL32
         LDA /USP-
-        STO .S32_SUB_LO
+        STO S32_SUB_LO
         LDA /USP-
-        STO .S32_SUB_HI
+        STO S32_SUB_HI
         LDA /USP-                 ; throw away the two high words on the stack
         LDA /USP-
 
         SET MULTI CR
-        LDA .S32_M1_HI
-        LDOR .S32_M1_LO            ; m1 = m1 >> 2
-        SRA.D 2 A
-        STO .S32_M1_HI
-        SLA.D 16 A
-        STO .S32_M1_LO
+        LDA S32_M1_HI; m1 = m1 >> 2
+        SRA.D 2 S32_M1_LO
+        STO S32_M1_HI
         CLR CARRY CR              ;  subtrahend = subtrahend + m1
-        ADS .S32_SUB_LO
-        LDA .S32_M1_HI
-        ADS .S32_SUB_HI
-        LDA .S32_ROOT_HI
-        LDOR .S32_ROOT_LO          ; root = root << 1
-        SLA.D 1 A
-        STO .S32_ROOT_HI
-        SLA.D 16 A
-        STO .S32_ROOT_LO
-
+        ADS S32_SUB_LO
+        LDA S32_M1_HI
+        ADS S32_SUB_HI
+        LDA S32_ROOT_HI ; root = root << 1
+        SLA.D 1 S32_ROOT_LO
+        STO S32_ROOT_HI
                      ; now compare 32b subtrahend with rem
         SET CARRY CR
-        LDA .S32_SUB_LO
-        CMP .S32_REM_LO
-        LDA .S32_SUB_HI
-        CMP .S32_REM_HI
+        LDA S32_SUB_LO
+        CMP S32_REM_LO
+        LDA S32_SUB_HI
+        CMP S32_REM_HI
         JBC CARRY CR S32_NEXT
 S32_ADJUST:
         ; CARRY bit already set here so no need to set explicitly for SBS
-        LDA .S32_SUB_LO
-        SBS .S32_REM_LO
-        LDA .S32_SUB_HI
-        SBS .S32_REM_HI
+        LDA S32_SUB_LO
+        SBS S32_REM_LO
+        LDA S32_SUB_HI
+        SBS S32_REM_HI
         CLR CARRY CR
         LDA ,0x1
-        ADS .S32_ROOT_LO
+        ADS S32_ROOT_LO
         LDA ,0x0
-        ADS .S32_ROOT_HI
+        ADS S32_ROOT_HI
 S32_NEXT:
-        ICZ .S32_COUNT S32_OUTER
+        ICZ S32_COUNT S32_OUTER
 
 S32_EXIT:
-        LDA .S32_ROOT_HI
+        LDA S32_ROOT_HI
         STO /USP+
-        LDA .S32_ROOT_LO
+        LDA S32_ROOT_LO
         STO /USP+
-        LDA .S32_REM_HI
+        LDA S32_REM_HI
         STO /USP+
-        LDA .S32_REM_LO
+        LDA S32_REM_LO
         STO /USP+
         RTN
-
-S32_SMC_TEMPLATE:
-        SLA.D 0 A     ; dummy shift by zero will have bit field incremented and used in code
-S32_LVAR:
-        .word 0x0000, 0x0000, 0x0000, 0x0000
-        .word 0x0000, 0x0000, 0x0000, 0x0000
-        .word 0x0000, 0x0000
-
-        .equ S32_ROOT_LO   S32_LVAR
-        .equ S32_ROOT_HI   S32_LVAR+1
-        .equ S32_REM_LO    S32_LVAR+2
-        .equ S32_REM_HI    S32_LVAR+3
-        .equ S32_SUB_LO    S32_LVAR+4
-        .equ S32_SUB_HI    S32_LVAR+5
-        .equ S32_COUNT     S32_LVAR+6
-        .equ S32_LOOPCTR   S32_LVAR+7
-        .equ S32_M1_LO     S32_LVAR+8
-        .equ S32_M1_HI     S32_LVAR+9
-
-
-
 
         ;; ------------------------------------------------------
         ;; ADD32 - add two 32b numbers and return 32b result
@@ -303,27 +267,24 @@ S32_LVAR:
         ;;
         ;; Local var. space: 2 words
         ;; ------------------------------------------------------
+        .equ A32_bb_lo  R10
+        .equ A32_bb_hi  R11
+
 ADD32:
         LDA /USP-
-        STO .A32_bb_lo            ; pop B lo and store
+        STO A32_bb_lo            ; pop B lo and store
         LDA /USP-
-        STO .A32_bb_hi             ; pop B hi and store
+        STO A32_bb_hi             ; pop B hi and store
         LDA /USP-                  ; pop A lo into ACC
         SET MULTI CR
         CLR CARRY CR
-        ADS .A32_bb_lo            ; bb_lo = A_lo + B_lo
+        ADS A32_bb_lo            ; bb_lo = A_lo + B_lo
         LDA /USP-                 ; pop A hi into ACC
-        ADD .A32_bb_hi            ; ACC = A_hi + B_hi + C
+        ADD A32_bb_hi            ; ACC = A_hi + B_hi + C
         STO /USP+                 ; push high result word
-        LDA .A32_bb_lo
+        LDA A32_bb_lo
         STO /USP+                 ; push low  result word
         RTN
-
-A32_LVAR:
-        .word 0x0000, 0x0000
-        .equ A32_bb_lo  A32_LVAR
-        .equ A32_bb_hi  A32_LVAR+1
-
 
         ;; ------------------------------------------------------
         ;; MUL32 - multiply two 32b numbers and return 64b result
@@ -340,8 +301,6 @@ A32_LVAR:
         ;;   USP-3   -> result 03 (hi) word
         ;;
         ;; ------------------------------------------------------
-        .equ M32_aa_lo  R8
-        .equ M32_aa_hi  R9
         .equ M32_bb_00  R10
         .equ M32_bb_01  R11
         .equ M32_bb_02  R12
@@ -351,6 +310,8 @@ A32_LVAR:
         .equ M32_res_02 R16
         .equ M32_res_03 R17
         .equ M32_count  R18
+        .equ M32_aa_lo  R19
+        .equ M32_aa_hi  R20
 
 
 MUL32:
