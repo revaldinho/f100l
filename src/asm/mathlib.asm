@@ -162,7 +162,6 @@ UD32_EXIT:
         .equ S32_M1_LO     R8
         .equ S32_M1_HI     R9
 
-
 SQRT32:
         LDA ,0x0000
         STO S32_ROOT_LO
@@ -175,7 +174,6 @@ SQRT32:
         JBS SIGN CR S32_EXIT
 
         LDA ,-15
-
         STO S32_COUNT
 S32_OUTER:
         CLR MULTI CR
@@ -215,6 +213,7 @@ S32_INNER:                          ; m1 = m1 << S32_LOOPCTR
         SRA.D 2 S32_M1_LO
         STO S32_M1_HI
         CLR CARRY CR              ;  subtrahend = subtrahend + m1
+        LDA S32_M1_LO
         ADS S32_SUB_LO
         LDA S32_M1_HI
         ADS S32_SUB_HI
@@ -420,7 +419,7 @@ M16L_LOOP:
         ADS M16L_res_lo
         LDA M16L_bb_hi
         ADS M16L_res_hi
-
+        LDA M16L_res_hi    
 M16L_SKIPADD:
         CLR MULTI CR
         SRA 1 M16L_aa

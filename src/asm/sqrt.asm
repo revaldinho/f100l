@@ -16,6 +16,7 @@ NEXTTEST:
         LDA ,-0x2
         STO .LPCTR
 RLOOP0:
+
         LDA /DATAPTR+
         STO /USP+
         STO /RESULTPTR+
