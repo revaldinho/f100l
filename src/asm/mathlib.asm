@@ -376,15 +376,15 @@ M32_LOOP:
 
 M32_SKIPADD:
 
-        LDA .M32_aa_hi
         LDOR .M32_aa_lo
+        LDA .M32_aa_hi
         SRA.D 1 A
         STO .M32_aa_hi
         SLA.D 16 A
         STO .M32_aa_lo
         ; Now shift the 64bit bb variable
-        LDA .M32_bb_03
         LDOR .M32_bb_02
+        LDA .M32_bb_03
         SLL.D 1 A
         STO .M32_bb_03
         SLL.D 16 A
@@ -395,8 +395,8 @@ M32_SKIPADD:
         LDA ,0x1
         ADS .M32_bb_02
 M32_SKIPADJ:
-        LDA .M32_bb_01
         LDOR .M32_bb_00
+        LDA .M32_bb_01
         SLL.D 1 A
         STO .M32_bb_01
         SLL.D 16 A
@@ -429,101 +429,6 @@ M32_LVAR:
         .equ M32_res_03 M32_LVAR+9
         .equ M32_count  M32_LVAR+10
 
-
-
-#ifdef LOCALVARSTACKS
-        ;; ------------------------------------------------------
-        ;; MUL16 - multiply two 16b numbers and return 32b result
-        ;;
-        ;; Version uses local variable stacks
-        ;;
-        ;; Entry:
-        ;;   USP   -> Operand A
-        ;;   USP-1 -> Operand B
-        ;; Exit:
-        ;;   USP   -> result lo word
-        ;;   USP-1 -> result hi word
-        ;;
-        ;; Local var. space: 6 words
-        ;; ------------------------------------------------------
-
-        ; Define which of the local variable stacks will be used
-        .EQU     M16_count    LVP0
-        .EQU     M16_bb_lo    LVP1
-        .EQU     M16_bb_hi    LVP2
-        .EQU     M16_res_lo   LVP3
-        .EQU     M16_res_hi   LVP4
-        .EQU     M16_aa       LVP5
-
-MUL16:  ; Claim local stack space
-        LDA ,0x0000
-        STO /LVP0+
-        STO /LVP1+
-        STO /LVP2+
-        STO /LVP3+
-        STO /LVP4+
-        STO /LVP5+
-
-        LDA ,-15
-        STO /M16_count
-
-        LDA /USP-
-        STO /M16_bb_lo
-        LDA /USP-
-        STO /M16_aa
-        LDA ,0x0000
-        STO /M16_bb_hi
-        STO /M16_res_lo
-        STO /M16_res_hi
-        SET MULTI CR
-
-M16_LOOP:
-        LDA /M16_aa
-        JBC 0 A M16_SKIPADD
-        CLR CARRY CR
-        LDA /M16_bb_lo
-        ADS /M16_res_lo
-        LDA /M16_bb_hi
-        ADS /M16_res_hi
-
-M16_SKIPADD:
-        CLR MULTI CR
-        LDA /M16_aa
-        SRA 1 A
-        STO /M16_aa
-        SET MULTI CR
-        LDOR /M16_bb_lo
-        LDA /M16_bb_hi
-        SLL.D 1 A
-        STO /M16_bb_hi
-        SLL.D 16 A
-        STO /M16_bb_lo
-        ICZ /M16_count M16_LOOP
-
-M16_EXIT:
-        ; Surrender local variable space
-        LDA /M16_bb_lo-
-        LDA /M16_bb_hi-
-        LDA /M16_aa-
-        LDA /M16_count-
-
-        LDA /M16_res_hi-
-        STO /USP+
-        LDA /M16_res_lo-
-        STO /USP+
-        RTN
-
-M16_LVAR:
-        .word 0x0000, 0x0000, 0x0000, 0x0000
-        .word 0x0000, 0x0000
-
-        .equ M16_aa     M16_LVAR
-        .equ M16_bb_lo  M16_LVAR+1
-        .equ M16_bb_hi  M16_LVAR+2
-        .equ M16_res_lo M16_LVAR+3
-        .equ M16_res_hi M16_LVAR+4
-        .equ M16_count  M16_LVAR+5
-#else
         ;; ------------------------------------------------------
         ;; MUL16 - multiply two 16b numbers and return 32b result
         ;;
@@ -536,55 +441,49 @@ M16_LVAR:
         ;;   USP   -> result lo word
         ;;   USP-1 -> result hi word
         ;;
-        ;; Local var. space: 6 words
+        ;; Use registers R10-R15
         ;; ------------------------------------------------------
+
+        .equ M16L_aa     R10
+        .equ M16L_bb_lo  R11
+        .equ M16L_bb_hi  R12
+        .equ M16L_res_lo R13
+        .equ M16L_res_hi R14
+        .equ M16L_count  R15
+        
 MUL16:
         LDA ,-15
         STO .M16L_count
 
         LDA /USP-
-        STO .M16L_bb_lo
+        STO M16L_bb_lo
         LDA /USP-
-        STO .M16L_aa
+        STO M16L_aa
         LDA ,0x0000
-        STO .M16L_bb_hi
-        STO .M16L_res_lo
-        STO .M16L_res_hi
+        STO M16L_bb_hi
+        STO M16L_res_lo
+        STO M16L_res_hi
         SET MULTI CR
 
 M16L_LOOP:
         JBC 0 M16L_aa M16L_SKIPADD
         CLR CARRY CR
-        LDA .M16L_bb_lo
-        ADS .M16L_res_lo
-        LDA .M16L_bb_hi
-        ADS .M16L_res_hi
+        LDA M16L_bb_lo
+        ADS M16L_res_lo
+        LDA M16L_bb_hi
+        ADS M16L_res_hi
 
 M16L_SKIPADD:
         CLR MULTI CR
         SRA 1 M16L_aa
         SET MULTI CR
-        LDOR .M16L_bb_lo
         LDA .M16L_bb_hi
-        SLL.D 1 A
-        STO .M16L_bb_hi
-        SLL.D 16 A
-        STO .M16L_bb_lo
-        ICZ .M16L_count M16L_LOOP
-        LDA .M16L_res_hi
+        SLL.D 1 M16L_bb_lo
+        STO M16L_bb_hi
+        ICZ M16L_count M16L_LOOP
+        LDA M16L_res_hi
         STO /USP+
-        LDA .M16L_res_lo
+        LDA M16L_res_lo
         STO /USP+
         RTN
 
-M16L_LVAR:
-        .word 0x0000, 0x0000, 0x0000, 0x0000
-        .word 0x0000, 0x0000
-
-        .equ M16L_aa     M16L_LVAR
-        .equ M16L_bb_lo  M16L_LVAR+1
-        .equ M16L_bb_hi  M16L_LVAR+2
-        .equ M16L_res_lo M16L_LVAR+3
-        .equ M16L_res_hi M16L_LVAR+4
-        .equ M16L_count  M16L_LVAR+5
-#endif

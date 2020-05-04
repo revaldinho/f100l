@@ -6,27 +6,32 @@
 ;; Initialise Machine Here
 .equ  LSP     0x0000        ; Link Stack Pointer
 .equ  USP     0x0001        ; User Stack Pointer
-.equ  LVP0    0x0002        ; 16 Local variable pointers
-.equ  LVP1    0x0003
-.equ  LVP2    0x0004
-.equ  LVP3    0x0005
-.equ  LVP4    0x0006
-.equ  LVP5    0x0007
-.equ  LVP6    0x0008
-.equ  LVP7    0x0009
-.equ  LVP8    0x000A
-.equ  LVP9    0x000B
-.equ  LVPA    0x000C
-.equ  LVPB    0x000D
-.equ  LVPC    0x000E
-.equ  LVPD    0x000F
-.equ  LVPE    0x0010
-.equ  LVPF    0x0011
-.equ  TMPVAR  0x0012
-.equ  DATAPTR 0x0013         ; another pointer
-.equ  RESULTPTR 0x0014       ; pointer to results area
-.equ  TESTCTR 0x00015        ; first_item in data area is number of tests
-.equ  LPCTR   0x00016        ; generic loop var for top level of program
+.equ  R0      0x0002        ; 16 Local variable pointers
+.equ  R1      R0 + 1
+.equ  R2      R0 + 2
+.equ  R3      R0 + 3
+.equ  R4      R0 + 4
+.equ  R5      R0 + 5
+.equ  R6      R0 + 6
+.equ  R7      R0 + 7
+.equ  R8      R0 + 8
+.equ  R9      R0 + 9
+.equ  R10     R0 + 10
+.equ  R11     R0 + 11
+.equ  R12     R0 + 12
+.equ  R13     R0 + 13
+.equ  R14     R0 + 14
+.equ  R15     R0 + 15
+.equ  R16     R0 + 16
+.equ  R17     R0 + 17
+.equ  R18     R0 + 18
+.equ  R19     R0 + 19
+.equ  R20     R0 + 20        
+.equ  TMPVAR  0x0021
+.equ  DATAPTR 0x0022         ; another pointer
+.equ  RESULTPTR 0x0023       ; pointer to results area
+.equ  TESTCTR 0x00024        ; first_item in data area is number of tests
+.equ  LPCTR   0x00025        ; generic loop var for top level of program
 
 .equ  CARRY   0x04          ; carry is bit 4 of the CR
 .equ  MULTI   0x05          ; multi-word flag is bit 5 of CR
@@ -43,12 +48,3 @@ INIT:   .org 0x800                  ; 0x800 standard start address
         STO .LSP
         LDA ,USER_STACK             ; initialize user stack pointer
         STO .USP
-        LDA ,0x0001                 ; first of the local variable stacks is pointer 2 but will get pre-incremented
-        STO .TMPVAR
-        LDA ,-15                     ; 16 stacks to initialise
-        STO .TESTCTR
-        LDA ,LOCAL_VARS             ; initialise local variable stacks
-INIT_LOCALVARS:
-        STO /TMPVAR+
-        ADD ,0x100									; each local variable stack can be 0x100 deep
-        ICZ .TESTCTR INIT_LOCALVARS
