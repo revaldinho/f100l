@@ -53,7 +53,7 @@ In single length operation the data to be shifted can be one of
 * the Condition Register (CR), or
 * a memory location (W)
 
-All single-length shifting is done through the Operand Register and the result is copied into the 
+All single-length shifting is done through the Operand Register and the result is copied into the
 required destination at the end of the operation. When a memory location is specified as the source
 that location is updated at the end of the shift via a read-modify-write operation. The Accumulator
 is not modified when shifting the Condition Register or a memory location.
@@ -183,8 +183,9 @@ Double Length Shifts
 --------------------
 
 When 'M' is set, a double length operation is performed on a 32-bit word which is made up of the Accumulator
-in the 16 MSBs and the internal Operand Register providing the lower 16 bits. The contents of the Operand
-Register are dependent on the previous instruction.
+in the 16 MSBs and the internal Operand Register providing the lower 16 bits. The Operand Register is either 
+pre-loaded by a previous instruction (R=0,2) or from a memory location (R=3). When R=3 the least significant
+word of the result will be written back to the same memory location.
 
 In double length mode the number of bit positions to be shifted is taken from the 5 LSBs of the opcode word.
 The lower 4 LSBs are the same bit as used in the single-length mode, but the 5th bit (the MSB) is taken from
@@ -200,10 +201,18 @@ In double length mode, the rotate operations are undefined.
 
 ::
 
+  SLA.D B W  {A, (W)} <- {A, (W)} << B
+  SLL.D B W  {A, (W)} <- {A, (W)} << B
+  SRA.D B W  {A, (W)} <- {A, (W)} >> B
+  SRL.D B W  {A, (W)} <- {A, (W)} >>> B
   SLA.D B A  {A, OR} <- {A, OR} << B
   SLL.D B A  {A, OR} <- {A, OR} << B
   SRA.D B A  {A, OR} <- {A, OR} >> B
   SRL.D B A  {A, OR} <- {A, OR} >>> B
+  SLA.D B CR  {A, CR} <- {A, CR} << B
+  SLL.D B CR  {A, CR} <- {A, CR} << B
+  SRA.D B CR  {A, CR} <- {A, CR} >> B
+  SRL.D B CR  {A, CR} <- {A, CR} >>> B
 
 **Instruction Encoding**
 
@@ -212,13 +221,29 @@ In double length mode, the rotate operations are undefined.
 +----+--+--+--+-+-+--------------+                 |                           |                      |
 | F  | T| R| S| J |   B          |                 |                           |                      |
 +----+--+--+--+-+-+--------------+-+---------------+---------------------------+----------------------+
-|0000|00|xx|00|0| 5'b<shift num> |  none           | SRA.D B A                 | TBC                  |
+|0000|00|x0|00|0| 5'b<shift num> |  none           | SRA.D B A                 | TBC                  |
 +----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
-|0000|00|xx|00|1| 5'b<shift num> |  none           | SRL.D B A                 | TBC                  |
+|0000|00|x0|00|1| 5'b<shift num> |  none           | SRL.D B A                 | TBC                  |
 +----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
-|0000|00|xx|01|0| 5'b<shift num> |  none           | SLA.D B A                 | TBC                  |
+|0000|00|x0|01|0| 5'b<shift num> |  none           | SLA.D B A                 | TBC                  |
 +----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
-|0000|00|xx|01|1| 5'b<shift num> |  none           | SLL.D B A                 | TBC                  |
+|0000|00|x0|01|1| 5'b<shift num> |  none           | SLL.D B A                 | TBC                  |
++----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
+|0000|00|10|00|0| 5'b<shift num> |  none           | SRA.D B CR                | TBC                  |
++----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
+|0000|00|10|00|1| 5'b<shift num> |  none           | SRL.D B CR                | TBC                  |
++----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
+|0000|00|10|01|0| 5'b<shift num> |  none           | SLA.D B CR                | TBC                  |
++----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
+|0000|00|10|01|1| 5'b<shift num> |  none           | SLL.D B CR                | TBC                  |
++----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
+|0000|00|11|00|0| 5'b<shift num> |X| 15'b <addr>   | SRA.D B W                 | TBC                  |
++----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
+|0000|00|11|00|1| 5'b<shift num> |X| 15'b <addr>   | SRL.D B W                 | TBC                  |
++----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
+|0000|00|11|01|0| 5'b<shift num> |X| 15'b <addr>   | SLA.D B W                 | TBC                  |
++----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
+|0000|00|11|01|1| 5'b<shift num> |X| 15'b <addr>   | SLL.D B W                 | TBC                  |
 +----+--+--+--+-+----------------+-+---------------+---------------------------+----------------------+
 
 **Condition Register**
@@ -331,9 +356,7 @@ class OpcodeF0_Shift(F100_Opcode) :
             warnings.append(w)
 
         if multilength == True:
-            if addr_mode != ADM_DIRECT or len(operands) != 2 or operands[1] != 'A' :
-                raise UserWarning("Error: double length shift instruction can use only direct addressing with a 5 bit field operand and the accumulator as the operand")
-            elif addr_mode != ADM_DIRECT or len(operands) != 2:
+            if addr_mode != ADM_DIRECT or len(operands) != 2:
                 raise UserWarning("Error: shift instruction can use only direct addressing with a 4 bit field operand and optional register or 15 bit second operand")
 
 
@@ -418,7 +441,7 @@ class OpcodeF0_Shift(F100_Opcode) :
         IR = self.CPU.IR
         IR.name = self.disassemble(self.CPU.IR)
         self.execstats[IR.name] += 1
-        
+
         if CR.M == 0 :
             # Single length shifts and rotates
             if IR.R == 1:
@@ -446,10 +469,10 @@ class OpcodeF0_Shift(F100_Opcode) :
             CR.S = 1 if result & 0x8000 else 0
             CR.V = 1 if (result & 0x8000) != (operand & 0x8000) else 0
 
-            CPU.OR = result
             if IR.R == 1:
-                CR.fromint(CPU.OR)
+                CR.fromint(result)
             elif IR.R ==3:
+                CPU.OR = result
                 CPU.memory_write(operand_addr, CPU.OR)
             else:
                 CPU.ACC = result
@@ -457,6 +480,10 @@ class OpcodeF0_Shift(F100_Opcode) :
         else:
             # Double length shifts use LSB of J field to extend shift number
             shift_dist = ( (IR.J << 4) | IR.B )  & 0x1F
+            # Double length shifts
+            if ( IR.R==3):
+                operand_addr = CPU.memory_fetch()
+                CPU.OR = CPU.memory_read(operand_addr)                    
             if IR.S == 0 and IR.J <2:
                 (result, result1) = d_sra(CPU.ACC, CPU.OR, shift_dist)
             elif IR.S == 0:
@@ -464,8 +491,12 @@ class OpcodeF0_Shift(F100_Opcode) :
             else:
                 (result, result1, overflow) = d_sll(CPU.ACC, CPU.OR, shift_dist)
             CR.S = 1 if result & 0x8000 else 0
-            CR.V = 1 if (result & 0x8000) != (CPU.ACC & 0x8000) else 0            
+            CR.V = 1 if (result & 0x8000) != (CPU.ACC & 0x8000) else 0
 
             CPU.ACC = result
             CPU.OR = result1
+            if (IR.R==3):
+                # Double length shifts write back the LSW into memory
+                CPU.memory_write(operand_addr, CPU.OR)
+            
         return cycle_count

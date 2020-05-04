@@ -15,6 +15,9 @@ Store the value in the accumulator to the specified memory location
    STO /P-    (P) <- A ;  P <- P - 1 ;
    STO .W     (W) <- A
 
+The operand register (OR) will have the same value as the accumulator at the
+end of this instruction.
+
 **Instruction Encoding**
 
 
@@ -66,10 +69,11 @@ class OpcodeF4(F100_Opcode) :
         CPU = self.CPU
         IR = self.CPU.IR
         CR = self.CPU.CR
-        
+
         self.execstats[IR.name] += 1
         (operand, operand_address, cycle_count) = self.get_operand(noread=True)
-        CPU.memory_write(operand_address, CPU.ACC)
+        CPU.OR = CPU.ACC
+        CPU.memory_write(operand_address, CPU.OR)
         CPU.CR.Z = 1 if (CPU.ACC & 0xFFFF) == 0 else 0
         CPU.CR.S = 1 if (CPU.ACC & 0x8000) != 0 else 0
         CPU.CR.V = 0

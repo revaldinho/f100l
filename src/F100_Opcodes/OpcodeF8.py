@@ -15,6 +15,9 @@ Load the accumulator with a value from the specified memory location
    LDA /P-    A <- (P) ;  P <- P - 1
    LDA .W     A <- (W)
 
+The operand register (OR) will have the same value as the accumulator at the
+end of this instruction.
+
 **Instruction Encoding**
 
 +----+-+-+--+-----------------+-+----------------+----------+----------------------+
@@ -64,8 +67,9 @@ class OpcodeF8(F100_Opcode) :
         CPU = self.CPU
         self.execstats[CPU.IR.name] += 1
 
-        (CPU.ACC, operand_address, cycle_count) = self.get_operand()
+        (CPU.OR, operand_address, cycle_count) = self.get_operand()
 
+        CPU.ACC = CPU.OR
         CPU.CR.Z = 1 if (CPU.ACC & 0xFFFF) == 0 else 0
         CPU.CR.S = 1 if (CPU.ACC & 0x8000) != 0 else 0
         CPU.CR.V = 0

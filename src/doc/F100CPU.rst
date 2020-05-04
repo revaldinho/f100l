@@ -169,7 +169,7 @@ launch right up into the mid 1990s.
 
 1. The BAe Sea Eagle Missile System [25]
 
-   Sea Eagle was an air-launched anti-ship missile originally introduced in 1981 and used in the UK Armed Forces until the late 1990s, and still in use in the Indian Navy as alte as 2009. [36]
+   Sea Eagle was an air-launched anti-ship missile originally introduced in 1981 and used in the UK Armed Forces until the late 1990s, and still in use in the Indian Navy as late as 2009. [36]
 
    The F100-L provides the on-board digital flight computer controlling the flight path of the missile until the target is acquired by the radar homing head during the final sea skimming phase of an attack. An upgrade program was abandoned on cost grounds in the mid 1990s so it's possible that the F100-L saw out the entire Sea Eagle lifespan.
 

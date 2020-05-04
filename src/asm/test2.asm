@@ -8,7 +8,12 @@
       .equ  LINK_STACK 0x4001  ; initial value for link stack (must be ODD)
       .equ  USER_STACK 0x4100  ; initial value for user stack
 
-
+        .equ  R0      0x0002
+        .equ  R1      0x0003
+        .equ  R2      0x0004
+        .equ  R3      0x0005        
+        .equ  R4      0x0006
+        
 INIT: .org 0x800
       LDA ,LINK_STACK
       STO .LSP
@@ -17,7 +22,25 @@ INIT: .org 0x800
 
 
 PROG_START:
-    	AND ,0x0000  		; zero accumulator
+        SET     5 CR
+        LDA     ,0x1234
+        STO     R0
+        LDA     ,0x8567
+        SLL.D   5 R0
+        LDA     ,0x1234
+        STO     R0
+        LDA     ,0x8567
+        SLA.D   5 R0
+        LDA     ,0x1234
+        STO     R0
+        LDA     ,0x8567
+        SRL.D   5 R0
+        LDA     ,0x1234
+        STO     R0
+        LDA     ,0x8567
+        SRA.D   5 R0
+        SLA.D   16 CR        
+        AND ,0x0000  		; zero accumulator
     	NEQ ,0x00FF             ; invert half of it
     	SUB ,0x0001
     	ADD ,0x0001
@@ -44,3 +67,6 @@ PROG_START:
 	CLR 4 CR
         HALT ,0x123
 
+        LDA     ,1
+        SBS     R4
+        LDA     /R4-

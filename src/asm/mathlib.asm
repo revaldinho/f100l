@@ -219,8 +219,8 @@ S32_INNER:                          ; m1 = m1 << S32_LOOPCTR
         LDA /USP-
 
         SET MULTI CR
-        LDOR .S32_M1_LO            ; m1 = m1 >> 2
         LDA .S32_M1_HI
+        LDOR .S32_M1_LO            ; m1 = m1 >> 2
         SRA.D 2 A
         STO .S32_M1_HI
         SLA.D 16 A
@@ -229,8 +229,8 @@ S32_INNER:                          ; m1 = m1 << S32_LOOPCTR
         ADS .S32_SUB_LO
         LDA .S32_M1_HI
         ADS .S32_SUB_HI
-        LDOR .S32_ROOT_LO          ; root = root << 1
         LDA .S32_ROOT_HI
+        LDOR .S32_ROOT_LO          ; root = root << 1
         SLA.D 1 A
         STO .S32_ROOT_HI
         SLA.D 16 A
@@ -376,15 +376,15 @@ M32_LOOP:
 
 M32_SKIPADD:
 
-        LDOR .M32_aa_lo
         LDA .M32_aa_hi
+        LDOR .M32_aa_lo
         SRA.D 1 A
         STO .M32_aa_hi
         SLA.D 16 A
         STO .M32_aa_lo
         ; Now shift the 64bit bb variable
-        LDOR .M32_bb_02
         LDA .M32_bb_03
+        LDOR .M32_bb_02
         SLL.D 1 A
         STO .M32_bb_03
         SLL.D 16 A
@@ -395,8 +395,8 @@ M32_SKIPADD:
         LDA ,0x1
         ADS .M32_bb_02
 M32_SKIPADJ:
-        LDOR .M32_bb_00
         LDA .M32_bb_01
+        LDOR .M32_bb_00
         SLL.D 1 A
         STO .M32_bb_01
         SLL.D 16 A

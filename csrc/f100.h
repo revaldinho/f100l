@@ -34,6 +34,7 @@
 #define TRUNC15(m)        (m & 0x7FFF)
 #endif
 #define INC_ADDR(m,n)     (m = TRUNC15(m+n))
+#define INC_PTR(m,n)      (m = TRUNC16(m+n))
 #define FETCH15(m, o, pc) o=TRUNC15(read_mem(pc)); INC_ADDR(pc,1)
 #define HALT(ir)          (ir.F==0 && ir.T==1)
 #define LSP               0
