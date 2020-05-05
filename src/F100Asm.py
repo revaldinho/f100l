@@ -44,6 +44,12 @@ OPTIONAL SWITCHES ::
   -n --nolisting                      suppress the listing to stdout while the
                                       program runs
 
+  -s --symboltable                    output symbol table at end of listing
+
+  -l --labelsonly                     include only labels in the symbol table output (default)
+
+  -f --fullsymbols                    include all symbols in the symbol table output
+
   -h --help                           print this help message
 
   If no output filename is provided the assembler just produces the normal
@@ -184,13 +190,13 @@ class F100Asm():
         (assembled_words, warnings) = op.assemble(opcode, operands, symbol_table, suppress_errors)
         return (assembled_words, warnings)
 
-    def twopass_assemble(self, text,listingon=True):
+    def twopass_assemble(self, text,listingon=True, symboltable=False, labelsonly=False):
         assembled_words = dict()
         for i in range(0,2):
-            assembled_words = self.assemble(text, i,listingon)
+            assembled_words = self.assemble(text, i,listingon,symboltable, labelsonly)
         return assembled_words
 
-    def assemble( self, text, pass_number,listingon=True):
+    def assemble( self, text, pass_number,listingon=True, symboltable=False, labelsonly=False):
         ''' Build the text into lines of tokens and expressions'''
 
         error_count = 0
@@ -286,10 +292,19 @@ class F100Asm():
             print ("# %d Error%s" % ( error_count, '' if error_count == 1 else 's'))
             print ("# %d Warning%s" % ( warning_count, '' if warning_count == 1 else 's'))
             print (line_sep)
-            print("# SymbolTable")
-            for s in self.st.tostring().split('\n'):
-                print( "# %s" % s )
-
+            if symboltable:
+                print("# SymbolTable")
+                if labelsonly:
+                    s = sorted(label_list)
+                    for i in range(0,len(s),2):
+                        if i < len(s)-2:
+                            print ( "# %-25s : 0x%04X (%6d) " % ( s[i], int(self.st[s[i]],10), int(self.st[s[i]],10) ), end="")
+                            print ( "# %-25s : 0x%04X (%6d) " % ( s[i+1], int(self.st[s[i+1]],10), int(self.st[s[i+1]],10) ))                        
+                        else:
+                            print ( "# %-25s : 0x%04X (%6d) " % ( s[i], int(self.st[s[i]],10), int(self.st[s[i]],10) ))
+                else:
+                    for s in self.st.tostring().split('\n'):
+                        print( "# %s" % s )
             if error_count > 0 :
                 raise UserWarning("Assembly finished with errors")
         return assembled_words
@@ -329,8 +344,10 @@ if __name__ == "__main__":
     output_format = "hex"
     endianness = "little"
     listingon = True
+    labelsonly = True
+    symboltable = False
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "e:f:o:g:hn", ["endianness=", "filename=","output=","format=","help","nolisting"])
+        opts, args = getopt.getopt( sys.argv[1:], "e:f:o:g:hnlas", ["endianness=", "filename=","output=","format=","help","nolisting", "labelsonly", "allsymbols", "symboltable"])
     except getopt.GetoptError as  err:
         print(err)
         usage()
@@ -349,6 +366,14 @@ if __name__ == "__main__":
                 usage()
         if opt in ("-n", "--nolisting"):
             listingon = False
+        if opt in ("-l", "--labelsonly"):
+            labelsonly = True
+            symboltable = True            
+        if opt in ("-a", "--allsymbols"):
+            labelsonly = False
+            symboltable = True            
+        if opt in ("-s", "--symboltable"):
+            symboltable = True
         elif opt in ("-h", "--help" ) :
             usage()
 
@@ -359,7 +384,7 @@ if __name__ == "__main__":
         f.close()
         s = time.time()
         try:
-            assembled_words = asm.twopass_assemble(text,listingon)
+            assembled_words = asm.twopass_assemble(text,listingon, symboltable, labelsonly)
             if output_filename != "" :
                 write_file(output_filename, output_format, assembled_words, endianness=endianness)
         except UserWarning as e:
