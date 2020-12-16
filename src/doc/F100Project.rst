@@ -54,13 +54,7 @@ Eventually we would like to look at some of the following ideas:
 More ambitiously, a full reverse engineering of the F100-L netlist or at least one or more
 of the associated chips is also a long-term possibility: something along the lines of the Visual6502_
 project. For this part of the project, some high resolution die photography has already been done both of the CPU
-itself and some of the associated peripheral chips. These photos are available on my photo hosting website_ .
-
-.. _Sphinx: http://www.sphinx-doc.org/en/1.5
-.. _Visual6502: http://visual6502.org
-.. _Cminusminus: https://github.com/revaldinho/c--
-.. _PiTubeDirect: https://github.com/hoglet67/PiTubeDirect
-.. _website: https://revaldinho.smugmug.com/Vintage-Technology/Integrated-Circuits/Ferranti-F100-and-Related-ICs
+itself and some of the associated peripheral chips. 
 
 And finally, the F100-L and family chips really should have a wikipedia article, shouldn't they?
 

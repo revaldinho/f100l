@@ -25,10 +25,6 @@ History, Cambridge, UK: Box704_.
 
 .. image:: ./F100L_Handset.png
 
-Additional photos in higher resolutions are available from my smugmug photo sharing website_
-
-.. _website: https://revaldinho.smugmug.com/Vintage-Technology/Ferranti-F100-Project/n-VXHdXd
-
 .. _Appendix2:
 
 Appendix 2 - F100-L Handset Assembly Language Summary
@@ -61,10 +57,6 @@ The following datasheet is reproduced from [15]
 
 Appendix 5 - F100-L Family Silicon Photo Gallery
 ------------------------------------------------
-
-Full size versions of these photographs are available on Smugmug_
-
-.. _Smugmug: https://revaldinho.smugmug.com/Vintage-Technology/Integrated-Circuits/Ferranti-F100-and-Related-ICs
 
 *Ferranti F100-L CPU*
 

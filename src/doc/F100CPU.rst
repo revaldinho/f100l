@@ -251,6 +251,3 @@ computer system with F112-L and F101-L ICs.
 
 .. image:: F100Board.png
 
-A higher resolution photo is available here_ .
-
-.. _here: https://revaldinho.smugmug.com/Vintage-Technology/Ferranti-F100-Project/n-VXHdXd
