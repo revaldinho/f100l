@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The F100-L Assembler &#8212; F100L 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The F100-L Emulator" href="F100Emu.html" />
+    <link rel="prev" title="The F100-L Instruction Set" href="F100InstrSet.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="the-f100-l-assembler">
+<h1>The F100-L Assembler<a class="headerlink" href="#the-f100-l-assembler" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-F100Asm">
+<span id="invoking-the-assembler"></span><h2>Invoking The Assembler<a class="headerlink" href="#module-F100Asm" title="Permalink to this headline">¶</a></h2>
+<p>USAGE:</p>
+<blockquote>
+<div><p>F100Asm is an assembler for the Ferranti F100-L CPU.</p>
+</div></blockquote>
+<p>REQUIRED SWITCHES</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">f</span> <span class="o">--</span><span class="n">filename</span>  <span class="o">&lt;</span><span class="n">filename</span><span class="o">&gt;</span>           <span class="n">specify</span> <span class="n">the</span> <span class="n">assembler</span> <span class="n">source</span> <span class="n">file</span>
+</pre></div>
+</div>
+<p>OPTIONAL SWITCHES</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">o</span> <span class="o">--</span><span class="n">output</span>    <span class="o">&lt;</span><span class="n">filename</span><span class="o">&gt;</span>           <span class="n">specify</span> <span class="n">file</span> <span class="n">name</span> <span class="k">for</span> <span class="n">assembled</span> <span class="n">code</span>
+
+<span class="o">-</span><span class="n">g</span> <span class="o">--</span><span class="nb">format</span>    <span class="o">&lt;</span><span class="nb">bin</span><span class="o">|</span><span class="n">ihex</span><span class="o">|</span><span class="nb">hex</span><span class="o">|</span><span class="n">hex16</span><span class="o">&gt;</span> <span class="nb">set</span> <span class="n">the</span> <span class="n">file</span> <span class="nb">format</span> <span class="k">for</span> <span class="n">the</span> <span class="n">assembled</span> <span class="n">code</span>
+                                    <span class="o">-</span> <span class="n">default</span> <span class="ow">is</span> <span class="nb">hex</span>
+
+<span class="o">-</span><span class="n">e</span> <span class="o">--</span><span class="n">endianness</span> <span class="o">&lt;</span><span class="n">little</span><span class="o">|</span><span class="n">big</span><span class="o">&gt;</span>        <span class="nb">set</span> <span class="n">endianness</span> <span class="n">of</span> <span class="n">byte</span> <span class="n">oriented</span> <span class="n">output</span>
+                                    <span class="o">-</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">little</span><span class="o">-</span><span class="n">endian</span>
+
+<span class="o">-</span><span class="n">n</span> <span class="o">--</span><span class="n">nolisting</span>                      <span class="n">suppress</span> <span class="n">the</span> <span class="n">listing</span> <span class="n">to</span> <span class="n">stdout</span> <span class="k">while</span> <span class="n">the</span>
+                                    <span class="n">program</span> <span class="n">runs</span>
+
+<span class="o">-</span><span class="n">s</span> <span class="o">--</span><span class="n">symboltable</span>                    <span class="n">output</span> <span class="n">symbol</span> <span class="n">table</span> <span class="n">at</span> <span class="n">end</span> <span class="n">of</span> <span class="n">listing</span>
+
+<span class="o">-</span><span class="n">l</span> <span class="o">--</span><span class="n">labelsonly</span>                     <span class="n">include</span> <span class="n">only</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">symbol</span> <span class="n">table</span> <span class="n">output</span> <span class="p">(</span><span class="n">default</span><span class="p">)</span>
+
+<span class="o">-</span><span class="n">f</span> <span class="o">--</span><span class="n">fullsymbols</span>                    <span class="n">include</span> <span class="nb">all</span> <span class="n">symbols</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">symbol</span> <span class="n">table</span> <span class="n">output</span>
+
+<span class="o">-</span><span class="n">h</span> <span class="o">--</span><span class="n">help</span>                           <span class="nb">print</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span>
+
+<span class="n">If</span> <span class="n">no</span> <span class="n">output</span> <span class="n">filename</span> <span class="ow">is</span> <span class="n">provided</span> <span class="n">the</span> <span class="n">assembler</span> <span class="n">just</span> <span class="n">produces</span> <span class="n">the</span> <span class="n">normal</span>
+<span class="n">listing</span> <span class="n">output</span> <span class="n">to</span> <span class="n">stdout</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>EXAMPLES</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span><span class="o">.</span><span class="mi">5</span> <span class="n">F100Asm</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">f</span> <span class="n">test</span><span class="o">.</span><span class="n">asm</span> <span class="o">-</span><span class="n">o</span> <span class="n">file</span><span class="o">.</span><span class="n">bin</span> <span class="o">-</span><span class="n">g</span> <span class="nb">bin</span> <span class="o">-</span><span class="n">e</span> <span class="n">little</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="assembler-file-format">
+<h2>Assembler File Format<a class="headerlink" href="#assembler-file-format" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="comments">
+<h3>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h3>
+<p>Comments can be placed anywhere in the code and start with the semi-colon (;) character, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ADDS</span> <span class="mh">0x134</span> <span class="p">;</span> <span class="n">add</span> <span class="n">the</span> <span class="n">magic</span> <span class="n">number</span> <span class="n">to</span> <span class="n">the</span> <span class="n">accumulator</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="labels">
+<h3>Labels<a class="headerlink" href="#labels" title="Permalink to this headline">¶</a></h3>
+<p>Labels can be placed anywhere in the code and will be evaluated during the first assembly pass.</p>
+<p>Labels must start with an alphabetic character or an underscore, end with a ‘:’ and any combination of alphanumeric characters or underscores is allowed in between.</p>
+<p>All labels and variables are case insensitive; they will all be converted to upper case during symbol table processing. e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LOOP_TOP</span><span class="p">:</span>    <span class="n">SRL</span>  <span class="mh">0x01</span> <span class="n">A</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="directives">
+<h3>Directives<a class="headerlink" href="#directives" title="Permalink to this headline">¶</a></h3>
+<p>F100ASM supports the following directives, all of which start with the dot (.) character</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">.ORG</span> <span class="pre">&lt;address&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.EQU</span> <span class="pre">&lt;variable</span> <span class="pre">name&gt;</span> <span class="pre">&lt;expression&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.DATA</span> <span class="pre">&lt;data&gt;</span> <span class="pre">[,</span> <span class="pre">&lt;data&gt;</span> <span class="pre">[,</span> <span class="pre">...</span> <span class="pre">]]]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.WORD</span> <span class="pre">&lt;data&gt;</span> <span class="pre">[,</span> <span class="pre">&lt;data&gt;</span> <span class="pre">[,</span> <span class="pre">...</span> <span class="pre">]]]</span></code></p></li>
+</ul>
+<div class="section" id="org">
+<h4>.ORG<a class="headerlink" href="#org" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">.ORG</span></code> sets the current instruction address to the value supplied before assembling the next instruction. e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">ORG</span> <span class="mh">0x0800</span> <span class="p">;</span> <span class="n">Instruction</span> <span class="n">execution</span> <span class="n">starts</span> <span class="n">at</span> <span class="mh">0x800</span> <span class="n">following</span> <span class="n">a</span> <span class="n">reset</span> <span class="n">when</span> <span class="n">AdSel</span> <span class="ow">is</span> <span class="n">left</span> <span class="n">floating</span> <span class="ow">or</span> <span class="n">tied</span> <span class="n">high</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="equ">
+<h4>.EQU<a class="headerlink" href="#equ" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">.EQU</span></code> is used to assign expressions or values to variable names. e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">EQU</span>  <span class="n">PTR_START</span> <span class="mh">0x100</span>
+<span class="o">.</span><span class="n">EQU</span>  <span class="n">STK_PTR1</span>  <span class="n">PTR_START</span><span class="o">+</span><span class="mi">1</span>
+<span class="o">.</span><span class="n">EQU</span>  <span class="n">MEMTOP</span>    <span class="mh">0x7FFF</span>
+<span class="o">.</span><span class="n">EQU</span>  <span class="n">STK_SIZE</span>  <span class="mh">0x0400</span>
+<span class="o">.</span><span class="n">EQU</span>  <span class="n">STK_BOT</span>   <span class="n">MEMTOP</span> <span class="o">-</span> <span class="n">STK_SIZE</span>
+</pre></div>
+</div>
+<p>F100ASM uses the Python ASR parser class to allow parsing of any valid Python expression. All expressions must evaulate to an integer number by the end of the first pass through the assembler. Expressions or symbols may be used anywhere a numerical value is allowed.</p>
+<p>Like labels all variable names must start with an alphabetic character or an underscore but subsequent characters may be alphanumeric. All variable names are case insensitive.</p>
+<p>Note that the two symbols A and C are reserved words and may not be used as variable names.</p>
+<p>Labels are treated like any other variable as far as expression parsing is concerned.</p>
+</div>
+<div class="section" id="data-and-word">
+<h4>.DATA and .WORD<a class="headerlink" href="#data-and-word" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">.DATA</span></code> and <code class="docutils literal notranslate"><span class="pre">.WORD</span></code> are synonyms of each other. These can be followed by a list of comma separated numeric values or expressions on the same line. e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">WORD</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span> <span class="p">;</span> <span class="n">Fibonacci</span> <span class="n">numbers</span>
+<span class="o">.</span><span class="n">WORD</span> <span class="n">STK_PTR1</span><span class="p">,</span> <span class="n">MEMTOP</span> <span class="o">-</span> <span class="n">STKSIZE</span>  <span class="p">;</span> <span class="n">examples</span> <span class="n">of</span> <span class="n">expressions</span>
+</pre></div>
+</div>
+<p><strong>Unsupported features</strong></p>
+<p>F100ASM doesn’t directly support definition of macros or conditional assembly. These features are easily added by pre-processing the assembly source using the C-preprocessor (cpp).</p>
+</div>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># -------------------------------------------------------------------------------------------</span>
+<span class="c1">#     _____________  ____        __       ___                             __    __</span>
+<span class="c1">#    / ____&lt;  / __ \/ __ \      / /      /   |  _____________  ____ ___  / /_  / /__  _____</span>
+<span class="c1">#   / /_   / / / / / / / /_____/ /      / /| | / ___/ ___/ _ \/ __ `__ \/ __ \/ / _ \/ ___/</span>
+<span class="c1">#  / __/  / / /_/ / /_/ /_____/ /___   / ___ |(__  |__  )  __/ / / / / / /_/ / /  __/ /</span>
+<span class="c1"># /_/    /_/\____/\____/     /_____/  /_/  |_/____/____/\___/_/ /_/ /_/_.___/_/\___/_/</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># F 1 0 0 - L * A S S E M B L E R (c) 2016 Revaldinho &amp; BigEd</span>
+<span class="c1"># -------------------------------------------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># LINE:       ADDR: CODE     SOURCE</span>
+<span class="c1"># ----:-----------:--------------------------------------------------------------------------</span>
+     <span class="mi">1</span><span class="p">:</span>                       <span class="o">.</span><span class="n">EQU</span>  <span class="n">_TMP</span> <span class="mh">0x3E8</span>
+     <span class="mi">2</span><span class="p">:</span>                       <span class="o">.</span><span class="n">EQU</span>  <span class="n">ping</span> <span class="mh">0x3EA</span>
+     <span class="mi">3</span><span class="p">:</span>      <span class="mi">001</span><span class="n">A</span><span class="p">:</span> <span class="mi">8001</span>       <span class="n">LDA</span> <span class="mh">0x0001</span>
+     <span class="mi">4</span><span class="p">:</span>      <span class="mi">001</span><span class="n">B</span><span class="p">:</span> <span class="mi">4800</span> <span class="mi">03</span><span class="n">EA</span>  <span class="n">STO</span> <span class="o">.</span><span class="n">ping</span>
+     <span class="mi">5</span><span class="p">:</span>                       <span class="o">.</span><span class="n">EQU</span>  <span class="n">pong</span> <span class="mh">0x3EC</span>
+     <span class="mi">6</span><span class="p">:</span>      <span class="mi">001</span><span class="n">D</span><span class="p">:</span> <span class="mi">8001</span>       <span class="n">LDA</span> <span class="mh">0x0001</span>
+     <span class="mi">7</span><span class="p">:</span>      <span class="mi">001</span><span class="n">E</span><span class="p">:</span> <span class="mi">4800</span> <span class="mi">03</span><span class="n">EC</span>  <span class="n">STO</span> <span class="o">.</span><span class="n">pong</span>
+     <span class="mi">8</span><span class="p">:</span>                       <span class="o">.</span><span class="n">EQU</span>  <span class="n">new_pong</span> <span class="mh">0x3EE</span>
+     <span class="mi">9</span><span class="p">:</span>                       <span class="n">L1</span><span class="p">:</span>
+    <span class="mi">10</span><span class="p">:</span>      <span class="mi">0020</span><span class="p">:</span> <span class="mi">8800</span> <span class="mi">03</span><span class="n">EA</span>  <span class="n">LDA</span> <span class="o">.</span><span class="n">ping</span>
+    <span class="mi">11</span><span class="p">:</span>      <span class="mi">0022</span><span class="p">:</span> <span class="mi">9800</span> <span class="mi">03</span><span class="n">EC</span>  <span class="n">ADD</span> <span class="o">.</span><span class="n">pong</span>
+    <span class="mi">12</span><span class="p">:</span>      <span class="mi">0024</span><span class="p">:</span> <span class="mi">4800</span> <span class="mi">03</span><span class="n">EE</span>  <span class="n">STO</span> <span class="o">.</span><span class="n">new_pong</span>
+    <span class="mi">13</span><span class="p">:</span>      <span class="mi">0026</span><span class="p">:</span> <span class="mi">8800</span> <span class="mi">03</span><span class="n">EC</span>  <span class="n">LDA</span> <span class="o">.</span><span class="n">pong</span>
+    <span class="mi">14</span><span class="p">:</span>      <span class="mi">0028</span><span class="p">:</span> <span class="mi">4800</span> <span class="mi">03</span><span class="n">EA</span>  <span class="n">STO</span> <span class="o">.</span><span class="n">ping</span>
+    <span class="mi">15</span><span class="p">:</span>      <span class="mi">002</span><span class="n">A</span><span class="p">:</span> <span class="mi">8800</span> <span class="mi">03</span><span class="n">EE</span>  <span class="n">LDA</span> <span class="o">.</span><span class="n">new_pong</span>
+    <span class="mi">16</span><span class="p">:</span>      <span class="mi">002</span><span class="n">C</span><span class="p">:</span> <span class="mi">4800</span> <span class="mi">03</span><span class="n">EC</span>  <span class="n">STO</span> <span class="o">.</span><span class="n">pong</span>
+    <span class="mi">17</span><span class="p">:</span>      <span class="mi">002</span><span class="n">E</span><span class="p">:</span> <span class="mi">8800</span> <span class="mi">03</span><span class="n">EA</span>  <span class="n">LDA</span> <span class="o">.</span><span class="n">ping</span>
+    <span class="mi">18</span><span class="p">:</span>      <span class="mi">0030</span><span class="p">:</span> <span class="n">D000</span> <span class="mi">0262</span>  <span class="n">NEQ</span> <span class="p">,</span><span class="mi">610</span>
+    <span class="mi">19</span><span class="p">:</span>      <span class="mi">0032</span><span class="p">:</span> <span class="mi">0181</span> <span class="mi">0020</span>  <span class="n">JBC</span> <span class="mh">0x01</span> <span class="n">CR</span> <span class="n">L1</span>
+<span class="c1"># -------------------------------------------------------------------------------------------</span>
+<span class="c1"># 0 Errors</span>
+<span class="c1"># 0 Warnings</span>
+<span class="c1"># -------------------------------------------------------------------------------------------</span>
+<span class="c1"># SymbolTable</span>
+<span class="c1"># --------------------------------: -------------------------------- : ----------------------</span>
+<span class="c1"># Symbol                          : Definition                       : Value Hex (Decimal)</span>
+<span class="c1"># --------------------------------: -------------------------------- : ----------------------</span>
+<span class="c1"># L1                              : 32                               : 0020 (32)</span>
+<span class="c1"># NEW_PONG                        : 0X3EE                            : 03EE (1006)</span>
+<span class="c1"># PING                            : 0X3EA                            : 03EA (1002)</span>
+<span class="c1"># PONG                            : 0X3EC                            : 03EC (1004)</span>
+<span class="c1"># _TMP                            : 0X3E8                            : 03E8 (1000)</span>
+<span class="c1"># --------------------------------: -------------------------------- : ----------------------</span>
+<span class="c1"># Run time = 0.004 s</span>
+<span class="c1"># -------------------------------------------------------------------------------------------</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">F100L</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="F100Project.html">The F100-L Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100CPU.html">The Ferranti F100-L Microprocessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Arch.html">F100-L Microprocessor Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100InstrSet.html">The F100-L Instruction Set</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The F100-L Assembler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Emu.html">The F100-L Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References and Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Appendices.html">Appendices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="F100InstrSet.html" title="previous chapter">The F100-L Instruction Set</a></li>
+      <li>Next: <a href="F100Emu.html" title="next chapter">The F100-L Emulator</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Revaldinho.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/doc/F100Asm.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

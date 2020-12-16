@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The F100-L Emulator &#8212; F100L 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="References and Bibliography" href="References.html" />
+    <link rel="prev" title="The F100-L Assembler" href="F100Asm.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="the-f100-l-emulator">
+<h1>The F100-L Emulator<a class="headerlink" href="#the-f100-l-emulator" title="Permalink to this headline">¶</a></h1>
+<p>The F100-L Emulator is written in Python and is still a work in progress. Currently
+it is able to run all internal instructions (the external functions for co-processor
+handling are not yet addressed) but testing has been minimal.</p>
+<div class="section" id="module-F100Emu">
+<span id="invoking-the-emulator"></span><h2>Invoking The Emulator<a class="headerlink" href="#module-F100Emu" title="Permalink to this headline">¶</a></h2>
+<p>USAGE:</p>
+<blockquote>
+<div><p>F100Emu is a very simple emulator for the Ferranti F100-L CPU.</p>
+</div></blockquote>
+<p>REQUIRED SWITCHES</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">f</span> <span class="o">--</span><span class="n">filename</span>  <span class="o">&lt;</span><span class="n">filename</span><span class="o">&gt;</span>      <span class="n">specify</span> <span class="n">the</span> <span class="n">assembled</span> <span class="nb">object</span> <span class="n">file</span>
+
+<span class="o">-</span><span class="n">g</span> <span class="o">--</span><span class="nb">format</span>    <span class="o">&lt;</span><span class="nb">bin</span><span class="o">|</span><span class="n">ihex</span><span class="o">|</span><span class="nb">hex</span><span class="o">&gt;</span>  <span class="nb">set</span> <span class="n">the</span> <span class="n">file</span> <span class="nb">format</span> <span class="k">for</span> <span class="n">the</span> <span class="n">assembled</span> <span class="n">code</span>
+</pre></div>
+</div>
+<p>OPTIONAL SWITCHES</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">a</span> <span class="o">--</span><span class="n">adsel</span>      <span class="o">&lt;</span><span class="mi">0</span><span class="o">|</span><span class="mi">1</span><span class="o">&gt;</span>          <span class="n">specify</span> <span class="n">the</span> <span class="n">state</span> <span class="n">of</span> <span class="n">the</span> <span class="n">AdSel</span> <span class="n">pin</span>
+                               <span class="o">-</span> <span class="n">defaults</span> <span class="n">to</span> <span class="mi">1</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">specified</span>
+
+<span class="o">-</span><span class="n">e</span> <span class="o">--</span><span class="n">endianness</span> <span class="o">&lt;</span><span class="n">little</span><span class="o">|</span><span class="n">big</span><span class="o">&gt;</span>   <span class="nb">set</span> <span class="n">endianness</span> <span class="n">of</span> <span class="n">byte</span> <span class="n">oriented</span> <span class="nb">input</span> <span class="n">file</span>
+                               <span class="o">-</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">little</span><span class="o">-</span><span class="n">endian</span>
+
+<span class="o">-</span><span class="n">n</span> <span class="o">--</span><span class="n">nolisting</span>                 <span class="n">suppress</span> <span class="n">the</span> <span class="n">listing</span> <span class="n">to</span> <span class="n">stdout</span> <span class="k">while</span> <span class="n">the</span>
+                               <span class="n">program</span> <span class="n">runs</span>
+
+<span class="o">-</span><span class="n">t</span> <span class="o">--</span><span class="n">traceon</span>                   <span class="nb">print</span> <span class="nb">all</span> <span class="n">memory</span> <span class="n">transactions</span> <span class="n">to</span> <span class="n">stdout</span>
+
+<span class="o">-</span><span class="n">m</span>  <span class="o">--</span><span class="n">memorydump</span> <span class="o">&lt;</span><span class="n">filename</span><span class="o">&gt;</span>    <span class="n">dump</span> <span class="n">memory</span> <span class="n">to</span> <span class="n">file</span> <span class="n">at</span> <span class="n">end</span> <span class="n">of</span> <span class="n">run</span><span class="o">.</span>
+
+                               <span class="n">Memory</span> <span class="n">dump</span> <span class="n">will</span> <span class="n">by</span> <span class="n">default</span> <span class="n">write</span> <span class="n">address</span> <span class="ow">and</span> <span class="n">data</span> <span class="k">for</span> <span class="nb">all</span>
+                               <span class="n">memory</span> <span class="n">locations</span> <span class="n">written</span> <span class="n">during</span> <span class="n">program</span> <span class="n">execution</span><span class="o">.</span> <span class="n">Use</span> <span class="n">the</span>
+                               <span class="o">-</span><span class="n">p</span><span class="o">/-</span><span class="n">q</span> <span class="n">switches</span> <span class="n">to</span> <span class="n">override</span> <span class="n">this</span> <span class="ow">and</span> <span class="n">instead</span> <span class="n">dump</span> <span class="n">a</span> <span class="n">fixed</span>
+                               <span class="n">block</span> <span class="k">if</span> <span class="n">required</span><span class="o">.</span>
+
+
+<span class="o">-</span><span class="n">p</span>  <span class="o">--</span><span class="n">memorystart</span> <span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span>        <span class="n">start</span> <span class="n">of</span> <span class="n">memory</span> <span class="n">dump</span> <span class="nb">range</span>
+
+<span class="o">-</span><span class="n">q</span>  <span class="o">--</span><span class="n">memoryend</span>   <span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span>        <span class="n">end</span> <span class="n">of</span> <span class="n">memory</span> <span class="n">dump</span> <span class="nb">range</span>
+
+<span class="o">-</span><span class="n">s</span>  <span class="o">--</span><span class="n">statistics</span>               <span class="nb">print</span> <span class="n">extended</span> <span class="n">statistics</span> <span class="n">summary</span> <span class="n">at</span> <span class="n">end</span> <span class="n">of</span> <span class="n">run</span>
+
+<span class="o">-</span><span class="n">h</span> <span class="o">--</span><span class="n">help</span>                      <span class="nb">print</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span>
+</pre></div>
+</div>
+<p>EXAMPLES</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span><span class="o">.</span><span class="mi">5</span> <span class="n">F100Emu</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">f</span> <span class="n">test</span><span class="o">.</span><span class="n">hex</span> <span class="o">-</span><span class="n">g</span> <span class="nb">hex</span>
+</pre></div>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span><span class="o">.</span><span class="mi">5</span> <span class="n">F100Emu</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">f</span> <span class="n">test2</span><span class="o">.</span><span class="n">hex</span> <span class="o">-</span><span class="n">g</span> <span class="nb">hex</span>
+
+  <span class="c1"># -------------------------------------------------------------------------------------------</span>
+  <span class="c1">#    _____________  ____        __       ______                __      __</span>
+  <span class="c1">#   / ____&lt;  / __ \/ __ \      / /      / ____/___ ___  __  __/ /___ _/ /_____  _____</span>
+  <span class="c1">#  / /_   / / / / / / / /_____/ /      / __/ / __ `__ \/ / / / / __ `/ __/ __ \/ ___/</span>
+  <span class="c1"># / __/  / / /_/ / /_/ /_____/ /___   / /___/ / / / / / /_/ / / /_/ / /_/ /_/ / /</span>
+  <span class="c1">#/_/    /_/\____/\____/     /_____/  /_____/_/ /_/ /_/\__,_/_/\__,_/\__/\____/_/</span>
+  <span class="c1">#</span>
+  <span class="c1">#</span>
+  <span class="c1"># F 1 0 0 - L * E M U L A T O R (c) 2016 Revaldinho &amp; BigEd</span>
+  <span class="c1"># -------------------------------------------------------------------------------------------</span>
+  <span class="c1">#                                   Condition Reg.</span>
+  <span class="c1"># PC   : Memory         : Acc. OR.  I Z V S C M F  : Instruction</span>
+  <span class="c1"># -------------------------------------------------------------------------------------------</span>
+    <span class="mi">0800</span> <span class="p">:</span> <span class="n">C000</span> <span class="mi">0000</span> <span class="n">D000</span> <span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">AND</span>
+    <span class="mi">0802</span> <span class="p">:</span> <span class="n">D000</span> <span class="mi">00</span><span class="n">FF</span> <span class="n">A000</span> <span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">NEQ</span>
+    <span class="mi">0804</span> <span class="p">:</span> <span class="n">A000</span> <span class="mi">0001</span> <span class="mi">9000</span> <span class="p">:</span> <span class="mi">00</span><span class="n">FF</span> <span class="mi">00</span><span class="n">FF</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">SUB</span>
+    <span class="mi">0806</span> <span class="p">:</span> <span class="mi">9000</span> <span class="mi">0001</span> <span class="mi">9000</span> <span class="p">:</span> <span class="n">FF02</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ADD</span>
+    <span class="mi">0808</span> <span class="p">:</span> <span class="mi">9000</span> <span class="mi">0001</span> <span class="mi">8000</span> <span class="p">:</span> <span class="n">FF03</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ADD</span>
+    <span class="mi">080</span><span class="n">A</span> <span class="p">:</span> <span class="mi">8000</span> <span class="n">FFFB</span> <span class="mi">4800</span> <span class="p">:</span> <span class="n">FF04</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">LDA</span>
+    <span class="mi">080</span><span class="n">C</span> <span class="p">:</span> <span class="mi">4800</span> <span class="mi">0010</span> <span class="mi">9000</span> <span class="p">:</span> <span class="n">FFFB</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">STO</span>
+    <span class="mi">080</span><span class="n">E</span> <span class="p">:</span> <span class="mi">9000</span> <span class="mi">0001</span> <span class="mi">7010</span> <span class="p">:</span> <span class="n">FFFB</span> <span class="mi">0010</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ADD</span>
+    <span class="mi">0810</span> <span class="p">:</span> <span class="mi">7010</span> <span class="mi">080</span><span class="n">E</span> <span class="mi">0523</span> <span class="p">:</span> <span class="n">FFFC</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ICZ</span>
+    <span class="mi">080</span><span class="n">E</span> <span class="p">:</span> <span class="mi">9000</span> <span class="mi">0001</span> <span class="mi">7010</span> <span class="p">:</span> <span class="n">FFFC</span> <span class="n">FFFB</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ADD</span>
+    <span class="mi">0810</span> <span class="p">:</span> <span class="mi">7010</span> <span class="mi">080</span><span class="n">E</span> <span class="mi">0523</span> <span class="p">:</span> <span class="n">FFFD</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ICZ</span>
+    <span class="mi">080</span><span class="n">E</span> <span class="p">:</span> <span class="mi">9000</span> <span class="mi">0001</span> <span class="mi">7010</span> <span class="p">:</span> <span class="n">FFFD</span> <span class="n">FFFC</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ADD</span>
+    <span class="mi">0810</span> <span class="p">:</span> <span class="mi">7010</span> <span class="mi">080</span><span class="n">E</span> <span class="mi">0523</span> <span class="p">:</span> <span class="n">FFFE</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ICZ</span>
+    <span class="mi">080</span><span class="n">E</span> <span class="p">:</span> <span class="mi">9000</span> <span class="mi">0001</span> <span class="mi">7010</span> <span class="p">:</span> <span class="n">FFFE</span> <span class="n">FFFD</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ADD</span>
+    <span class="mi">0810</span> <span class="p">:</span> <span class="mi">7010</span> <span class="mi">080</span><span class="n">E</span> <span class="mi">0523</span> <span class="p">:</span> <span class="n">FFFF</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ICZ</span>
+    <span class="mi">080</span><span class="n">E</span> <span class="p">:</span> <span class="mi">9000</span> <span class="mi">0001</span> <span class="mi">7010</span> <span class="p">:</span> <span class="n">FFFF</span> <span class="n">FFFE</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ADD</span>
+    <span class="mi">0810</span> <span class="p">:</span> <span class="mi">7010</span> <span class="mi">080</span><span class="n">E</span> <span class="mi">0523</span> <span class="p">:</span> <span class="mi">0000</span> <span class="mi">0001</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">ICZ</span>
+    <span class="mi">0812</span> <span class="p">:</span> <span class="mi">0523</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="p">:</span> <span class="mi">0000</span> <span class="n">FFFF</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span>  <span class="p">:</span> <span class="n">HALT</span>
+  <span class="n">CPU</span> <span class="n">Halted</span> <span class="k">with</span> <span class="n">halt</span> <span class="n">number</span> <span class="mh">0x0123</span>
+  <span class="c1"># -------------------------------------------------------------------------------------------</span>
+  <span class="c1"># Program execution Statistics</span>
+  <span class="c1"># -------------------------------------------------------------------------------------------</span>
+  <span class="c1">#          Instruction count:      17</span>
+  <span class="c1">#          Logic cycle count:       0</span>
+  <span class="c1">#      Total Memory accesses:      64</span>
+  <span class="c1">#               memory reads:      58</span>
+  <span class="c1">#              memory writes:       6</span>
+  <span class="c1"># -------------------------------------------------------------------------------------------</span>
+  <span class="c1"># Emulator Performance Statistics</span>
+  <span class="c1"># -------------------------------------------------------------------------------------------</span>
+  <span class="c1"># Run time                  :       0.00 s</span>
+  <span class="c1"># Instructions per second   :       0.01 MIPS</span>
+  <span class="c1"># -------------------------------------------------------------------------------------------</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">F100L</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="F100Project.html">The F100-L Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100CPU.html">The Ferranti F100-L Microprocessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Arch.html">F100-L Microprocessor Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100InstrSet.html">The F100-L Instruction Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Asm.html">The F100-L Assembler</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The F100-L Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References and Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Appendices.html">Appendices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="F100Asm.html" title="previous chapter">The F100-L Assembler</a></li>
+      <li>Next: <a href="References.html" title="next chapter">References and Bibliography</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Revaldinho.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/doc/F100Emu.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

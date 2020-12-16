@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>F100-L Microprocessor Architecture &#8212; F100L 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The F100-L Instruction Set" href="F100InstrSet.html" />
+    <link rel="prev" title="The Ferranti F100-L Microprocessor" href="F100CPU.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="f100-l-microprocessor-architecture">
+<h1>F100-L Microprocessor Architecture<a class="headerlink" href="#f100-l-microprocessor-architecture" title="Permalink to this headline">¶</a></h1>
+<p>The Ferranti F100-L is a single-address, single accumulator, 16-bit word length
+microprocessor with 2’s complement fixed-point arithmetic.</p>
+<p>The processor has 29 basic instructions, which can be subdivided into six
+main categories:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>arithmetic and logical,</p></li>
+<li><p>shifts,</p></li>
+<li><p>bit tests and jumps,</p></li>
+<li><p>link stack (for interrupt handling),</p></li>
+<li><p>double-length (32-bit) instructions, and</p></li>
+<li><p>external functions</p></li>
+</ul>
+</div></blockquote>
+<p>The last of these categories, external functions, is a notable feature. The F100-L
+brings out enough of the internal control bus to pins so that instructions which
+are not fully decoded inside the CPU can be passed out to a co-processor for
+further decoding and execution.</p>
+<p>The processor provides 4 main addressing modes for most instructions: direct, pointer
+indirect, immediate data and immediate indirect. Direct and pointer direct encode the
+operand in with the single 16 bit opcode for optimal efficiency. Additionally most
+instructions implementing pointer access are able to select pre-incrementing or
+post decrementing of the pointer in the same instruction.</p>
+<div class="section" id="cpu-architecture-diagram">
+<h2>CPU Architecture Diagram<a class="headerlink" href="#cpu-architecture-diagram" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-default" id="id1">
+<img alt="F100-L Block Diagram" src="../_images/F100L_CPU_Diagram.png" />
+<p class="caption"><span class="caption-text"><strong>F100-L Simplified CPU Block Diagram</strong></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="datapath-registers-and-function-unit">
+<h2>Datapath Registers and Function Unit<a class="headerlink" href="#datapath-registers-and-function-unit" title="Permalink to this headline">¶</a></h2>
+<p>The datapath side of the machine has only 3 registers</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the 16-bit accumulator (ACC)</p></li>
+<li><p>the 16-bit operand register (OR)</p></li>
+<li><p>the 7-bit condition register (CR)</p></li>
+</ul>
+</div></blockquote>
+<p>All arithmetic and logical operations are performed on one or more of these registers.
+Any instructions specifying a memory location as an operand will access that memory location
+and store the result in the operand register before processing. Once all operands are in place
+the function unit will perform the required operation and save the result either to the
+accumulator, or first to the OR and then to memory if a memory location is the final
+destination.</p>
+<p>Although the OR is usually a very transitory point, it is possible to access and set the
+contents of this register directly by using one of the double-word shift instructions.</p>
+<p>The function unit itself is a bit-serial unit. All operations are processed one bit at
+a time, and every instruction requires at least 18 logic cycles in addition to any memory
+accesses.</p>
+</div>
+<div class="section" id="control-unit">
+<h2>Control Unit<a class="headerlink" href="#control-unit" title="Permalink to this headline">¶</a></h2>
+<p>The Control Unit has two main registers</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the 15-bit Program Counter (PC)</p></li>
+<li><p>the 16-bit Instruction Register (IR)</p></li>
+</ul>
+</div></blockquote>
+<p>The PC holds the address of the next instruction, or operand to be fetched
+from memory. It has a built-in incrementing unit and can be loaded directly from the
+main system bus during jump and call instructions.</p>
+<p>The IR serves a dual purpose as it can hold either instructions or addresses. The IR
+is loaded with an instruction during the instruction fetch. If the IR is subsequently
+required to hold an address, then any instruction bits which need to be preserved
+are transferred into ‘Function Latches’ elsewhere in the control block.</p>
+<span class="target" id="module-ConditionReg"></span><div class="section" id="the-condition-register">
+<h3>The Condition Register<a class="headerlink" href="#the-condition-register" title="Permalink to this headline">¶</a></h3>
+<p>The Condition Register hold 7 flag bits.</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 4%" />
+<col style="width: 5%" />
+<col style="width: 11%" />
+<col style="width: 16%" />
+<col style="width: 63%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Bit</p></td>
+<td><p>Flag</p></td>
+<td><p>Reset State</p></td>
+<td><p>Name</p></td>
+<td><p>Function</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>I</p></td>
+<td><p>0</p></td>
+<td><p>Interrupt Disable</p></td>
+<td><p>disables interrupts when set</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>Z</p></td>
+<td><p>X</p></td>
+<td><p>Zero</p></td>
+<td><p>indicates zero results</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>V</p></td>
+<td><p>X</p></td>
+<td><p>Overflow</p></td>
+<td><p>indicates overflow in arithmetic and shift operations</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>N</p></td>
+<td><p>X</p></td>
+<td><p>Negative sign</p></td>
+<td><p>indicates sign of results</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>C</p></td>
+<td><p>X</p></td>
+<td><p>Carry</p></td>
+<td><p>carry bit, set at the end of arithmetic and shift operations</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>M</p></td>
+<td><p>0</p></td>
+<td><p>Multi-Length</p></td>
+<td><p>enables use of the carry bit as input to arithmetic and shift operations</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>F</p></td>
+<td><p>0</p></td>
+<td><p>Fail</p></td>
+<td><p>set if an external function , DMA or IO cycle does not complete
+within an externally defined time.</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The ‘M’ flag is cleared by a CPU reset, interrupt or execution of the CAL (Call subroutine) instruction.
+It can also be cleared or set explicitly by the user through one of the bit set or clear, rotate or shift instructions.</p>
+</div>
+</div>
+<div class="section" id="memory-space">
+<h2>Memory Space<a class="headerlink" href="#memory-space" title="Permalink to this headline">¶</a></h2>
+<p>The program counter and addressing logic are only 15 rather than 16-bits wide, so
+the maximum addressable memory size is 64 KBytes, arranged as 32K by 16-bit words.
+Limiting the addressable memory to 32K rather than 64K words seems like an odd
+choice in hindsight, since a full 16 bit implementation would have doubled the
+address space at almost no extra cost in internal logic. However, in 1975 memory
+was not plentiful and Ferranti was selling micro-computer systems with the F100-L
+a few years later starting with just 4KBytes of RAM. The successor chip, the F200-L,
+introduced in 1984 added the additional address bit and so is able to address 64Kwords
+even without the additional memory management unit (MMU) companion chip launched
+at the same time.</p>
+<p>In this address space, the lower portion of the address range is treated differently
+to the rest of the range.</p>
+<p>The first 256 words of memory can be used as pointers for Pointer Indirect Addressing modes,
+with pre-increment and post-decrementing available for the pointers themselves. Locations
+1-255 are available for user programs; location 0 is reserved
+for use as the processor’s link stack pointer since the CPU has no internal
+stack pointer state of its own. The various jump to and return from subroutines
+will always adjust the value of the stack pointer in location 0 appropriately.</p>
+<p>Additionally when using any kind of indirection, the instruction word is able
+to encode up to 11 bits of address in a single word opcode (Direct addressing). Therefore
+it is preferred to use memory locations up to 0x07FF as data or additional pointers.</p>
+<p>Memory above 0x0800 can be used for additional bulk data or program instruction code.</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 72%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Memory Area</p></td>
+<td><p>Primary Usage</p></td>
+</tr>
+<tr class="row-even"><td><p>0x0000</p></td>
+<td><p>Link Stack Pointer</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x0001 - 0x00FF</p></td>
+<td><p>Pointer area</p></td>
+</tr>
+<tr class="row-even"><td><p>0x0100 - 0x07FF</p></td>
+<td><p>Directly addressed Data or Program Area</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x0800 - 0x7FFF</p></td>
+<td><p>Data or Program Area</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p><em>Note: The user must always initialise the link stack pointer with an ODD value. The
+return from stack operations assume that the top of the stack is odd and
+access this location and the one immediately below by simply zeroing
+the LSB when popping off the condition register and return address contents.</em></p>
+</div>
+<div class="section" id="processor-start-up">
+<h2>Processor Start Up<a class="headerlink" href="#processor-start-up" title="Permalink to this headline">¶</a></h2>
+<p>When the processor is reset, program execution begins at one of two addresses
+selected by the state of the AdSel pin (both of which are above the Direct
+address mode area - see above).</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 63%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>AdSel Pin</p></td>
+<td><p>Program Counter Initial State</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>0x4000</p></td>
+</tr>
+<tr class="row-odd"><td><p>1 (or floating)</p></td>
+<td><p>0x0800</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="addressing-modes">
+<h2>Addressing Modes<a class="headerlink" href="#addressing-modes" title="Permalink to this headline">¶</a></h2>
+<p>The F100-L CPU supports 4 addressing modes and these are described below together
+with the assembler syntax.</p>
+<p><strong>Direct addressing</strong></p>
+<p>The address of the operand data is encoded in an 11 bit field in the opcode word. In the
+assembler this mode is denoted by providing just a bare operand. e.g.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AND</span> <span class="mh">0x444</span>  <span class="p">;</span>  <span class="n">A</span> <span class="o">&lt;-</span> <span class="n">A</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x444</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>If an operand is used which is larger than 11 bits, the assembler will emit a warning
+and instead assemble the instruction using the Immediate Indirect Addressing mode below.
+This will always achieve the correct behaviour, but the latter mode requires two instruction
+words where Direct Addressing, with a smaller operand, needs only one.</p>
+<p><strong>Immediate addressing</strong></p>
+<p>The 16 bit operand data is placed in the word immediately following the opcode. In the
+assembler this mode is denoted by a comma (,) immediately before the operand e.g.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AND</span> <span class="p">,</span><span class="mh">0x4444</span> <span class="p">;</span> <span class="n">A</span> <span class="o">&lt;-</span> <span class="n">A</span> <span class="o">&amp;</span> <span class="mh">0x4444</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Pointer Addressing</strong></p>
+<p>The address of the operand data is encoded in an 8 bit field in the opcode word.
+Optionally the value of this pointer can be pre-incremented or post-decremented.
+This mode is denoted in the assembler by a slash (/) immediately in front of the
+operand and optionally a plus (+) or minus (-) symbol following. e.g.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AND</span> <span class="o">/</span><span class="mh">0x44</span>  <span class="p">;</span>  <span class="n">A</span> <span class="o">&lt;-</span> <span class="n">A</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x44</span><span class="p">)</span>
+<span class="n">AND</span> <span class="o">/</span><span class="mh">0x44</span><span class="o">+</span> <span class="p">;</span>  <span class="p">(</span><span class="mh">0x44</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="mh">0x44</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">;</span> <span class="n">A</span> <span class="o">&lt;-</span> <span class="n">A</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x44</span><span class="p">)</span>
+<span class="n">AND</span> <span class="o">/</span><span class="mh">0x44</span><span class="o">-</span> <span class="p">;</span>  <span class="n">A</span> <span class="o">&lt;-</span> <span class="n">A</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x44</span><span class="p">)</span> <span class="p">;</span> <span class="p">(</span><span class="mh">0x44</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="mh">0x44</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Immediate Indirect Addressing - Double Word Operations</strong></p>
+<p>The 15 bit address of the operand data is placed in the word immediately following
+the opcode. This mode is denoted in the assembler by a dot (.) immediately in front
+of the operand, e.g.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AND</span> <span class="o">.</span><span class="mh">0x4444</span>  <span class="p">;</span>  <span class="n">A</span> <span class="o">&lt;-</span> <span class="n">A</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x4444</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Behaviour is slightly different for jump instructions where the provided operand
+will be used as the jump address, e.g.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">JMP</span> <span class="o">.</span><span class="mh">0x4444</span> <span class="p">;</span> <span class="n">PC</span> <span class="o">&lt;-</span> <span class="mh">0x4444</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Immediate Indirect Addressing - Three Word Operations</strong></p>
+<p>Bit Conditional jump operations can use another variation of this addressing mode,
+where a jump is conditional on the value of a bit in a memory location, so that
+two operand words are needed, one for the memory location to be inspected and a
+second for the jump destination. e.g.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">JBS</span>  <span class="mh">0x2</span> <span class="mh">0x4444</span> <span class="mh">0x5555</span> <span class="p">;</span> <span class="n">PC</span> <span class="o">&lt;-</span> <span class="mh">0x5555</span> <span class="k">if</span> <span class="p">(</span><span class="mh">0x4444</span><span class="p">)[</span><span class="mi">4</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">PC</span><span class="o">+</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">F100L</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="F100Project.html">The F100-L Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100CPU.html">The Ferranti F100-L Microprocessor</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">F100-L Microprocessor Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100InstrSet.html">The F100-L Instruction Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Asm.html">The F100-L Assembler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Emu.html">The F100-L Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References and Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Appendices.html">Appendices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="F100CPU.html" title="previous chapter">The Ferranti F100-L Microprocessor</a></li>
+      <li>Next: <a href="F100InstrSet.html" title="next chapter">The F100-L Instruction Set</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Revaldinho.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/doc/F100Arch.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

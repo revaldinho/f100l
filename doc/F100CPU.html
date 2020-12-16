@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Ferranti F100-L Microprocessor &#8212; F100L 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="F100-L Microprocessor Architecture" href="F100Arch.html" />
+    <link rel="prev" title="The F100-L Project" href="F100Project.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="the-ferranti-f100-l-microprocessor">
+<h1>The Ferranti F100-L Microprocessor<a class="headerlink" href="#the-ferranti-f100-l-microprocessor" title="Permalink to this headline">¶</a></h1>
+<p>The Ferranti F100-L was the first European designed and manufactured
+16-bit microprocessor[1].</p>
+<p>Launched in 1976, the F100-L was designed by Ferranti Computer Systems Ltd in
+their Bracknell, UK design centre. The chips were then fabricated in Ferranti
+Electronics Ltd’s Gem Mill works in Manchester.</p>
+<p>The F100-L project started in the early 1970s with the intention of creating
+complete microprocessor based solutions for military applications as well as serving
+the needs of various Ferranti divisons.[5] The military requirement included the ability to operate over
+a wide temperature range of -55C to +125C and to be resistant to the effects of
+radiation. The 16 bit word size was chosen as the system was seen to be a way of
+downsizing existing applications running using mini-computers and software.</p>
+<p>As well as being one of the first of the 16 bit processors the F100-L was
+unusual in that it was designed using a bipolar technology when other manufacturers had already turned to planar
+MOS processes to improve component densities. The choice of bipolar
+technology was driven by the radiation hardness requirement and
+eventually it was shown that the F100-L was almost totally latch-up
+resistant even after significant doses of radiation.[11] Ferranti were already technology leaders in the fabrication and application of
+bipolar design for both linear and logical applications through their
+Common Diffusion Isolation (CDI) process.</p>
+<div class="section" id="f100-l-family-support-chips">
+<h2>F100-L Family Support Chips<a class="headerlink" href="#f100-l-family-support-chips" title="Permalink to this headline">¶</a></h2>
+<p>Although the F100-L was a self-contained microprocessor, it was always intended
+to be part of a chip set. By the time the CPU was in production in 1977 two only
+two of these companion chips were available, the F111 and F112. Additional
+family members were added starting with the F113, F114 and ZN1001 in 1978.[16]</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 90%" />
+<col style="width: 5%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Part No</p></td>
+<td><p>Function</p></td>
+<td><p>Pkg</p></td>
+</tr>
+<tr class="row-even"><td><p>ZN1001</p></td>
+<td><p>Clock Generator a general purpose oscillator requiring a crystal to define the clock rate and an RC network to define pulse width.</p></td>
+<td><p>DIP16</p></td>
+</tr>
+<tr class="row-odd"><td><p>F101-L</p></td>
+<td><p>Single chip co-processor implementing 2’s complement multipy and divide functions, performing a 16 bit multiply in around 8uS and a
+division in around 10uS [5]</p></td>
+<td><p>DIP40</p></td>
+</tr>
+<tr class="row-even"><td><p>F111-L</p></td>
+<td><p>Control interface chip, usually sold together with the F112-L to handle all system interfacing including DMA channel control.</p></td>
+<td><p>DIP40</p></td>
+</tr>
+<tr class="row-odd"><td><p>F112-L</p></td>
+<td><p>Data interface chip used to connect any system device to the IO bus.</p></td>
+<td><p>DIP40</p></td>
+</tr>
+<tr class="row-even"><td><p>F113-L</p></td>
+<td><p>High speed memory interface providing all necessary control signals for ROM and RAM handling with no requirement for additional ‘glue’.
+The F113 provided the highest speed memory access for circuits implemented with TTL technologies and dissipated around 350mW[5].</p></td>
+<td><p>DIP24</p></td>
+</tr>
+<tr class="row-odd"><td><p>F114-L</p></td>
+<td><p>Medium speed, lower power memory interface with similar features to the F113-L above. This part was more suitable for battery operation
+with reduced performance but also a reduced power draw of just 25mW[5].</p></td>
+<td><p>DIP24</p></td>
+</tr>
+<tr class="row-even"><td><p>F115-L</p></td>
+<td><p>Real Time Interrupt handler, can be used with an external crystal to generate real time interrupt at one of 15 rates selectable by
+hardware or software control. An external device and also generate interrupts using the F115 logic.</p></td>
+<td><p>DIP24</p></td>
+</tr>
+<tr class="row-odd"><td><p>F117-L</p></td>
+<td><p>Two channel interrupt controller provides full vectored interrupt capability for two external devices connected to an F100-L system.</p></td>
+<td><p>DIP24</p></td>
+</tr>
+<tr class="row-even"><td><p>F118-L</p></td>
+<td><p>Serial Interface Master Chip - implements a serial bus in which up to 16 F119-L slaves can be connected to a single master. Up to  4
+F118-L ICs can be connected to an F100-L to create 4 separate serial busses.</p></td>
+<td><p>DIP40</p></td>
+</tr>
+<tr class="row-odd"><td><p>F119-L</p></td>
+<td><p>Serial Interface Slave Chip - provides an interface for one or two peripherals onto the F100-L serial bus.</p></td>
+<td><p>DIP28</p></td>
+</tr>
+</tbody>
+</table>
+<p>The chip sets were designed to allow F100-L systems to be constructed with a
+minimum of glue logic. Like the F100-L the rest of the chipset also needed
+to be radiation hard, and so was also built in CDI technology. Unlike the
+processor however, a good number of the the support chips
+were implemented as gate arrays. For example the F111, F112, F113 and F115 are
+all implemented on 2000 series ULAs.</p>
+<p>The most common combination of chips was also available as a multi-chip-module. This thick film module was sold
+as the FBH5092 and packaged up an F100-L, F101-L, clock generator and two F112-L data interfaces onto a leadless ceramic
+chip carrier which in turn was bonded to the lead frame of a ceramic 64 pin package.</p>
+</div>
+<div class="section" id="pricing-and-commercial-history">
+<h2>Pricing and Commercial History<a class="headerlink" href="#pricing-and-commercial-history" title="Permalink to this headline">¶</a></h2>
+<p>At the launch in 1976 the CPU alone was priced at 57UKP
+in quantities of 100 [1,3], and available in the following speed and operating condition ranges.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 43%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Operating Condition</p></td>
+<td><p>Operating Temperature Range</p></td>
+<td><p>Clock Frequency</p></td>
+</tr>
+<tr class="row-even"><td><p>Commercial</p></td>
+<td><p>0C - +70C</p></td>
+<td><p>8 MHz</p></td>
+</tr>
+<tr class="row-odd"><td><p>Industrial</p></td>
+<td><p>-25C - +80C</p></td>
+<td><p>6.5 MHz</p></td>
+</tr>
+<tr class="row-even"><td><p>Military</p></td>
+<td><p>-55C - +125C</p></td>
+<td><p>3MHz, 5MHz</p></td>
+</tr>
+</tbody>
+</table>
+<p>Later versions were able to run at up to 20MHz.</p>
+<p>By 1978 prices had reduced somewhat to 39UKP for the processor, with
+a support chip set of an F111-L and 2 F112-L’s available for an additional 18KUP.[4] The table below
+shows costs for a selection of microprocessors available in 1978[15]</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 18%" />
+<col style="width: 18%" />
+<col style="width: 17%" />
+<col style="width: 19%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td rowspan="2"><p>Manufacturer</p></td>
+<td rowspan="2"><p>Chip Number</p></td>
+<td rowspan="2"><p>Datapath/
+Address bus
+Width</p></td>
+<td colspan="2"><p>Cost (Qty of 100)</p></td>
+</tr>
+<tr class="row-even"><td><p>Mil  Spec</p></td>
+<td><p>Commercial</p></td>
+</tr>
+<tr class="row-odd"><td><p>Ferranti</p></td>
+<td><p>F100-L</p></td>
+<td><p>16/15</p></td>
+<td><p>$78</p></td>
+<td><p>$78</p></td>
+</tr>
+<tr class="row-even"><td><p>Texas Instruments</p></td>
+<td><p>SBP9900NJ</p></td>
+<td><p>16/15</p></td>
+<td><p>$425</p></td>
+<td><p>$71</p></td>
+</tr>
+<tr class="row-odd"><td><p>Intersil</p></td>
+<td><p>IMS6100</p></td>
+<td><p>12/12</p></td>
+<td><p>$53</p></td>
+<td><p>$15</p></td>
+</tr>
+<tr class="row-even"><td><p>Zilog</p></td>
+<td><p>Z80</p></td>
+<td><p>8/16</p></td>
+<td><p>$165</p></td>
+<td><p>$25</p></td>
+</tr>
+<tr class="row-odd"><td><p>Motorola</p></td>
+<td><p>MC6800</p></td>
+<td><p>8/16</p></td>
+<td><p>$76</p></td>
+<td><p>$18</p></td>
+</tr>
+<tr class="row-even"><td><p>MOS Technology</p></td>
+<td><p>MCS6502</p></td>
+<td><p>8/16</p></td>
+<td><p>N/A</p></td>
+<td><p>$11</p></td>
+</tr>
+<tr class="row-odd"><td><p>Intel</p></td>
+<td><p>MCS8080A</p></td>
+<td><p>8/16</p></td>
+<td><p>$32</p></td>
+<td><p>$13</p></td>
+</tr>
+<tr class="row-even"><td><p>Nat. Semiconductor</p></td>
+<td><p>SC/MP</p></td>
+<td><p>8/12</p></td>
+<td><p>N/A</p></td>
+<td><p>$9</p></td>
+</tr>
+<tr class="row-odd"><td><p>Advaned Micro. Devices</p></td>
+<td><p>Am2901A</p></td>
+<td><p>4/design.
+dependent</p></td>
+<td><p>$71</p></td>
+<td><p>$15</p></td>
+</tr>
+</tbody>
+</table>
+<p>The F100-L represented good value for a military spec part but was less competitive
+with parts from other manufacturers designed and packaged for less rigorous commercial requirements. This
+made the F100-L less attractive for use in the nascent personal computer market created
+by the 8 bit processors. Additionally many of these 8 bit processors actually provided 16 bit
+addressing and even some 16 bit (double word) data processing. The Zilog Z80 is a good example
+of this with a number of internal registers which can be paired to perform 16 bit operations.
+Continuing this comparison, by 1979 it was estimated that only 5000 F100-L parts had been
+manufactured in total[6]. Zilog on the other hand sold 100,000 Z80s into Tandy in
+1978 alone for inclusion in their Tandy TRS-80 computer[7].</p>
+<p>Although no other third party commercial computer offerings were based on this CPU, Ferranti
+didn’t miss out completely on the home and personal computer boom: their dominant position
+as a provider of semi-custom ICs using their ULA technology made them the first
+choice for many manufacturers in cost reducing their own designs. Ferranti
+ULAs powered many of the largest selling European machines, including most of
+those from Sinclair and Acorn.</p>
+<p>Ferranti made and sold their own computer system based around the F100-L. This went
+on sale in 1980 at a single unit cost of 5800UKP for a system with two floppy drives[13].
+The Science Museum has a <a class="reference external" href="http://ingenious.org.uk/See/Scienceandtechnology/Physicsoptics/?target=SeeLarge&amp;ObjectID=%7B170D0C25-A24B-658A-A0DD-7D6DCCAE1A20%7D&amp;source=Search&amp;SearchCategoryID=%7BC30DE785-2657-4A36-A5A6-000000042538%7D&amp;viewby=images">photograph</a> of this system being used in City University, London:</p>
+<p>Selling into its originally intended military markets the F100-L appears to have had some longevity and
+even spawned a successor in 1984 - the F200-L.[14,18] The F200-L was fully software compatible with the
+original F100-L, and supplied in the same 40 pin DIL package. The main logical changes in the F200 were the
+integration of the multiplier unit onto the die or at least into the same package, and an additional address
+bit to bring the directly addressable memory area up to 64K words. This address range could be expanded to 1M words
+when combined with the F220 Memory Management Unit IC introduced at the same time, via a paging scheme combining a
+fixed 32K word lower page and a swappable upper 32K. [19] The newer F200 and F220 were both available in commercial, industrial
+and military grades matching the original family members.</p>
+<p>Not long after the introduction of the F200 chips, Ferranti acquired the American technology company International
+Signal and Control in 1987. Unfortunately for Ferranti the state of ISC had been presented fraudulently and the
+completion of the deal caused Ferranti to collapse owing to the hidden debts of its new subsidiary. Ferranti was
+broken up and their chip business was sold to Plessey for £30M[2]. At that time both F200 and
+F100, as well as the ULA business, were listed as noteworthy assets. Plessey (later merged with GEC to form GPT)
+were still building some number of F200’s in 1992, and support chips including the F113 as late as 1995.</p>
+</div>
+<div class="section" id="applications">
+<h2>Applications<a class="headerlink" href="#applications" title="Permalink to this headline">¶</a></h2>
+<p>Although little information is publicly available on Ferranti turn-key systems for military applications, three stand out
+as having generated sufficient demand to keep the processor and support chips in production from the original 1976
+launch right up into the mid 1990s.</p>
+<ol class="arabic">
+<li><p>The BAe Sea Eagle Missile System [25]</p>
+<p>Sea Eagle was an air-launched anti-ship missile originally introduced in 1981 and used in the UK Armed Forces until the late 1990s, and still in use in the Indian Navy as late as 2009. [36]</p>
+<p>The F100-L provides the on-board digital flight computer controlling the flight path of the missile until the target is acquired by the radar homing head during the final sea skimming phase of an attack. An upgrade program was abandoned on cost grounds in the mid 1990s so it’s possible that the F100-L saw out the entire Sea Eagle lifespan.</p>
+</li>
+<li><p>The Ferranti Falcon Integrated Fire Control System (IFCS) for tanks and AFVs</p>
+<p>“The Ferranti Falcon Fire Control System is a digital system based on the F100-L Microprocessor providing a versatile and cost-effective means of enhancing the combat capability of gun-aimed fighting vehicles. Compact Dimensions, simplicity of operation and low cost enusre the Falcon application is not restricted to main battle tanks.”</p>
+<p>– Janes Weapon Systems, 1985/86 [26]</p>
+<p>The Ferranti Falcon system may originally have been developed for the MBT-80 tank, intended as a British Chieftain replacement, but the MBT-80 project itself was abandoned in 1980[32a]. Whatever its origins, the Ferranti Falcon system itself continued into production and was offered as an option for Chieftain 900 tanks [32b], and was used on the Brazilian MB-3 Tamoyo tanks [33].</p>
+<p>A gun control predictor for smaller calibre Naval cannon, possibly related to the Ferranti Falcon, was also offered and adopted at least by the Brazilian navy.</p>
+</li>
+<li><p>The Naval CACS-1, Computer Assisted Command System, and later CAAIS 450, Computer Aided Action Information System.</p>
+<p>Both of these systems used Ferranti F100-L powered terminals to support multi-processor Ferranti FM1600 and Argus M700 computer systems.</p>
+<p>“CAAIS 450 is a distributed processing system using the FM1600E computer and Coral 66 software language. It operates at 650 kips and has a memory of 1.2 million words. It is designed to fit a wide range of warships down to fast attack craft size and to interface with a fire-control system. The system also uses new consoles each with its own computer, core, Dragon display drive (using Ferranti F100L microprocessors) and input/output devices. There are two types of display system; two-operator and single-operator, and a typical configuration would be three two-man consoles. These may be supplemented by one two-man or two one-man consoles, the latter being either joined or autonomous.”</p>
+<p>– Janes Naval Systems, No. 25, [27]</p>
+<p>The CACS-1 system was widely adopted in Royal Navy vessels, including in Type 22 frigates. The CAAIS was also used by the Navy in Hunt Class minesweepers, but also offered for export and used in Brazilian Navy Inhaúma class ships. [27]</p>
+</li>
+</ol>
+<p>The F100-L was the also subject of a number of application studies and trials although
+it’s not clear how many of these resulted in sales of more than sample quantities.</p>
+<p>The highest profile application was the F100-L’s inclusion in the University of Surrey’s
+UoSAT program, where the F100-L was the heart of the secondary computer unit launched
+into space. [9,11]</p>
+<p>Other applications and research projects include</p>
+<ul class="simple">
+<li><p>Engine management control</p>
+<ul>
+<li><p>Ultra Electronic Controls Ltd. announced an engine management system in 1979[21], and later published technical papers [22,23]</p></li>
+<li><p>Dowty Group displayed an F100-L digital speed and temperature limiter at the Farnborough Airshow in 1978 [24]</p></li>
+<li><p>Proceedings of the ASME include another research paper on Helicopter Engine Management control [17]</p></li>
+</ul>
+</li>
+<li><p>A standard spacecraft compute module was offered by the British Aerospace  Space and Communications Division [28]</p></li>
+<li><p>several papers have been published on control of nuclear test equipment using the CAMAC protocol</p></li>
+<li><p>medical instrumentation and monitoring [29]</p></li>
+<li><p>application of micro processors in Air Traffic Control [30]</p></li>
+<li><p>an RAE study into airframe stress monitoring using F100-L micro processor for data acquisition and management in flight prior to download for later analysis [34]</p></li>
+</ul>
+</div>
+<div class="section" id="silicon-implementation">
+<h2>Silicon Implementation<a class="headerlink" href="#silicon-implementation" title="Permalink to this headline">¶</a></h2>
+<p>Although the F100-L uses the same CDI technology as the company’s ULA, the
+CPU itself is a full-custom design. The die is approximately square, 5.8mm per side giving an
+area of 33.64sqmm. The die contains around 7000 individual components. [10] The following figure
+(recreated from a new die photograph but using Grundy’s original labelling) shows
+the main areas of the chip as described in the Architecture section later.</p>
+<img alt="../_images/SiliconDiagram.png" src="../_images/SiliconDiagram.png" />
+</div>
+<div class="section" id="preservation">
+<h2>Preservation<a class="headerlink" href="#preservation" title="Permalink to this headline">¶</a></h2>
+<p>Since the F100-L didn’t make it into any notable micro- or mini- computer systems, there are
+no significant displays of the hardware in any science or technology museums.</p>
+<p>The Museum of Science and Industry (MOSI) in Manchester has a paperweight memento of a
+single packaged chip encased in perspex with the legend “F100-L the world’s most advanced
+16 bit microprocessor.” MOSI also holds the Ferranti Archive, including company documents, sales
+and marketing materials relating to the product line.</p>
+<p>The Centre for Computing History (CCH) in Cambridge has a couple of hardware artifacts but
+these are held in storage rather than on general display. Of the items they hold, the
+control handset from the F100-L microcomputer system is the most accessible. This unit
+has a complete instruction set summary table printed in the reverse and a transcript of
+that is included in the Appendices here.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="http://www.computinghistory.org.uk/det/16974/Box-704-Ferranti-Marconi/">http://www.computinghistory.org.uk/det/16974/Box-704-Ferranti-Marconi/</a></p></li>
+</ul>
+</div></blockquote>
+<p>As well as the the handset they also have a board, possibly from an Naval CACS or CAAIS F100-L
+computer system with F112-L and F101-L ICs.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="http://www.computinghistory.org.uk/det/23397/Box-812-Various/">http://www.computinghistory.org.uk/det/23397/Box-812-Various/</a></p></li>
+</ul>
+</div></blockquote>
+<img alt="../_images/F100Board.png" src="../_images/F100Board.png" />
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">F100L</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="F100Project.html">The F100-L Project</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Ferranti F100-L Microprocessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Arch.html">F100-L Microprocessor Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100InstrSet.html">The F100-L Instruction Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Asm.html">The F100-L Assembler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Emu.html">The F100-L Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References and Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Appendices.html">Appendices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="F100Project.html" title="previous chapter">The F100-L Project</a></li>
+      <li>Next: <a href="F100Arch.html" title="next chapter">F100-L Microprocessor Architecture</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Revaldinho.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/doc/F100CPU.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The F100-L Project &#8212; F100L 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Ferranti F100-L Microprocessor" href="F100CPU.html" />
+    <link rel="prev" title="Welcome to the F100-L Project" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="the-f100-l-project">
+<h1>The F100-L Project<a class="headerlink" href="#the-f100-l-project" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to the F100-L Project.</p>
+<p>The aim of this project is to preserve a little knowledge and understanding of an
+all but forgotten microprocessor, the Ferranti F100-L. This was a full 16 bit
+microprocessor implemented in bipolar technology and introduced in 1976. When
+it was announced it was indeed a technological marvel but it never achieved lasting
+fame since its use was confined almost exclusively to the military
+market in the UK. Even so, this processor and a successor F200-L remained in
+production right up until the early 1990s. That’s a pretty good innings for an
+little known CPU.</p>
+<p>The documentation here provides a brief introduction to the life and times of the CPU
+and collects pointers to a number of external resources. Unfortunately
+many of these are not freely available on the web; the best technical reference
+papers are all behind paywalls, and the Ferranti F100-L Hardware Manual seems to be
+physically available only in The British Library. So, a key aim of the F100-L
+project documentation is to provide sufficient technical information on the
+CPU architecture and the instruction set to at least allow the creation of a
+software emulation of the CPU.</p>
+<p>We have not been able to find any snippets of F100-L code on the web, but from
+the Hardware Manual and other references have created an assembler and a simple
+CPU emulator. Both of these are written in Python and share a lot of code in an
+object oriented style. Much of the technical documentation has been
+auto-generated from this code, using <a class="reference external" href="http://www.sphinx-doc.org/en/1.5">Sphinx</a> , but a negative consequence of this particular
+OO coding style is that the emulator is not spectacularly fast. That’s not important
+for this initial sketch though as it is really intended only to be correct
+and to act as a reference for a better implementation, possibly in C or JavaScript later.</p>
+<p>The project is a work in progress and likely to move very slowly as time allows. At the
+moment the emulator and assembler are both still being completed and tested. A disassembler
+will be added into the same Python code shortly and then the focus will be to add accurate instruction
+timings to the emulator so that we can begin to write short snippets of code and benchmark the
+processor again some of its contemporaries from the late 1970s.</p>
+<p>Eventually we would like to look at some of the following ideas:</p>
+<ul class="simple">
+<li><p>implementation of a better, more accessible emulator</p>
+<ul>
+<li><p>possibly in Javascript with a graphical front-panel</p></li>
+<li><p>possibly in C to be used with the <a class="reference external" href="https://github.com/hoglet67/PiTubeDirect">PiTubeDirect</a> project and a BBC Micro</p></li>
+</ul>
+</li>
+<li><p>implementation of a higher high level language to allow larger programs to be run</p>
+<ul>
+<li><p>possibly an extension of the <a class="reference external" href="https://github.com/revaldinho/c--">Cminusminus</a> teaching code</p></li>
+<li><p>possibly a 16bit BCPL OCODE/CINTCODE interpreter</p></li>
+</ul>
+</li>
+<li><p>re-implementation of the CPU in hardware in a CPLD or FPGA, mainly to evaluate the trade-offs of performance against the resource saving choice of a bit-serial datapath architecture</p></li>
+</ul>
+<p>More ambitiously, a full reverse engineering of the F100-L netlist or at least one or more
+of the associated chips is also a long-term possibility: something along the lines of the <a class="reference external" href="http://visual6502.org">Visual6502</a>
+project. For this part of the project, some high resolution die photography has already been done both of the CPU
+itself and some of the associated peripheral chips.</p>
+<blockquote>
+<div></div></blockquote>
+<p>And finally, the F100-L and family chips really should have a wikipedia article, shouldn’t they?</p>
+<p>Revaldinho. December 2016</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">F100L</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The F100-L Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100CPU.html">The Ferranti F100-L Microprocessor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Arch.html">F100-L Microprocessor Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100InstrSet.html">The F100-L Instruction Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Asm.html">The F100-L Assembler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="F100Emu.html">The F100-L Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References and Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Appendices.html">Appendices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to the F100-L Project</a></li>
+      <li>Next: <a href="F100CPU.html" title="next chapter">The Ferranti F100-L Microprocessor</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Revaldinho.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/doc/F100Project.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
