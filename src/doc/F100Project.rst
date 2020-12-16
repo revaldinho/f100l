@@ -56,6 +56,11 @@ of the associated chips is also a long-term possibility: something along the lin
 project. For this part of the project, some high resolution die photography has already been done both of the CPU
 itself and some of the associated peripheral chips. 
 
+ .. _Sphinx: http://www.sphinx-doc.org/en/1.5
+ .. _Visual6502: http://visual6502.org
+ .. _Cminusminus: https://github.com/revaldinho/c--
+ .. _PiTubeDirect: https://github.com/hoglet67/PiTubeDirect
+
 And finally, the F100-L and family chips really should have a wikipedia article, shouldn't they?
 
 Revaldinho. December 2016
